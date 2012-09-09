@@ -8615,6 +8615,99 @@ void ObjectMgr::LoadHotfixData()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u hotfix info entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+void ObjectMgr::LoadPhasingDefinitions()
+{
+    _PhasingDefinitionStore.clear();
+
+    uint32 oldMSTime = getMSTime();
+
+    //                                                 0       1       2         3        4
+    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phasemask, phaseId, flags FROM `phase_template` ORDER BY `entry` ASC");
+
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 phasing definitions. DB table `phasing_visibility` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field *fields = result->Fetch();
+
+        PhasingDefinition PhasingDefinition;
+
+        PhasingDefinition.zoneId                = fields[0].GetUInt32();
+        PhasingDefinition.entry                 = fields[1].GetUInt32();
+        PhasingDefinition.phasemask             = fields[2].GetUInt32();
+        PhasingDefinition.phaseId               = fields[3].GetUInt32();
+        PhasingDefinition.flags                 = fields[4].GetUInt32();
+
+        // Checks
+        if ((PhasingDefinition.flags & PHASING_FLAG_OVERWRITE_EXISTING) && (PhasingDefinition.flags & PHASING_FLAG_NEGATE_PHASE))
+        {
+            sLog->outError(LOG_FILTER_SQL, "Flags defined in phase in zoneId %d and entry %u does contain PHASING_FLAG_OVERWRITE_EXISTING and PHASING_FLAG_NEGATE_PHASE. Setting flags to PHASING_FLAG_OVERWRITE_EXISTING", PhasingDefinition.zoneId, PhasingDefinition.entry);
+            PhasingDefinition.flags &= ~PHASING_FLAG_NEGATE_PHASE;
+        }
+
+        _PhasingDefinitionStore[PhasingDefinition.zoneId].push_back(PhasingDefinition);
+
+        ++count;
+    }
+    while (result->NextRow());
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u phasing definitions in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadTerrainSwapDefinitions()
+{
+    _TerrainSwapDefinitionStore.clear();
+
+    uint32 oldMSTime = getMSTime();
+
+    //                                                    0         1         2
+    QueryResult result = WorldDatabase.Query("SELECT  `phaseId`, `zoneId`, `map` FROM `phase_terrainswap`");
+
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 terrain swap definitions. DB table `phase_terrainswap` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field *fields = result->Fetch();
+
+        TerrainSwapDefinition terrainSwap;
+
+        terrainSwap.phaseId = fields[0].GetUInt32();
+        terrainSwap.zoneId  = fields[1].GetUInt32();
+        terrainSwap.map     = fields[2].GetUInt32();
+
+        /*
+        // Checks
+        if (!sPhaseStore.LookupEntry(terrainSwap.phaseId))
+        {
+            sLog->outError(LOG_FILTER_SQL, "phaseId %u defined in phase_terrainswap does not exist in phase.dbc, skipped.");
+            continue;
+        }
+        */
+
+        _TerrainSwapDefinitionStore[MAKE_PAIR32(terrainSwap.phaseId, terrainSwap.zoneId)] = terrainSwap;
+
+        ++count;
+    }
+    while (result->NextRow());
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u terrain swap definitions in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+TerrainSwapDefinition const* ObjectMgr::GetTerrainSwap(uint32 phaseId, uint32 zoneId) const
+{
+    TerrainSwapDefinitionStore::const_iterator itr = _TerrainSwapDefinitionStore.find(MAKE_PAIR32(phaseId, zoneId));
+
+    return (itr != _TerrainSwapDefinitionStore.end()) ? &(itr->second) : NULL;
+}
+
 GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
 {
     GameObjectTemplateContainer::const_iterator itr = _gameObjectTemplateStore.find(entry);

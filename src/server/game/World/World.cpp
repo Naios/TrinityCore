@@ -1609,6 +1609,12 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading World States...");              // must be loaded before battleground, outdoor PvP and conditions
     LoadWorldStates();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Phase template...");
+    sObjectMgr->LoadPhasingDefinitions();
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Terrainswap Data...");
+    sObjectMgr->LoadTerrainSwapDefinitions();
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Conditions...");
     sConditionMgr->LoadConditions();
 
