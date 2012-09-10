@@ -64,6 +64,8 @@ struct TerrainSwapDefinition
     uint32 map;
 };
 
+typedef UNORDERED_MAP<uint32 /* MAKE_PAIR32(phaseId, zoneId) */, TerrainSwapDefinition> TerrainSwapDefinitionStore;
+
 // Flags from Phase.dbc
 enum PhaseFlag
 {
@@ -94,7 +96,17 @@ private:
     Player* player;
 };
 
-typedef UNORDERED_MAP<uint32 /* MAKE_PAIR32(phaseId, zoneId) */, TerrainSwapDefinition> TerrainSwapDefinitionStore;
+struct PhaseUpdateData
+{
+    void AddConditionType(ConditionTypes const conditionType) { _conditionTypeFlags |= (1 << conditionType); }
+    void AddQuestUpdate(uint32 const questId);
+
+    bool IsConditionRelated(Condition const* condition) const;
+
+private:
+    uint32 _conditionTypeFlags;
+    uint32 _questId;
+};
 
 class PhaseMgr
 {
@@ -102,16 +114,14 @@ public:
     PhaseMgr(Player* _player);
     ~PhaseMgr() {}
 
-    void SendPhaseDataToPlayer();
-
     uint32 GetCurrentPhasemask() { return phaseData.GetCurrentPhasemask(); };
     inline uint32 GetPhaseMaskForSpawn() { return phaseData.GetCurrentPhasemask(); }
 
-    // Notifier if condition for the player has changed
-    void NotifyQuestChanged(uint32 const questId);
-    void NotifyLevelChanged(uint32 const level);
-    void NotifyCoditionChanged() { Recalculate(); }
+    // Phase definitions update handling
+    void NotifyConditionChanged(PhaseUpdateData const updateData);
     void NotifyStoresReloaded() { Recalculate(); }
+
+    void SendPhaseDataToPlayer();
 
     // Aura phase effects
     void RegisterPhasingAuraEffect(AuraEffect const* auraEffect);
@@ -128,17 +138,13 @@ public:
     void SendDebugReportToPlayer(Player* const debugger);
 
 private:
-    void NotifyZoneChanged();
-
     void Recalculate();
 
     inline bool CheckDefinition(PhasingDefinition const* phasingDefinition);
 
     void AddPhasingDefinitionToPhase(uint32 &phase, PhasingDefinition const* phasingDefinition);
 
-    bool HasPhaseConditionType(ConditionTypes conditionType) const;
-
-    void FinishZoneOrAreaUpdate();
+    bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
 
     PhasingDefinitionStore const* _PhasingStore;
 

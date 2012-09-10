@@ -41,7 +41,13 @@ void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
     _UpdateFlags &= ~updateFlag;
 
     if (updateFlag == PHASE_UPDATE_FLAG_ZONE_UPDATE)
-        NotifyZoneChanged();
+    {
+        // Update zone changes
+        phaseData.Reset();
+
+        if (_PhasingStore->find(player->GetZoneId()) != _PhasingStore->end())
+            Recalculate();
+    }
 
     SendPhaseDataToPlayer();
 }
@@ -49,30 +55,9 @@ void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
 /////////////////////////////////////////////////////////////////
 // Notifier
 
-void PhaseMgr::NotifyZoneChanged()
+void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const updateData)
 {
-    uint32 const zoneId = player->GetZoneId();
-
-    phaseData.Reset();
-
-    if (_PhasingStore->find(player->GetZoneId()) != _PhasingStore->end())
-        Recalculate();
-
-    SendPhaseDataToPlayer();
-}
-
-void PhaseMgr::NotifyQuestChanged(uint32 const questId)
-{
-    if (HasPhaseConditionType(CONDITION_QUESTREWARDED) || HasPhaseConditionType(CONDITION_QUESTTAKEN) || HasPhaseConditionType(CONDITION_QUEST_COMPLETE))
-    {
-        Recalculate();
-        SendPhaseDataToPlayer();
-    }
-}
-
-void PhaseMgr::NotifyLevelChanged(uint32 const level)
-{
-    if (HasPhaseConditionType(CONDITION_LEVEL))
+    if (NeedsPhaseUpdateWithData(updateData))
     {
         Recalculate();
         SendPhaseDataToPlayer();
@@ -117,7 +102,7 @@ inline bool PhaseMgr::CheckDefinition(PhasingDefinition const* phasingDefinition
     return sConditionMgr->IsObjectMeetToConditions(player, sConditionMgr->GetConditionsForPhaseDefinition(phasingDefinition->zoneId, phasingDefinition->entry));
 }
 
-bool PhaseMgr::HasPhaseConditionType(ConditionTypes conditionType) const
+bool PhaseMgr::NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const
 {
     PhasingDefinitionStore::const_iterator itr = _PhasingStore->find(player->GetZoneId());
     if (itr != _PhasingStore->end())
@@ -126,7 +111,7 @@ bool PhaseMgr::HasPhaseConditionType(ConditionTypes conditionType) const
         {
             ConditionList conditionList = sConditionMgr->GetConditionsForPhaseDefinition(phase->zoneId, phase->entry);
             for (ConditionList::const_iterator condition = conditionList.begin(); condition != conditionList.end(); ++condition)
-                if ((*condition)->ConditionType == conditionType)
+                if (updateData.IsConditionRelated(*condition))
                     return true;
         }
     }
@@ -135,10 +120,15 @@ bool PhaseMgr::HasPhaseConditionType(ConditionTypes conditionType) const
 
 void PhaseMgr::AddPhasingDefinitionToPhase(uint32 &phaseMask, PhasingDefinition const* phasingDefinition)
 {
-    if (phasingDefinition->IsNegatingPhasemask())
-        phaseMask &= ~phasingDefinition->phasemask;
+    if (phasingDefinition->IsOverwritingExistingPhases())
+        phaseMask = phasingDefinition->phasemask;
     else
-        phaseMask |= phasingDefinition->phasemask;
+    {
+        if (phasingDefinition->IsNegatingPhasemask())
+            phaseMask &= ~phasingDefinition->phasemask;
+        else
+            phaseMask |= phasingDefinition->phasemask;
+    }
 
     if (phaseData.flag == PHASEFLAG_NORMAL_PHASE)
         phaseData.flag = PHASEFLAG_NO_TERRAINSWAP;
@@ -242,4 +232,31 @@ void PhaseData::SendDataToPlayer()
 
     if (player->IsVisible())
         player->UpdateObjectVisibility();
+}
+
+//////////////////////////////////////////////////////////////////
+// Phase Update Data
+
+void PhaseUpdateData::AddQuestUpdate(uint32 const questId)
+{
+    AddConditionType(CONDITION_QUESTREWARDED);
+    AddConditionType(CONDITION_QUESTTAKEN);
+    AddConditionType(CONDITION_QUEST_COMPLETE);
+    AddConditionType(CONDITION_QUEST_NONE);
+
+    _questId = questId;
+}
+
+bool PhaseUpdateData::IsConditionRelated(Condition const* condition) const
+{
+    switch (condition->ConditionType)
+    {
+    case CONDITION_QUESTREWARDED:
+    case CONDITION_QUESTTAKEN:
+    case CONDITION_QUEST_COMPLETE:
+    case CONDITION_QUEST_NONE:
+        return condition->ConditionValue1 == _questId && ((1 << condition->ConditionType) & _conditionTypeFlags);
+    default:
+        return (1 << condition->ConditionType) & _conditionTypeFlags;
+    }
 }
