@@ -137,6 +137,8 @@ public:
     // Debug
     void SendDebugReportToPlayer(Player* const debugger);
 
+    static bool IsConditionTypeSupported(ConditionTypes const conditionType);
+
 private:
     void Recalculate();
 

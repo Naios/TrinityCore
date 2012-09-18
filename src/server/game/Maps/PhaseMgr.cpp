@@ -260,3 +260,22 @@ bool PhaseUpdateData::IsConditionRelated(Condition const* condition) const
         return (1 << condition->ConditionType) & _conditionTypeFlags;
     }
 }
+
+bool PhaseMgr::IsConditionTypeSupported(ConditionTypes const conditionType)
+{
+    switch (conditionType)
+    {
+    case CONDITION_QUESTREWARDED:
+    case CONDITION_QUESTTAKEN:
+    case CONDITION_QUEST_COMPLETE:
+    case CONDITION_QUEST_NONE:
+    case CONDITION_TEAM:
+    case CONDITION_CLASS:
+    case CONDITION_RACE:
+    case CONDITION_INSTANCE_DATA:
+    case CONDITION_LEVEL:
+        return true;
+    default:
+        return false;
+    }
+}

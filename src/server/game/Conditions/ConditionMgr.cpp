@@ -1411,17 +1411,24 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                 return false;
             }
             break;
+        case CONDITION_SOURCE_TYPE_PHASE_TEMPLATE:
+            if (!PhaseMgr::IsConditionTypeSupported(cond->ConditionType))
+            {
+                sLog->outError(LOG_FILTER_SQL, "Condition source type `CONDITION_SOURCE_TYPE_PHASE_TEMPLATE` does not support condition type %u, ignoring.", cond->ConditionType);
+                return false;
+            }
+            break;
         case CONDITION_SOURCE_TYPE_GOSSIP_MENU:
         case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
         case CONDITION_SOURCE_TYPE_SMART_EVENT:
         case CONDITION_SOURCE_TYPE_NONE:
-        case CONDITION_SOURCE_TYPE_PHASE_TEMPLATE:
         default:
             break;
     }
 
     return true;
 }
+
 bool ConditionMgr::isConditionTypeValid(Condition* cond)
 {
     if (cond->ConditionType == CONDITION_NONE || cond->ConditionType >= CONDITION_MAX)
