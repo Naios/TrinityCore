@@ -1723,7 +1723,7 @@ void WorldSession::HandleQueryInspectAchievements(WorldPacket& recvData)
     if (!player)
         return;
 
-    player->GetAchievementMgr().SendAchievementInfo(_player);
+    player->SendRespondInspectAchievements(_player);
 }
 
 void WorldSession::HandleGuildAchievementProgressQuery(WorldPacket& recvData)
@@ -1805,7 +1805,7 @@ void WorldSession::HandleHearthAndResurrect(WorldPacket& /*recvData*/)
     if (_player->isInFlight())
         return;
 
-    if(Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetZoneId()))
+    if (/*Battlefield* bf = */sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetZoneId()))
     {
         // bf->PlayerAskToLeave(_player); FIXME
         return;

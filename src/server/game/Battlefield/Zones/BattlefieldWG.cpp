@@ -30,7 +30,7 @@ enum WGVehicles
     NPC_WG_SEIGE_ENGINE_ALLIANCE        = 28312,
     NPC_WG_SEIGE_ENGINE_HORDE           = 32627,
     NPC_WG_DEMOLISHER                   = 28094,
-    NPC_WG_CATAPULT                     = 27881,
+    NPC_WG_CATAPULT                     = 27881
 };
 
 BattlefieldWG::~BattlefieldWG()
@@ -459,7 +459,7 @@ void BattlefieldWG::DoCompleteOrIncrementAchievement(uint32 achievement, Player*
     {
         case ACHIEVEMENTS_WIN_WG_100:
         {
-            // player->GetAchievementMgr().UpdateAchievementCriteria();
+            // player->UpdateAchievementCriteria();
         }
         default:
         {

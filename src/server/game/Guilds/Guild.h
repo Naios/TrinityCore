@@ -39,6 +39,7 @@ enum GuildMisc
     GUILD_WITHDRAW_MONEY_UNLIMITED      = 0xFFFFFFFF,
     GUILD_WITHDRAW_SLOT_UNLIMITED       = 0xFFFFFFFF,
     GUILD_EVENT_LOG_GUID_UNDEFINED      = 0xFFFFFFFF,
+    GUILD_EXPERIENCE_UNCAPPED_LEVEL     = 20                    ///> Hardcoded in client, starting from this level, guild daily experience gain is unlimited.
 };
 
 enum GuildDefaultRanks
@@ -48,7 +49,7 @@ enum GuildDefaultRanks
     GR_OFFICER      = 1,
     GR_VETERAN      = 2,
     GR_MEMBER       = 3,
-    GR_INITIATE     = 4,
+    GR_INITIATE     = 4
     // When promoting member server does: rank--
     // When demoting member server does: rank++
 };
@@ -88,7 +89,7 @@ enum GuildCommandType
 
 enum GuildCommandError
 {
-    ERR_PLAYER_NO_MORE_IN_GUILD         = 0x00,
+    ERR_GUILD_COMMAND_SUCCESS           = 0x00,
     ERR_GUILD_INTERNAL                  = 0x01,
     ERR_ALREADY_IN_GUILD                = 0x02,
     ERR_ALREADY_IN_GUILD_S              = 0x03,
@@ -138,7 +139,7 @@ enum GuildEvents
     GE_RANK_CREATED                 = 12,
     GE_RANK_DELETED                 = 13,
     GE_RANK_ORDER_CHANGED           = 14,
-    GE_FOUNDER                      = 15, // At guild creation - Set founder
+    GE_FOUNDER                      = 15,
     GE_SIGNED_ON                    = 16,
     GE_SIGNED_OFF                   = 17,
     GE_GUILDBANKBAGSLOTS_CHANGED    = 18,
@@ -158,7 +159,7 @@ enum PetitionTurns
     PETITION_TURN_ALREADY_IN_GUILD      = 2,
     PETITION_TURN_NEED_MORE_SIGNATURES  = 4,
     PETITION_TURN_GUILD_PERMISSIONS     = 11,
-    PETITION_TURN_GUILD_NAME_INVALID    = 12,
+    PETITION_TURN_GUILD_NAME_INVALID    = 12
 };
 
 enum PetitionSigns
@@ -170,7 +171,7 @@ enum PetitionSigns
     PETITION_SIGN_NOT_SERVER            = 4,
     PETITION_SIGN_FULL                  = 5,
     PETITION_SIGN_ALREADY_SIGNED_OTHER  = 6,
-    PETITION_SIGN_RESTRICTED_ACCOUNT    = 7,
+    PETITION_SIGN_RESTRICTED_ACCOUNT    = 7
 };
 
 enum GuildBankRights
@@ -180,7 +181,7 @@ enum GuildBankRights
     GUILD_BANK_RIGHT_UPDATE_TEXT    = 0x04,
 
     GUILD_BANK_RIGHT_DEPOSIT_ITEM   = GUILD_BANK_RIGHT_VIEW_TAB | GUILD_BANK_RIGHT_PUT_ITEM,
-    GUILD_BANK_RIGHT_FULL           = 0xFF,
+    GUILD_BANK_RIGHT_FULL           = 0xFF
 };
 
 enum GuildBankEventLogTypes
@@ -194,7 +195,7 @@ enum GuildBankEventLogTypes
     GUILD_BANK_LOG_MOVE_ITEM2           = 7,
     GUILD_BANK_LOG_UNK1                 = 8,
     GUILD_BANK_LOG_BUY_SLOT             = 9,
-    GUILD_BANK_LOG_CASH_FLOW_DEPOSIT    = 10,
+    GUILD_BANK_LOG_CASH_FLOW_DEPOSIT    = 10
 };
 
 enum GuildEventLogTypes
@@ -204,7 +205,7 @@ enum GuildEventLogTypes
     GUILD_EVENT_LOG_PROMOTE_PLAYER    = 3,
     GUILD_EVENT_LOG_DEMOTE_PLAYER     = 4,
     GUILD_EVENT_LOG_UNINVITE_PLAYER   = 5,
-    GUILD_EVENT_LOG_LEAVE_GUILD       = 6,
+    GUILD_EVENT_LOG_LEAVE_GUILD       = 6
 };
 
 enum GuildEmblemError
@@ -259,9 +260,6 @@ uint32 const MinNewsItemLevel[MAX_CONTENT] = { 61, 90, 200, 353 };
 
 typedef std::map<uint32, GuildNewsEntry> GuildNewsLogMap;
 
-#define GUILD_EXPERIENCE_UNCAPPED_LEVEL 20  ///> Hardcoded in client, starting from this level, guild daily experience gain is unlimited.
-
-////////////////////////////////////////////////////////////////////////////////////////////
 // Emblem info
 class EmblemInfo
 {
@@ -270,7 +268,7 @@ public:
 
     void LoadFromDB(Field* fields);
     void SaveToDB(uint32 guildId) const;
-    void ReadPacket(WorldPacket& recv) { recv >> m_style >> m_color >> m_borderStyle >> m_borderColor >> m_backgroundColor; }
+    void ReadPacket(WorldPacket& recv);
     void WritePacket(WorldPacket& data) const;
 
     uint32 GetStyle() const { return m_style; }
@@ -623,6 +621,7 @@ private:
         Item* GetItem(bool isCloned = false) const { return isCloned ? m_pClonedItem : m_pItem; }
         uint8 GetContainer() const { return m_container; }
         uint8 GetSlotId() const { return m_slotId; }
+
     protected:
         virtual InventoryResult CanStore(Item* pItem, bool swap) = 0;
 
@@ -718,7 +717,7 @@ public:
     void HandleSetMemberRank(WorldSession* session, uint64 targetGuid, uint64 setterGuid, uint32 rank);
     void HandleAddNewRank(WorldSession* session, const std::string& name);
     void HandleRemoveRank(WorldSession* session, uint32 rankId);
-    void HandleMemberDepositMoney(WorldSession* session, uint32 amount);
+    void HandleMemberDepositMoney(WorldSession* session, uint32 amount, bool cashFlow = false);
     bool HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool repair = false);
     void HandleMemberLogout(WorldSession* session);
     void HandleDisband(WorldSession* session);

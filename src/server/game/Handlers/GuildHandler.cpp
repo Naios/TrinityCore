@@ -481,7 +481,7 @@ void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket & recvData)
     uint64 GoGuid;
     recvData >> GoGuid;
 
-    uint32 money;
+    uint64 money;
     recvData >> money;
 
     if (money)
@@ -787,7 +787,7 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
 {
     recvPacket.read_skip<uint32>(); // Unk
 
-    if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
+    if (sGuildMgr->GetGuildById(_player->GetGuildId()))
     {
         std::vector<GuildReward> const& rewards = sGuildMgr->GetGuildRewards();
 

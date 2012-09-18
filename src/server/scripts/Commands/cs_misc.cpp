@@ -953,13 +953,12 @@ public:
         if (!player_str)
             return false;
 
-        char* location_str = strtok(NULL, "");
-        if (!location_str)
-            location_str = "inn";
+        std::string location_str = "inn";
+        if (char const* loc = strtok(NULL, " "))
+            location_str = loc;
 
         Player* player = NULL;
-        std::string playerName;
-        if (!handler->extractPlayerTarget((char*)player_str, &player, NULL, &playerName))
+        if (!handler->extractPlayerTarget(player_str, &player))
             return false;
 
         if (player->isInFlight() || player->isInCombat())
@@ -969,19 +968,19 @@ public:
             return false;
         }
 
-        if (!stricmp(location_str, "inn"))
+        if (location_str == "inn")
         {
             player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
             return true;
         }
 
-        if (!stricmp(location_str, "graveyard"))
+        if (location_str == "graveyard")
         {
             player->RepopAtGraveyard();
             return true;
         }
 
-        if (!stricmp(location_str, "startzone"))
+        if (location_str == "startzone")
         {
             player->TeleportTo(player->GetStartPosition());
             return true;

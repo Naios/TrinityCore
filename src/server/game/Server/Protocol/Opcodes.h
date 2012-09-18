@@ -1166,6 +1166,7 @@ enum Opcodes
     SMSG_PLAY_DANCE                                   = 0x4704,
     SMSG_PLAY_MUSIC                                   = 0x4B06,
     SMSG_PLAY_OBJECT_SOUND                            = 0x2635,
+    SMSG_PLAY_ONE_SHOT_ANIM_KIT                       = 0x4A35,
     SMSG_PLAY_SOUND                                   = 0x2134,
     SMSG_PLAY_SPELL_VISUAL                            = 0x10B1,
     SMSG_PLAY_SPELL_VISUAL_KIT                        = 0x55A5,
@@ -1243,12 +1244,15 @@ enum Opcodes
     SMSG_SERVER_MESSAGE                               = 0x6C04,
     SMSG_SERVER_PERF                                  = 0x74B6,
     SMSG_SETUP_RESEARCH_HISTORY                       = 0x0000,
+    SMSG_SET_AI_ANIM_KIT                              = 0x0000,
     SMSG_SET_DF_FAST_LAUNCH_RESULT                    = 0x35B6,
     SMSG_SET_FACTION_ATWAR                            = 0x4216,
     SMSG_SET_FACTION_STANDING                         = 0x0126,
     SMSG_SET_FACTION_VISIBLE                          = 0x2525,
     SMSG_SET_FLAT_SPELL_MODIFIER                      = 0x2834,
     SMSG_SET_FORCED_REACTIONS                         = 0x4615,
+    SMSG_SET_MELEE_ANIM_KIT                           = 0x0000,
+    SMSG_SET_MOVEMENT_ANIM_KIT                        = 0x0000,
     SMSG_SET_PCT_SPELL_MODIFIER                       = 0x0224,
     SMSG_SET_PHASE_SHIFT                              = 0x70A0,
     SMSG_SET_PLAYER_DECLINED_NAMES_RESULT             = 0x2B25,
@@ -1401,7 +1405,7 @@ enum SessionStatus
     STATUS_TRANSFER,                                        // Player transferring to another map (_player != NULL, m_GUID == _player->GetGUID(), !inWorld())
     STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT,                    // _player != NULL or _player == NULL && m_playerRecentlyLogout && m_playerLogout, m_GUID store last _player guid)
     STATUS_NEVER,                                           // Opcode not accepted from client (deprecated or server side only)
-    STATUS_UNHANDLED,                                       // Opcode not handled yet
+    STATUS_UNHANDLED                                        // Opcode not handled yet
 };
 
 enum PacketProcessing
@@ -1420,15 +1424,48 @@ struct OpcodeHandler
 {
     OpcodeHandler() {}
     OpcodeHandler(char const* _name, SessionStatus _status, PacketProcessing _processing, pOpcodeHandler _handler)
-        : name(_name), status(_status), packetProcessing(_processing), handler(_handler) {}
+        : Name(_name), Status(_status), ProcessingPlace(_processing), Handler(_handler) {}
 
-    char const* name;
-    SessionStatus status;
-    PacketProcessing packetProcessing;
-    pOpcodeHandler handler;
+    char const* Name;
+    SessionStatus Status;
+    PacketProcessing ProcessingPlace;
+    pOpcodeHandler Handler;
 };
 
-extern OpcodeHandler* opcodeTable[NUM_OPCODE_HANDLERS];
+class OpcodeTable
+{
+    public:
+        OpcodeTable()
+        {
+            memset(_internalTable, 0, sizeof(_internalTable));
+        }
+
+        ~OpcodeTable()
+        {
+            for (uint16 i = 0; i < NUM_OPCODE_HANDLERS; ++i)
+                delete _internalTable[i];
+        }
+
+        void Initialize();
+
+        OpcodeHandler const* operator[](uint32 index) const
+        {
+            return _internalTable[index];
+        }
+
+    private:
+        template<bool isInValidRange, bool isNonZero>
+        void ValidateAndSetOpcode(uint16 opcode, char const* name, SessionStatus status, PacketProcessing processing, pOpcodeHandler handler);
+
+        // Prevent copying this structure
+        OpcodeTable(OpcodeTable const&);
+        OpcodeTable& operator=(OpcodeTable const&);
+
+        OpcodeHandler* _internalTable[NUM_OPCODE_HANDLERS];
+};
+
+extern OpcodeTable opcodeTable;
+
 void InitOpcodes();
 
 /// Lookup opcode name for human understandable logging
@@ -1440,9 +1477,9 @@ inline std::string GetOpcodeNameForLogging(Opcodes id)
 
     if (id < UNKNOWN_OPCODE)
     {
-        if (OpcodeHandler* handler = opcodeTable[uint32(id) & 0x7FFF])
+        if (OpcodeHandler const* handler = opcodeTable[uint32(id) & 0x7FFF])
         {
-            ss << handler->name;
+            ss << handler->Name;
             if (opcode & COMPRESSED_OPCODE_MASK)
                 ss << "_COMPRESSED";
         }

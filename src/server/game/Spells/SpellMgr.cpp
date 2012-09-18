@@ -2623,6 +2623,19 @@ void SpellMgr::LoadSpellAreas()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spell area requirements in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// Temporary structure to hold spell effect entries for faster loading
+struct SpellEffectArray
+{
+    SpellEffectArray()
+    {
+        effects[0] = NULL;
+        effects[1] = NULL;
+        effects[2] = NULL;
+    }
+
+    SpellEffectEntry const* effects[MAX_SPELL_EFFECTS];
+};
+
 void SpellMgr::LoadSpellInfoStore()
 {
     uint32 oldMSTime = getMSTime();
@@ -2630,11 +2643,20 @@ void SpellMgr::LoadSpellInfoStore()
     UnloadSpellInfoStore();
     mSpellInfoMap.resize(sSpellStore.GetNumRows(), NULL);
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+    std::map<uint32, SpellEffectArray> effectsBySpell;
+
+    for (uint32 i = 0; i < sSpellEffectStore.GetNumRows(); ++i)
     {
-        if (SpellEntry const* spellEntry = sSpellStore.LookupEntry(i))
-            mSpellInfoMap[i] = new SpellInfo(spellEntry);
+        SpellEffectEntry const* effect = sSpellEffectStore.LookupEntry(i);
+        if (!effect)
+            continue;
+
+        effectsBySpell[effect->EffectSpellId].effects[effect->EffectIndex] = effect;
     }
+
+    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+        if (SpellEntry const* spellEntry = sSpellStore.LookupEntry(i))
+            mSpellInfoMap[i] = new SpellInfo(spellEntry, effectsBySpell[i].effects);
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded spell info store in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
@@ -3427,6 +3449,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 71159: // Awaken Plagued Zombies
                 spellInfo->DurationIndex = 21;
+                break;
+            case 70530: // Volatile Ooze Beam Protection (Professor Putricide)
+                spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA; // for an unknown reason this was SPELL_EFFECT_APPLY_AREA_AURA_RAID
                 break;
             // THIS IS HERE BECAUSE COOLDOWN ON CREATURE PROCS IS NOT IMPLEMENTED
             case 71604: // Mutated Strength (Professor Putricide)

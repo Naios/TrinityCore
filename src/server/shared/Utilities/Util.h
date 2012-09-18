@@ -48,12 +48,6 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText = false, bool hou
 uint32 TimeStringToSecs(const std::string& timestring);
 std::string TimeToTimestampStr(time_t t);
 
-inline uint32 secsToTimeBitFields(time_t secs)
-{
-    tm* lt = localtime(&secs);
-    return uint32((lt->tm_year - 100) << 24 | lt->tm_mon  << 20 | (lt->tm_mday - 1) << 14 | lt->tm_wday << 11 | lt->tm_hour << 6 | lt->tm_min);
-}
-
 /* Return a random number in the range min..max; (max-min) must be smaller than 32768. */
  int32 irand(int32 min, int32 max);
 
@@ -459,7 +453,7 @@ public:
                 return 0;
         }
         return 0;
-    };
+    }
 
     template<class type>
     inline bool operator < (type & right) const
@@ -472,7 +466,7 @@ public:
                 return 0;
         }
         return 0;
-    };
+    }
 
     template<class type>
     inline bool operator != (type & right)
@@ -492,7 +486,7 @@ public:
             || part[2]!=right.part[2])
                 return true;
         return false;
-    };
+    }
 
     template<class type>
     inline bool operator == (type & right)
@@ -502,7 +496,7 @@ public:
             || part[2]!=right.part[2])
                 return false;
         return true;
-    };
+    }
 
     template<class type>
     inline bool operator == (type & right) const
@@ -512,7 +506,7 @@ public:
             || part[2]!=right.part[2])
                 return false;
         return true;
-    };
+    }
 
     template<class type>
     inline void operator = (type & right)
@@ -520,7 +514,7 @@ public:
         part[0]=right.part[0];
         part[1]=right.part[1];
         part[2]=right.part[2];
-    };
+    }
 
     template<class type>
     inline flag96 operator & (type & right)
@@ -528,20 +522,21 @@ public:
         flag96 ret(part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]);
         return
             ret;
-    };
+    }
+
     template<class type>
     inline flag96 operator & (type & right) const
     {
         flag96 ret(part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]);
         return
             ret;
-    };
+    }
 
     template<class type>
     inline void operator &= (type & right)
     {
         *this=*this & right;
-    };
+    }
 
     template<class type>
     inline flag96 operator | (type & right)
@@ -549,7 +544,7 @@ public:
         flag96 ret(part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]);
         return
             ret;
-    };
+    }
 
     template<class type>
     inline flag96 operator | (type & right) const
@@ -557,13 +552,13 @@ public:
         flag96 ret(part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]);
         return
             ret;
-    };
+    }
 
     template<class type>
     inline void operator |= (type & right)
     {
         *this=*this | right;
-    };
+    }
 
     inline void operator ~ ()
     {
@@ -578,7 +573,7 @@ public:
         flag96 ret(part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]);
         return
             ret;
-    };
+    }
 
     template<class type>
     inline flag96 operator ^ (type & right) const
@@ -586,13 +581,13 @@ public:
         flag96 ret(part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]);
         return
             ret;
-    };
+    }
 
     template<class type>
     inline void operator ^= (type & right)
     {
         *this=*this^right;
-    };
+    }
 
     inline operator bool() const
     {
