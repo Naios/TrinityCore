@@ -87,13 +87,6 @@ void PhaseMgr::Recalculate()
                     break;
             }
         }
-
-        if (phaseId)
-        {
-            TerrainSwapDefinition const* terrainSwap = sObjectMgr->GetTerrainSwap(phaseId, player->GetZoneId());
-            if (terrainSwap)
-                phaseData.UseTerrainSwap(terrainSwap);
-        }
     }
 }
 
@@ -197,17 +190,6 @@ void PhaseMgr::SetCustomPhase(uint32 const phaseMask)
 
 //////////////////////////////////////////////////////////////////
 // Phase Data
-
-void PhaseData::UseTerrainSwap(TerrainSwapDefinition const* _terrainswap)
-{
-    terrainswap = _terrainswap->map;
-    phaseid     = _terrainswap->phaseId;
-
-    /*
-    PhaseEntry const* entry = sPhaseStore.LookupEntry(phaseid);
-    flag = entry->flag;
-    */
-}
 
 uint32 PhaseData::GetCurrentPhasemask() const
 {

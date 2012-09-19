@@ -46,6 +46,7 @@ struct PhasingDefinition
     uint32 entry;
     uint32 phasemask;
     uint32 phaseId;
+    uint32 terrainswapmap;
     uint8 flags;
 
     bool IsOverwritingExistingPhases() const { return flags & PHASING_FLAG_OVERWRITE_EXISTING; }
@@ -55,16 +56,6 @@ struct PhasingDefinition
 
 typedef std::vector<PhasingDefinition> PhasingDefinitionContainer;
 typedef UNORDERED_MAP<uint32 /*zoneId*/, PhasingDefinitionContainer> PhasingDefinitionStore;
-
-// Terrainswap
-struct TerrainSwapDefinition
-{
-    uint32 phaseId;
-    uint32 zoneId;
-    uint32 map;
-};
-
-typedef UNORDERED_MAP<uint32 /* MAKE_PAIR32(phaseId, zoneId) */, TerrainSwapDefinition> TerrainSwapDefinitionStore;
 
 // Flags from Phase.dbc
 enum PhaseFlag
@@ -87,7 +78,6 @@ struct PhaseData
     inline uint32 GetPhaseMaskForSpawn() const;
 
     void Reset() { _PhasemaskThroughDefinitions = 0; terrainswap = 0; phaseid = 0; flag = PHASEFLAG_NORMAL_PHASE; }
-    void UseTerrainSwap(TerrainSwapDefinition const* _terrainswap);
     void SendDataToPlayer();
 
 private:

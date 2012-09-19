@@ -907,10 +907,8 @@ class ObjectMgr
         void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
 
         void LoadPhasingDefinitions();
-        void LoadTerrainSwapDefinitions();
 
         PhasingDefinitionStore const* GetPhasingDefinitionStore() { return &_PhasingDefinitionStore; }
-        TerrainSwapDefinition const* GetTerrainSwap(uint32 phaseId, uint32 zoneId) const;
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint8 level);
@@ -1227,7 +1225,6 @@ class ObjectMgr
         InstanceTemplateContainer _instanceTemplateStore;
 
         PhasingDefinitionStore _PhasingDefinitionStore;
-        TerrainSwapDefinitionStore _TerrainSwapDefinitionStore;
 
     private:
         void LoadScripts(ScriptsType type);
