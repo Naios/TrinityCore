@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `phase_template`;
-CREATE TABLE `phase_template` (
+DROP TABLE IF EXISTS `phase_definitions`;
+CREATE TABLE `phase_definitions` (
   `zoneId` mediumint(7) unsigned NOT NULL DEFAULT '0',
   `entry` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `phasemask` bigint(20) unsigned NOT NULL DEFAULT '1',
@@ -7,13 +7,13 @@ CREATE TABLE `phase_template` (
   `terrainswapmap` smallint(5) unsigned NOT NULL DEFAULT '0',
   `flags` tinyint(3) unsigned DEFAULT '0',
   `comment` text,
-  PRIMARY KEY (`entry`,`zoneId`)
+  PRIMARY KEY (`zoneId`, `entry`)
 )
 AUTO_INCREMENT=1
 ENGINE=MyISAM
 COLLATE='utf8_general_ci';
 
-INSERT INTO `phase_template` (`zoneId`, `entry`, `phasemask`, `phaseId`, `terrainswapmap`, `flags`, `comment`) VALUES
+INSERT INTO `phase_definitions` (`zoneId`, `entry`, `phasemask`, `phaseId`, `terrainswapmap`, `flags`, `comment`) VALUES
 (1519, 1, 129,  0,   0,   0, 'Stormwind: [A] Heros Call: Vashj''ir'),
 (1519, 2, 257,  0,   0,   0, 'Stormwind: [A] Heros Call: Hyjal'),
 (1519, 3, 513,  0,   0,   0, 'Stormwind: [A] Heros Call: Deepholm'),
@@ -26,6 +26,17 @@ INSERT INTO `phase_template` (`zoneId`, `entry`, `phasemask`, `phaseId`, `terrai
 (1637, 5, 2049, 0,   0,   0, 'Orgrimmar: [H] Warchiefs Command: Twilight Highlands'),
 (4755, 1, 0,    102, 638, 0, 'Gilneas: Default Terrainswap'),
 ( 616, 1, 0,    165, 719, 0, 'Mount Hyjal: Default Terrainswap');
+
+DROP TABLE IF EXISTS `spell_phase_info`;
+CREATE TABLE `spell_phase_info` (
+  `spellId` mediumint(7) unsigned NOT NULL DEFAULT '0',
+  `phasemask` bigint(20) unsigned NOT NULL DEFAULT '1',
+  `terrainswapmap` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`spellId`)
+)
+AUTO_INCREMENT=1
+ENGINE=MyISAM
+COLLATE='utf8_general_ci';
 
 DELETE FROM `trinity_string` WHERE `entry` BETWEEN 176 AND 182;
 INSERT INTO `trinity_string` (`entry`, `content_default`) VALUES

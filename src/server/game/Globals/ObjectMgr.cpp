@@ -8625,11 +8625,11 @@ void ObjectMgr::LoadPhasingDefinitions()
     uint32 oldMSTime = getMSTime();
 
     //                                                 0       1       2         3            4           5
-    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phasemask, phaseId, terrainswapmap, flags FROM `phase_template` ORDER BY `entry` ASC");
+    QueryResult result = WorldDatabase.Query("SELECT zoneId, entry, phasemask, phaseId, terrainswapmap, flags FROM `phase_definitions` ORDER BY `entry` ASC");
 
     if (!result)
     {
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 phasing definitions. DB table `phasing_visibility` is empty.");
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 phasing definitions. DB table `phase_definitions` is empty.");
         return;
     }
 
@@ -8660,6 +8660,40 @@ void ObjectMgr::LoadPhasingDefinitions()
     }
     while (result->NextRow());
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u phasing definitions in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadSpellPhaseInfo()
+{
+    _SpellPhaseInfoStore.clear();
+
+    uint32 oldMSTime = getMSTime();
+
+    //                                                  0         1             2
+    QueryResult result = WorldDatabase.Query("SELECT spellId, phasemask, terrainswapmap FROM `spell_phase_info`");
+
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell phase infos. DB table `spell_phase_info` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field *fields = result->Fetch();
+
+        SpellPhaseInfo spellPhaseInfo;
+
+        spellPhaseInfo.spellId                = fields[0].GetUInt32();
+        spellPhaseInfo.phasemask              = fields[1].GetUInt32();
+        spellPhaseInfo.terrainswapmap         = fields[2].GetUInt32();
+
+        _SpellPhaseInfoStore[spellPhaseInfo.spellId] = spellPhaseInfo;
+
+        ++count;
+    }
+    while (result->NextRow());
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spell phase infos in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)

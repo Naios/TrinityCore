@@ -63,13 +63,28 @@ struct PhasingDefinition
 typedef std::vector<PhasingDefinition> PhasingDefinitionContainer;
 typedef UNORDERED_MAP<uint32 /*zoneId*/, PhasingDefinitionContainer> PhasingDefinitionStore;
 
-// Flags from Phase.dbc
-enum PhaseFlag
+struct SpellPhaseInfo
 {
-    PHASEFLAG_NO_TERRAINSWAP           = 0x0,
-    PHASEFLAG_TERRAINSWAP              = 0x4,
-    PHASEFLAG_NORMAL_PHASE             = 0x8
+    uint32 spellId;
+    uint32 phasemask;
+    uint32 terrainswapmap;
 };
+
+typedef UNORDERED_MAP<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseInfoStore;
+
+struct PhaseInfo
+{
+    PhaseInfo() : phasemask(0), terrainswapmap(0), phaseId(0) {}
+
+    uint32 phasemask;
+    uint32 terrainswapmap;
+    uint32 phaseId;
+
+    bool NeedsServerSideUpdate() const { return phasemask; }
+    bool NeedsClientSideUpdate() const { return terrainswapmap || phaseId; }
+};
+
+typedef UNORDERED_MAP<uint32 /*spellId*/, PhaseInfo> PhaseInfoContainer;
 
 struct PhaseData
 {
@@ -84,8 +99,10 @@ struct PhaseData
 
     void ResetDefinitions() { _PhasemaskThroughDefinitions = 0; activePhaseDefinitions.clear(); }
     void AddPhaseDefinition(PhasingDefinition const* phasingDefinition);
-
     bool HasActiveDefinitions() const { return !activePhaseDefinitions.empty(); }
+
+    void AddAuraInfo(uint32 const spellId, PhaseInfo phaseInfo);
+    uint32 RemoveAuraInfo(uint32 const spellId);
 
     void SendPhaseMaskToPlayer();
     void SendPhaseshiftToPlayer();
@@ -93,6 +110,7 @@ struct PhaseData
 private:
     Player* player;
     std::vector<PhasingDefinition const*> activePhaseDefinitions;
+    PhaseInfoContainer spellPhaseInfo;
 };
 
 struct PhaseUpdateData
@@ -146,6 +164,7 @@ private:
     bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
 
     PhasingDefinitionStore const* _PhasingStore;
+    SpellPhaseInfoStore const* _SpellPhaseInfoStore;
 
     Player* player;
     PhaseData phaseData;

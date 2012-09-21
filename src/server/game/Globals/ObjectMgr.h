@@ -907,8 +907,10 @@ class ObjectMgr
         void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
 
         void LoadPhasingDefinitions();
+        void LoadSpellPhaseInfo();
 
         PhasingDefinitionStore const* GetPhasingDefinitionStore() { return &_PhasingDefinitionStore; }
+        SpellPhaseInfoStore const* GetSpellPhaseInfoStore() { return &_SpellPhaseInfoStore; }
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint8 level);
@@ -1225,6 +1227,7 @@ class ObjectMgr
         InstanceTemplateContainer _instanceTemplateStore;
 
         PhasingDefinitionStore _PhasingDefinitionStore;
+        SpellPhaseInfoStore _SpellPhaseInfoStore;
 
     private:
         void LoadScripts(ScriptsType type);
