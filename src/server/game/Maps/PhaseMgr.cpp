@@ -27,13 +27,18 @@ PhaseMgr::PhaseMgr(Player* _player) : player(_player), phaseData(_player)
     _PhasingStore = sObjectMgr->GetPhasingDefinitionStore();
 }
 
-void PhaseMgr::SendPhaseDataToPlayer()
+void PhaseMgr::Update()
 {
-    // Never update the phasemask if an update is in progress
-    if (_UpdateFlags)
+    if (_UpdateFlags & PHASE_UPDATE_IN_PROGRESS)
         return;
 
-    phaseData.SendDataToPlayer();
+    if (_UpdateFlags & PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED)
+        phaseData.SendPhaseshiftToPlayer();
+
+    if (_UpdateFlags & PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED)
+        phaseData.SendPhaseMaskToPlayer();
+
+    _UpdateFlags = 0;
 }
 
 void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
@@ -43,13 +48,17 @@ void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
     if (updateFlag == PHASE_UPDATE_FLAG_ZONE_UPDATE)
     {
         // Update zone changes
-        phaseData.Reset();
+        if (phaseData.HasActiveDefinitions())
+        {
+            phaseData.ResetDefinitions();
+            _UpdateFlags |= (PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED | PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
+        }
 
         if (_PhasingStore->find(player->GetZoneId()) != _PhasingStore->end())
             Recalculate();
     }
 
-    SendPhaseDataToPlayer();
+    Update();
 }
 
 /////////////////////////////////////////////////////////////////
@@ -60,7 +69,7 @@ void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const updateData)
     if (NeedsPhaseUpdateWithData(updateData))
     {
         Recalculate();
-        SendPhaseDataToPlayer();
+        Update();
     }
 }
 
@@ -69,25 +78,26 @@ void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const updateData)
 
 void PhaseMgr::Recalculate()
 {
-    phaseData.Reset();
+    phaseData.ResetDefinitions();
 
     PhasingDefinitionStore::const_iterator itr = _PhasingStore->find(player->GetZoneId());
     if (itr != _PhasingStore->end())
-    {
-        uint32 phaseId = 0;
-
         for (PhasingDefinitionContainer::const_iterator phase = itr->second.begin(); phase != itr->second.end(); ++phase)
         {
             if (CheckDefinition(&(*phase)))
             {
-                AddPhasingDefinitionToPhase(phaseData._PhasemaskThroughDefinitions, &(*phase));
-                phaseId = phase->phaseId;
+                phaseData.AddPhaseDefinition(&(*phase));
+
+                if (phase->phasemask)
+                    _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+
+                if (phase->phaseId || phase->terrainswapmap)
+                    _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
 
                 if (phase->IsLastDefinition())
                     break;
             }
         }
-    }
 }
 
 inline bool PhaseMgr::CheckDefinition(PhasingDefinition const* phasingDefinition)
@@ -111,41 +121,39 @@ bool PhaseMgr::NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const
     return false;
 }
 
-void PhaseMgr::AddPhasingDefinitionToPhase(uint32 &phaseMask, PhasingDefinition const* phasingDefinition)
-{
-    if (phasingDefinition->IsOverwritingExistingPhases())
-        phaseMask = phasingDefinition->phasemask;
-    else
-    {
-        if (phasingDefinition->IsNegatingPhasemask())
-            phaseMask &= ~phasingDefinition->phasemask;
-        else
-            phaseMask |= phasingDefinition->phasemask;
-    }
-
-    if (phaseData.flag == PHASEFLAG_NORMAL_PHASE)
-        phaseData.flag = PHASEFLAG_NO_TERRAINSWAP;
-}
-
 //////////////////////////////////////////////////////////////////
 // Auras
 
 void PhaseMgr::RegisterPhasingAuraEffect(AuraEffect const* auraEffect)
 {
-    phaseData._PhasemaskThroughAuras |= auraEffect->GetMiscValue();
+    if (auraEffect->GetMiscValue())
+    {
+        phaseData._PhasemaskThroughAuras |= auraEffect->GetMiscValue();
+        _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+    }
 
-    SendPhaseDataToPlayer();
+    if (auraEffect->GetMiscValueB())
+        _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+
+    Update();
 }
 
 void PhaseMgr::UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect)
 {
-    phaseData._PhasemaskThroughAuras = 0;
-    Unit::AuraEffectList const& auraPhases = player->GetAuraEffectsByType(SPELL_AURA_PHASE);
-    if (!auraPhases.empty())
+    if (auraEffect->GetMiscValue())
+    {
+        phaseData._PhasemaskThroughAuras = 0;
+        Unit::AuraEffectList const& auraPhases = player->GetAuraEffectsByType(SPELL_AURA_PHASE);
         for (Unit::AuraEffectList::const_iterator itr = auraPhases.begin(); itr != auraPhases.end(); ++itr)
             phaseData._PhasemaskThroughAuras |= (*itr)->GetMiscValue();
 
-    SendPhaseDataToPlayer();
+        _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+    }
+
+    if (auraEffect->GetMiscValueB())
+        _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
+
+    Update();
 }
 
 //////////////////////////////////////////////////////////////////
@@ -185,7 +193,9 @@ void PhaseMgr::SetCustomPhase(uint32 const phaseMask)
 {
     phaseData._CustomPhasemask = phaseMask;
 
-    SendPhaseDataToPlayer();
+    _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
+
+    Update();
 }
 
 //////////////////////////////////////////////////////////////////
@@ -202,18 +212,60 @@ inline uint32 PhaseData::GetPhaseMaskForSpawn() const
     return (phase ? phase : PHASEMASK_NORMAL);
 }
 
-void PhaseData::SendDataToPlayer()
+void PhaseData::SendPhaseMaskToPlayer()
 {
+    // Server side update
     uint32 const phasemask = GetCurrentPhasemask();
     if (player->GetPhaseMask() == phasemask)
         return;
-
-    // ToDo Send Terrainswap and PhaseId
 
     player->SetPhaseMask(phasemask, false);
 
     if (player->IsVisible())
         player->UpdateObjectVisibility();
+}
+
+void PhaseData::SendPhaseshiftToPlayer()
+{
+    // Client side update
+    std::vector<uint32> phaseIds;
+    std::vector<uint32> terrainswaps;
+
+    // AuraEffects
+    Unit::AuraEffectList const& auraPhases = player->GetAuraEffectsByType(SPELL_AURA_PHASE);
+    for (Unit::AuraEffectList::const_iterator itr = auraPhases.begin(); itr != auraPhases.end(); ++itr)
+    {
+        if (uint32 const miscValueB = (*itr)->GetMiscValueB())
+            phaseIds.push_back(miscValueB);
+    }
+
+    // Phase Definitions
+    for (std::vector<PhasingDefinition const*>::const_iterator itr = activePhaseDefinitions.begin(); itr != activePhaseDefinitions.end(); ++itr)
+    {
+        if ((*itr)->phaseId)
+            phaseIds.push_back((*itr)->phaseId);
+
+        if ((*itr)->terrainswapmap)
+            terrainswaps.push_back((*itr)->terrainswapmap);
+    }
+
+    // ToDo: Implement the Handler from cyberbrests research
+    // player->GetSession()->SendSetPhaseshift(phaseIds, terrainswaps);
+}
+
+void PhaseData::AddPhaseDefinition(PhasingDefinition const* phasingDefinition)
+{
+    if (phasingDefinition->IsOverwritingExistingPhases())
+        _PhasemaskThroughDefinitions = phasingDefinition->phasemask;
+    else
+    {
+        if (phasingDefinition->IsNegatingPhasemask())
+            _PhasemaskThroughDefinitions &= ~phasingDefinition->phasemask;
+        else
+            _PhasemaskThroughDefinitions |= phasingDefinition->phasemask;
+    }
+
+    activePhaseDefinitions.push_back(phasingDefinition);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -233,13 +285,13 @@ bool PhaseUpdateData::IsConditionRelated(Condition const* condition) const
 {
     switch (condition->ConditionType)
     {
-    case CONDITION_QUESTREWARDED:
-    case CONDITION_QUESTTAKEN:
-    case CONDITION_QUEST_COMPLETE:
-    case CONDITION_QUEST_NONE:
-        return condition->ConditionValue1 == _questId && ((1 << condition->ConditionType) & _conditionTypeFlags);
-    default:
-        return (1 << condition->ConditionType) & _conditionTypeFlags;
+        case CONDITION_QUESTREWARDED:
+        case CONDITION_QUESTTAKEN:
+        case CONDITION_QUEST_COMPLETE:
+        case CONDITION_QUEST_NONE:
+            return condition->ConditionValue1 == _questId && ((1 << condition->ConditionType) & _conditionTypeFlags);
+        default:
+            return (1 << condition->ConditionType) & _conditionTypeFlags;
     }
 }
 
@@ -247,17 +299,17 @@ bool PhaseMgr::IsConditionTypeSupported(ConditionTypes const conditionType)
 {
     switch (conditionType)
     {
-    case CONDITION_QUESTREWARDED:
-    case CONDITION_QUESTTAKEN:
-    case CONDITION_QUEST_COMPLETE:
-    case CONDITION_QUEST_NONE:
-    case CONDITION_TEAM:
-    case CONDITION_CLASS:
-    case CONDITION_RACE:
-    case CONDITION_INSTANCE_DATA:
-    case CONDITION_LEVEL:
-        return true;
-    default:
-        return false;
+        case CONDITION_QUESTREWARDED:
+        case CONDITION_QUESTTAKEN:
+        case CONDITION_QUEST_COMPLETE:
+        case CONDITION_QUEST_NONE:
+        case CONDITION_TEAM:
+        case CONDITION_CLASS:
+        case CONDITION_RACE:
+        case CONDITION_INSTANCE_DATA:
+        case CONDITION_LEVEL:
+            return true;
+        default:
+            return false;
     }
 }

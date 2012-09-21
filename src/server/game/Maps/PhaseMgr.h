@@ -35,9 +35,15 @@ enum PhasingFlags
 
 enum PhaseUpdateFlag
 {
-    PHASE_UPDATE_FLAG_ZONE_UPDATE   = 0x01,
-    PHASE_UPDATE_FLAG_AREA_UPDATE   = 0x02,
-    PHASE_UPDATE_FLAG_STORE_UPDATE  = 0x04,
+    PHASE_UPDATE_FLAG_ZONE_UPDATE           = 0x01,
+    PHASE_UPDATE_FLAG_AREA_UPDATE           = 0x02,
+    PHASE_UPDATE_FLAG_STORE_UPDATE          = 0x04,
+
+    PHASE_UPDATE_IN_PROGRESS                = (PHASE_UPDATE_FLAG_ZONE_UPDATE | PHASE_UPDATE_FLAG_AREA_UPDATE | PHASE_UPDATE_FLAG_STORE_UPDATE),
+
+    // Internal flags
+    PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED    = 0x08,
+    PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED    = 0x10,
 };
 
 struct PhasingDefinition
@@ -67,23 +73,26 @@ enum PhaseFlag
 
 struct PhaseData
 {
-    PhaseData(Player* _player) : player(_player), _PhasemaskThroughAuras(0), _CustomPhasemask(0) { Reset(); }
+    PhaseData(Player* _player) : player(_player), _PhasemaskThroughDefinitions(0), _PhasemaskThroughAuras(0), _CustomPhasemask(0) {}
 
     uint32 _PhasemaskThroughDefinitions;
     uint32 _PhasemaskThroughAuras;
     uint32 _CustomPhasemask;
-    uint32 flag;
 
     uint32 GetCurrentPhasemask() const;
     inline uint32 GetPhaseMaskForSpawn() const;
 
-    void Reset() { _PhasemaskThroughDefinitions = 0; terrainswap = 0; phaseid = 0; flag = PHASEFLAG_NORMAL_PHASE; }
-    void SendDataToPlayer();
+    void ResetDefinitions() { _PhasemaskThroughDefinitions = 0; activePhaseDefinitions.clear(); }
+    void AddPhaseDefinition(PhasingDefinition const* phasingDefinition);
+
+    bool HasActiveDefinitions() const { return !activePhaseDefinitions.empty(); }
+
+    void SendPhaseMaskToPlayer();
+    void SendPhaseshiftToPlayer();
 
 private:
-    uint32 terrainswap;
-    uint32 phaseid;
     Player* player;
+    std::vector<PhasingDefinition const*> activePhaseDefinitions;
 };
 
 struct PhaseUpdateData
@@ -111,7 +120,7 @@ public:
     void NotifyConditionChanged(PhaseUpdateData const updateData);
     void NotifyStoresReloaded() { Recalculate(); }
 
-    void SendPhaseDataToPlayer();
+    void Update();
 
     // Aura phase effects
     void RegisterPhasingAuraEffect(AuraEffect const* auraEffect);
@@ -124,6 +133,8 @@ public:
     // Needed for modify phase command
     void SetCustomPhase(uint32 const phaseMask);
 
+    void FillInHandlerInfo(std::vector<uint32> &phaseIds, std::vector<uint32> &terrainswaps) { phaseData.FillInHandlerInfo(phaseIds, terrainswaps); }
+
     // Debug
     void SendDebugReportToPlayer(Player* const debugger);
 
@@ -133,8 +144,6 @@ private:
     void Recalculate();
 
     inline bool CheckDefinition(PhasingDefinition const* phasingDefinition);
-
-    void AddPhasingDefinitionToPhase(uint32 &phase, PhasingDefinition const* phasingDefinition);
 
     bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
 
