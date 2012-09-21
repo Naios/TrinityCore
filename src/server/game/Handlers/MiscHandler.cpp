@@ -1753,6 +1753,11 @@ void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recvData*/)
     SendAccountDataTimes(GLOBAL_CACHE_MASK);
 }
 
+void WorldSession::SendSetPhaseShift(std::list<uint32> const phaseIds, std::list<uint32> const terrainswaps)
+{
+    // ToDo: Implement the handler
+}
+
 // Battlefield and Battleground
 void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 {

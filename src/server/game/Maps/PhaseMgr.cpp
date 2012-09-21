@@ -230,8 +230,8 @@ void PhaseData::SendPhaseMaskToPlayer()
 void PhaseData::SendPhaseshiftToPlayer()
 {
     // Client side update
-    std::vector<uint32> phaseIds;
-    std::vector<uint32> terrainswaps;
+    std::list<uint32> phaseIds;
+    std::list<uint32> terrainswaps;
 
     // AuraEffects
     Unit::AuraEffectList const& auraPhases = player->GetAuraEffectsByType(SPELL_AURA_PHASE);
@@ -251,8 +251,7 @@ void PhaseData::SendPhaseshiftToPlayer()
             terrainswaps.push_back((*itr)->terrainswapmap);
     }
 
-    // ToDo: Implement the Handler from cyberbrests research
-    // player->GetSession()->SendSetPhaseshift(phaseIds, terrainswaps);
+    player->GetSession()->SendSetPhaseShift(phaseIds, terrainswaps);
 }
 
 void PhaseData::AddPhaseDefinition(PhasingDefinition const* phasingDefinition)
