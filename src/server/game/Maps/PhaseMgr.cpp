@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////
 // Updating
 
-PhaseMgr::PhaseMgr(Player* _player) : player(_player), phaseData(_player)
+PhaseMgr::PhaseMgr(Player* _player) : player(_player), phaseData(_player), _UpdateFlags(0)
 {
     _PhasingStore = sObjectMgr->GetPhasingDefinitionStore();
 }
@@ -167,22 +167,21 @@ void PhaseMgr::SendDebugReportToPlayer(Player* const debugger)
 
     PhasingDefinitionStore::const_iterator itr = _PhasingStore->find(player->GetZoneId());
     if (itr == _PhasingStore->end())
-    {
         ChatHandler(debugger).PSendSysMessage(LANG_PHASING_NO_DEFINITIONS, player->GetZoneId());
-        return;
-    }
-
-    for (PhasingDefinitionContainer::const_iterator phase = itr->second.begin(); phase != itr->second.end(); ++phase)
+    else
     {
-        if (CheckDefinition(&(*phase)))
-            ChatHandler(debugger).PSendSysMessage(LANG_PHASING_SUCCESS, phase->IsNegatingPhasemask() ? "negated Phase" : "Phase", phase->phasemask);
-        else
-            ChatHandler(debugger).PSendSysMessage(LANG_PHASING_FAILED, phase->phasemask, phase->entry, phase->zoneId);
-
-        if (phase->IsLastDefinition())
+        for (PhasingDefinitionContainer::const_iterator phase = itr->second.begin(); phase != itr->second.end(); ++phase)
         {
-            ChatHandler(debugger).PSendSysMessage(LANG_PHASING_LAST_PHASE, phase->phasemask, phase->entry, phase->zoneId);
-            break;
+            if (CheckDefinition(&(*phase)))
+                ChatHandler(debugger).PSendSysMessage(LANG_PHASING_SUCCESS, phase->IsNegatingPhasemask() ? "negated Phase" : "Phase", phase->phasemask);
+            else
+                ChatHandler(debugger).PSendSysMessage(LANG_PHASING_FAILED, phase->phasemask, phase->entry, phase->zoneId);
+
+            if (phase->IsLastDefinition())
+            {
+                ChatHandler(debugger).PSendSysMessage(LANG_PHASING_LAST_PHASE, phase->phasemask, phase->entry, phase->zoneId);
+                break;
+            }
         }
     }
 
@@ -257,7 +256,10 @@ void PhaseData::SendPhaseshiftToPlayer()
 void PhaseData::AddPhaseDefinition(PhasingDefinition const* phasingDefinition)
 {
     if (phasingDefinition->IsOverwritingExistingPhases())
+    {
+        activePhaseDefinitions.clear();
         _PhasemaskThroughDefinitions = phasingDefinition->phasemask;
+    }
     else
     {
         if (phasingDefinition->IsNegatingPhasemask())
