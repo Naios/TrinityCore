@@ -78,12 +78,15 @@ void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const updateData)
 
 void PhaseMgr::Recalculate()
 {
-    phaseData.ResetDefinitions();
+    if (phaseData.HasActiveDefinitions())
+    {
+        phaseData.ResetDefinitions();
+        _UpdateFlags |= (PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED | PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
+    }
 
     PhasingDefinitionStore::const_iterator itr = _PhasingStore->find(player->GetZoneId());
     if (itr != _PhasingStore->end())
         for (PhasingDefinitionContainer::const_iterator phase = itr->second.begin(); phase != itr->second.end(); ++phase)
-        {
             if (CheckDefinition(&(*phase)))
             {
                 phaseData.AddPhaseDefinition(&(*phase));
@@ -97,7 +100,6 @@ void PhaseMgr::Recalculate()
                 if (phase->IsLastDefinition())
                     break;
             }
-        }
 }
 
 inline bool PhaseMgr::CheckDefinition(PhasingDefinition const* phasingDefinition)
@@ -161,7 +163,7 @@ void PhaseMgr::UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect)
 
 void PhaseMgr::SendDebugReportToPlayer(Player* const debugger)
 {
-    ChatHandler(debugger).PSendSysMessage(LANG_PHASING_REPORT_STATUS, player->GetName(), player->GetZoneId(), player->getLevel(), player->GetTeamId(), phaseData.flag);
+    ChatHandler(debugger).PSendSysMessage(LANG_PHASING_REPORT_STATUS, player->GetName(), player->GetZoneId(), player->getLevel(), player->GetTeamId(), _UpdateFlags);
 
     PhasingDefinitionStore::const_iterator itr = _PhasingStore->find(player->GetZoneId());
     if (itr == _PhasingStore->end())

@@ -133,8 +133,6 @@ public:
     // Needed for modify phase command
     void SetCustomPhase(uint32 const phaseMask);
 
-    void FillInHandlerInfo(std::vector<uint32> &phaseIds, std::vector<uint32> &terrainswaps) { phaseData.FillInHandlerInfo(phaseIds, terrainswaps); }
-
     // Debug
     void SendDebugReportToPlayer(Player* const debugger);
 
