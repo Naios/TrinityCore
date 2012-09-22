@@ -1755,6 +1755,33 @@ void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recvData*/)
 
 void WorldSession::SendSetPhaseShift(std::set<uint32> const phaseIds, std::set<uint32> const terrainswaps)
 {
+    ObjectGuid guid = _player->GetGUID();
+    uint32 map;
+    uint32 phaseCount;
+    uint32 terrainCount;
+    uint32 unkCounter;
+
+    WorldPacket data(SMSG_SET_PHASE_SHIFT, 16+4+4+4+4+4+2*unkCounter+map+2*phaseCount+terrainCount*2);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[3]);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[4]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[0]);
+    data.WriteBit(guid[7]);
+
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[4]);
+
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid[3]);
+    data.WriteByteSeq(guid[0]);
+
+    data.WriteByteSeq(guid[5]);
+    SendPacket(&data);
     // ToDo: Implement the handler
 }
 
