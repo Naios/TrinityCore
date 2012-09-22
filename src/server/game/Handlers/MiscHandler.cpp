@@ -1757,32 +1757,48 @@ void WorldSession::SendSetPhaseShift(std::set<uint32> const phaseIds, std::set<u
 {
     ObjectGuid guid = _player->GetGUID();
     uint32 map;
-    uint32 phaseCount;
-    uint32 terrainCount;
-    uint32 unkCounter;
+    uint32 count;
 
-    WorldPacket data(SMSG_SET_PHASE_SHIFT, 16+4+4+4+4+4+2*unkCounter+map+2*phaseCount+terrainCount*2);
+    WorldPacket data(SMSG_SET_PHASE_SHIFT, 16 + 4 + 4 + 4 + 4 + 4 + 2 * count + map + 2 * phaseIds.size() + terrainswaps.size() * 2);
     data.WriteBit(guid[2]);
     data.WriteBit(guid[3]);
     data.WriteBit(guid[1]);
     data.WriteBit(guid[6]);
     data.WriteBit(guid[4]);
     data.WriteBit(guid[5]);
-    data.WriteBit(guid[0]);
     data.WriteBit(guid[7]);
+    data.WriteBit(guid[0]);
 
-    data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[4]);
+    data << uint32(count) / 2;
+    for (uint8 i = 0; i < count; ++i)
+        data << uint16(i);
 
     data.WriteByteSeq(guid[1]);
+
+    data << uint32();
+
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[6]);
+
+    data << uint32(0) / 2;
+    MapEntry const* mapEntry = sMapStore.LookupEntry(count);
+    for (uint8 i = 0; i < count; ++i)
+        mapEntry->rootPhaseMap, i;
+
+    data << uint32(0) / 2;
+    PhaseEntry const* phaseEntry = sPhaseStore.LookupEntry(count);
+    for (uint8 i = 0; i < count; ++i)
+        phaseEntry->flag, i;
+
     data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[0]);
 
+    data << uint32(0) / 2;
+    for (uint8 i = 0; i < count; ++i)
+        data << uint16(i);
+
     data.WriteByteSeq(guid[5]);
     SendPacket(&data);
-    // ToDo: Implement the handler
 }
 
 // Battlefield and Battleground
