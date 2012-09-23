@@ -30,7 +30,7 @@ PhaseMgr::PhaseMgr(Player* _player) : player(_player), phaseData(_player), _Upda
 
 void PhaseMgr::Update()
 {
-    if (_UpdateFlags & PHASE_UPDATE_IN_PROGRESS)
+    if (IsUpdateInProgress())
         return;
 
     if (_UpdateFlags & PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED)

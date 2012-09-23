@@ -39,8 +39,6 @@ enum PhaseUpdateFlag
     PHASE_UPDATE_FLAG_AREA_UPDATE           = 0x02,
     PHASE_UPDATE_FLAG_STORE_UPDATE          = 0x04,
 
-    PHASE_UPDATE_IN_PROGRESS                = (PHASE_UPDATE_FLAG_ZONE_UPDATE | PHASE_UPDATE_FLAG_AREA_UPDATE | PHASE_UPDATE_FLAG_STORE_UPDATE),
-
     // Internal flags
     PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED    = 0x08,
     PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED    = 0x10,
@@ -162,6 +160,8 @@ private:
     inline bool CheckDefinition(PhasingDefinition const* phasingDefinition);
 
     bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
+
+    inline bool IsUpdateInProgress() const { return (_UpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_STORE_UPDATE); }
 
     PhasingDefinitionStore const* _PhasingStore;
     SpellPhaseInfoStore const* _SpellPhaseInfoStore;
