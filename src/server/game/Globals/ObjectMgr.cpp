@@ -8650,7 +8650,7 @@ void ObjectMgr::LoadPhaseDefinitions()
         // Checks
         if ((PhaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (PhaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))
         {
-            sLog->outError(LOG_FILTER_SQL, "Flags defined in phase in zoneId %d and entry %u does contain PHASE_FLAG_OVERWRITE_EXISTING and PHASE_FLAG_NEGATE_PHASE. Setting flags to PHASE_FLAG_OVERWRITE_EXISTING", PhaseDefinition.zoneId, PhaseDefinition.entry);
+            sLog->outError(LOG_FILTER_SQL, "Flags defined in phase_definitions in zoneId %d and entry %u does contain PHASE_FLAG_OVERWRITE_EXISTING and PHASE_FLAG_NEGATE_PHASE. Setting flags to PHASE_FLAG_OVERWRITE_EXISTING", PhaseDefinition.zoneId, PhaseDefinition.entry);
             PhaseDefinition.flags &= ~PHASE_FLAG_NEGATE_PHASE;
         }
 
@@ -8669,11 +8669,11 @@ void ObjectMgr::LoadSpellPhaseDbcInfo()
     uint32 oldMSTime = getMSTime();
 
     //                                               0       1            2
-    QueryResult result = WorldDatabase.Query("SELECT id, phasemask, terrainswapmap FROM `spell_phase_info`");
+    QueryResult result = WorldDatabase.Query("SELECT id, phasemask, terrainswapmap FROM `spell_phase_dbc`");
 
     if (!result)
     {
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell dbc infos. DB table `spell_phase_info` is empty.");
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell dbc infos. DB table `spell_phase_dbc` is empty.");
         return;
     }
 
@@ -8683,8 +8683,21 @@ void ObjectMgr::LoadSpellPhaseDbcInfo()
         Field *fields = result->Fetch();
 
         SpellPhaseInfo spellPhaseInfo;
-
         spellPhaseInfo.spellId                = fields[0].GetUInt32();
+
+        SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellPhaseInfo.spellId);
+        if (!spell)
+        {
+            sLog->outError(LOG_FILTER_SQL, "Spell %u defined in `spell_phase_dbc` does not exists, skipped.", spellPhaseInfo.spellId);
+            continue;
+        }
+
+        if (!spell->HasAura(SPELL_AURA_PHASE))
+        {
+            sLog->outError(LOG_FILTER_SQL, "Spell %u defined in `spell_phase_dbc` does not have aura effect type SPELL_AURA_PHASE, useless value.", spellPhaseInfo.spellId);
+            continue;
+        }
+
         spellPhaseInfo.phasemask              = fields[1].GetUInt32();
         spellPhaseInfo.terrainswapmap         = fields[2].GetUInt32();
 
