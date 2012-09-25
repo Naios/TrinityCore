@@ -28,9 +28,9 @@ class Player;
 // Phasing (visibility)
 enum PhasingFlags
 {
-    PHASING_FLAG_OVERWRITE_EXISTING = 0x01,       // don't stack with existing phases, overwrites existing phases
-    PHASING_FLAG_NO_MORE_PHASES     = 0x02,       // stop calculating phases after this phase was applied (no more phases will be applied)
-    PHASING_FLAG_NEGATE_PHASE       = 0x04        // negate instead to add the phasemask
+    PHASE_FLAG_OVERWRITE_EXISTING           = 0x01,       // don't stack with existing phases, overwrites existing phases
+    PHASE_FLAG_NO_MORE_PHASES               = 0x02,       // stop calculating phases after this phase was applied (no more phases will be applied)
+    PHASE_FLAG_NEGATE_PHASE                 = 0x04        // negate instead to add the phasemask
 };
 
 enum PhaseUpdateFlag
@@ -44,7 +44,7 @@ enum PhaseUpdateFlag
     PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED    = 0x10,
 };
 
-struct PhasingDefinition
+struct PhaseDefinition
 {
     uint32 zoneId;
     uint32 entry;
@@ -53,13 +53,13 @@ struct PhasingDefinition
     uint32 terrainswapmap;
     uint8 flags;
 
-    bool IsOverwritingExistingPhases() const { return flags & PHASING_FLAG_OVERWRITE_EXISTING; }
-    bool IsLastDefinition() const { return flags & PHASING_FLAG_NO_MORE_PHASES; }
-    bool IsNegatingPhasemask() const { return flags & PHASING_FLAG_NEGATE_PHASE; }
+    bool IsOverwritingExistingPhases() const { return flags & PHASE_FLAG_OVERWRITE_EXISTING; }
+    bool IsLastDefinition() const { return flags & PHASE_FLAG_NO_MORE_PHASES; }
+    bool IsNegatingPhasemask() const { return flags & PHASE_FLAG_NEGATE_PHASE; }
 };
 
-typedef std::vector<PhasingDefinition> PhasingDefinitionContainer;
-typedef UNORDERED_MAP<uint32 /*zoneId*/, PhasingDefinitionContainer> PhasingDefinitionStore;
+typedef std::vector<PhaseDefinition> PhaseDefinitionContainer;
+typedef UNORDERED_MAP<uint32 /*zoneId*/, PhaseDefinitionContainer> PhaseDefinitionStore;
 
 struct SpellPhaseInfo
 {
@@ -68,7 +68,7 @@ struct SpellPhaseInfo
     uint32 terrainswapmap;
 };
 
-typedef UNORDERED_MAP<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseInfoStore;
+typedef UNORDERED_MAP<uint32 /*spellId*/, SpellPhaseInfo> SpellPhaseDBCStore;
 
 struct PhaseInfo
 {
@@ -96,7 +96,7 @@ struct PhaseData
     inline uint32 GetPhaseMaskForSpawn() const;
 
     void ResetDefinitions() { _PhasemaskThroughDefinitions = 0; activePhaseDefinitions.clear(); }
-    void AddPhaseDefinition(PhasingDefinition const* phasingDefinition);
+    void AddPhaseDefinition(PhaseDefinition const* phaseDefinition);
     bool HasActiveDefinitions() const { return !activePhaseDefinitions.empty(); }
 
     void AddAuraInfo(uint32 const spellId, PhaseInfo phaseInfo);
@@ -107,7 +107,7 @@ struct PhaseData
 
 private:
     Player* player;
-    std::vector<PhasingDefinition const*> activePhaseDefinitions;
+    std::vector<PhaseDefinition const*> activePhaseDefinitions;
     PhaseInfoContainer spellPhaseInfo;
 };
 
@@ -157,14 +157,14 @@ public:
 private:
     void Recalculate();
 
-    inline bool CheckDefinition(PhasingDefinition const* phasingDefinition);
+    inline bool CheckDefinition(PhaseDefinition const* phaseDefinition);
 
     bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
 
     inline bool IsUpdateInProgress() const { return (_UpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_STORE_UPDATE); }
 
-    PhasingDefinitionStore const* _PhasingStore;
-    SpellPhaseInfoStore const* _SpellPhaseInfoStore;
+    PhaseDefinitionStore const* _PhaseDefinitionStore;
+    SpellPhaseDBCStore const* _SpellPhaseDBCStore;
 
     Player* player;
     PhaseData phaseData;

@@ -1368,8 +1368,8 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Spell Group Stack Rules...");
     sSpellMgr->LoadSpellGroupStackRules();
 
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Spell Phase Info...");
-    sObjectMgr->LoadSpellPhaseInfo();
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Spell Phase Dbc Info...");
+    sObjectMgr->LoadSpellPhaseDbcInfo();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading NPC Texts...");
     sObjectMgr->LoadGossipText();
@@ -1616,8 +1616,8 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading World States...");              // must be loaded before battleground, outdoor PvP and conditions
     LoadWorldStates();
 
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Phase template...");
-    sObjectMgr->LoadPhasingDefinitions();
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Phase definitions...");
+    sObjectMgr->LoadPhaseDefinitions();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Conditions...");
     sConditionMgr->LoadConditions();

@@ -27,12 +27,12 @@ INSERT INTO `phase_definitions` (`zoneId`, `entry`, `phasemask`, `phaseId`, `ter
 (4755, 1, 0,    102, 638, 0, 'Gilneas: Default Terrainswap'),
 ( 616, 1, 0,    165, 719, 0, 'Mount Hyjal: Default Terrainswap');
 
-DROP TABLE IF EXISTS `spell_phase_info`;
-CREATE TABLE `spell_phase_info` (
-  `spellId` mediumint(7) unsigned NOT NULL DEFAULT '0',
+DROP TABLE IF EXISTS `spell_phase_dbc`;
+CREATE TABLE `spell_phase_dbc` (
+  `id` mediumint(7) unsigned NOT NULL DEFAULT '0',
   `phasemask` bigint(20) unsigned NOT NULL DEFAULT '1',
   `terrainswapmap` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`spellId`)
+  PRIMARY KEY (`id`)
 )
 AUTO_INCREMENT=1
 ENGINE=MyISAM

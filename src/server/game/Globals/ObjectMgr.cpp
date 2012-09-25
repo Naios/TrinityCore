@@ -8618,9 +8618,9 @@ void ObjectMgr::LoadHotfixData()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u hotfix info entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-void ObjectMgr::LoadPhasingDefinitions()
+void ObjectMgr::LoadPhaseDefinitions()
 {
-    _PhasingDefinitionStore.clear();
+    _PhaseDefinitionStore.clear();
 
     uint32 oldMSTime = getMSTime();
 
@@ -8638,23 +8638,23 @@ void ObjectMgr::LoadPhasingDefinitions()
     {
         Field *fields = result->Fetch();
 
-        PhasingDefinition PhasingDefinition;
+        PhaseDefinition PhaseDefinition;
 
-        PhasingDefinition.zoneId                = fields[0].GetUInt32();
-        PhasingDefinition.entry                 = fields[1].GetUInt32();
-        PhasingDefinition.phasemask             = fields[2].GetUInt32();
-        PhasingDefinition.phaseId               = fields[3].GetUInt32();
-        PhasingDefinition.terrainswapmap        = fields[4].GetUInt32();
-        PhasingDefinition.flags                 = fields[5].GetUInt32();
+        PhaseDefinition.zoneId                = fields[0].GetUInt32();
+        PhaseDefinition.entry                 = fields[1].GetUInt32();
+        PhaseDefinition.phasemask             = fields[2].GetUInt32();
+        PhaseDefinition.phaseId               = fields[3].GetUInt32();
+        PhaseDefinition.terrainswapmap        = fields[4].GetUInt32();
+        PhaseDefinition.flags                 = fields[5].GetUInt32();
 
         // Checks
-        if ((PhasingDefinition.flags & PHASING_FLAG_OVERWRITE_EXISTING) && (PhasingDefinition.flags & PHASING_FLAG_NEGATE_PHASE))
+        if ((PhaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (PhaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))
         {
-            sLog->outError(LOG_FILTER_SQL, "Flags defined in phase in zoneId %d and entry %u does contain PHASING_FLAG_OVERWRITE_EXISTING and PHASING_FLAG_NEGATE_PHASE. Setting flags to PHASING_FLAG_OVERWRITE_EXISTING", PhasingDefinition.zoneId, PhasingDefinition.entry);
-            PhasingDefinition.flags &= ~PHASING_FLAG_NEGATE_PHASE;
+            sLog->outError(LOG_FILTER_SQL, "Flags defined in phase in zoneId %d and entry %u does contain PHASE_FLAG_OVERWRITE_EXISTING and PHASE_FLAG_NEGATE_PHASE. Setting flags to PHASE_FLAG_OVERWRITE_EXISTING", PhaseDefinition.zoneId, PhaseDefinition.entry);
+            PhaseDefinition.flags &= ~PHASE_FLAG_NEGATE_PHASE;
         }
 
-        _PhasingDefinitionStore[PhasingDefinition.zoneId].push_back(PhasingDefinition);
+        _PhaseDefinitionStore[PhaseDefinition.zoneId].push_back(PhaseDefinition);
 
         ++count;
     }
@@ -8662,18 +8662,18 @@ void ObjectMgr::LoadPhasingDefinitions()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u phasing definitions in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-void ObjectMgr::LoadSpellPhaseInfo()
+void ObjectMgr::LoadSpellPhaseDbcInfo()
 {
-    _SpellPhaseInfoStore.clear();
+    _SpellPhaseDBCStore.clear();
 
     uint32 oldMSTime = getMSTime();
 
-    //                                                  0         1             2
-    QueryResult result = WorldDatabase.Query("SELECT spellId, phasemask, terrainswapmap FROM `spell_phase_info`");
+    //                                               0       1            2
+    QueryResult result = WorldDatabase.Query("SELECT id, phasemask, terrainswapmap FROM `spell_phase_info`");
 
     if (!result)
     {
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell phase infos. DB table `spell_phase_info` is empty.");
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell dbc infos. DB table `spell_phase_info` is empty.");
         return;
     }
 
@@ -8688,12 +8688,12 @@ void ObjectMgr::LoadSpellPhaseInfo()
         spellPhaseInfo.phasemask              = fields[1].GetUInt32();
         spellPhaseInfo.terrainswapmap         = fields[2].GetUInt32();
 
-        _SpellPhaseInfoStore[spellPhaseInfo.spellId] = spellPhaseInfo;
+        _SpellPhaseDBCStore[spellPhaseInfo.spellId] = spellPhaseInfo;
 
         ++count;
     }
     while (result->NextRow());
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spell phase infos in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spell dbc infos in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
