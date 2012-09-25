@@ -58,7 +58,7 @@ struct PhaseDefinition
     bool IsNegatingPhasemask() const { return flags & PHASE_FLAG_NEGATE_PHASE; }
 };
 
-typedef std::vector<PhaseDefinition> PhaseDefinitionContainer;
+typedef std::list<PhaseDefinition> PhaseDefinitionContainer;
 typedef UNORDERED_MAP<uint32 /*zoneId*/, PhaseDefinitionContainer> PhaseDefinitionStore;
 
 struct SpellPhaseInfo
@@ -107,7 +107,7 @@ struct PhaseData
 
 private:
     Player* player;
-    std::vector<PhaseDefinition const*> activePhaseDefinitions;
+    std::list<PhaseDefinition const*> activePhaseDefinitions;
     PhaseInfoContainer spellPhaseInfo;
 };
 

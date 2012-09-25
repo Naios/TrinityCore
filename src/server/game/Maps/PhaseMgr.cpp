@@ -252,7 +252,7 @@ void PhaseData::SendPhaseshiftToPlayer()
     }
 
     // Phase Definitions
-    for (std::vector<PhaseDefinition const*>::const_iterator itr = activePhaseDefinitions.begin(); itr != activePhaseDefinitions.end(); ++itr)
+    for (std::list<PhaseDefinition const*>::const_iterator itr = activePhaseDefinitions.begin(); itr != activePhaseDefinitions.end(); ++itr)
     {
         if ((*itr)->phaseId)
             phaseIds.insert((*itr)->phaseId);
