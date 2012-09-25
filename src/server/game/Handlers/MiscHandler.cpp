@@ -1801,7 +1801,6 @@ void WorldSession::SendSetPhaseShift(std::set<uint32> const& phaseIds, std::set<
     SendPacket(&data);
 }
 
-
 // Battlefield and Battleground
 void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 {

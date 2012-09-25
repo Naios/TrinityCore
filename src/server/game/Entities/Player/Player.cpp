@@ -14950,6 +14950,11 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
                     CastSpell(this, itr->second->spellId, true);
     }
 
+    PhaseUpdateData phaseUdateData;
+    phaseUdateData.AddQuestUpdate(quest_id);
+
+    phaseMgr.NotifyConditionChanged(phaseUdateData);
+
     UpdateForQuestWorldObjects();
 }
 
@@ -15117,6 +15122,11 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     RemoveActiveQuest(quest_id);
     m_RewardedQuests.insert(quest_id);
     m_RewardedQuestsSave[quest_id] = true;
+
+    PhaseUpdateData phaseUdateData;
+    phaseUdateData.AddQuestUpdate(quest_id);
+
+    phaseMgr.NotifyConditionChanged(phaseUdateData);
 
     // StoreNewItem, mail reward, etc. save data directly to the database
     // to prevent exploitable data desynchronisation we save the quest status to the database too
@@ -15722,6 +15732,11 @@ void Player::RemoveActiveQuest(uint32 quest_id)
     {
         m_QuestStatus.erase(itr);
         m_QuestStatusSave[quest_id] = false;
+
+        PhaseUpdateData phaseUdateData;
+        phaseUdateData.AddQuestUpdate(quest_id);
+
+        phaseMgr.NotifyConditionChanged(phaseUdateData);
         return;
     }
 }
@@ -15733,6 +15748,11 @@ void Player::RemoveRewardedQuest(uint32 quest_id)
     {
         m_RewardedQuests.erase(rewItr);
         m_RewardedQuestsSave[quest_id] = false;
+
+        PhaseUpdateData phaseUdateData;
+        phaseUdateData.AddQuestUpdate(quest_id);
+
+        phaseMgr.NotifyConditionChanged(phaseUdateData);
     }
 }
 

@@ -3,7 +3,7 @@ CREATE TABLE `phase_definitions` (
   `zoneId` mediumint(7) unsigned NOT NULL DEFAULT '0',
   `entry` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `phasemask` bigint(20) unsigned NOT NULL DEFAULT '1',
-  `phaseId` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `phaseId` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `terrainswapmap` smallint(5) unsigned NOT NULL DEFAULT '0',
   `flags` tinyint(3) unsigned DEFAULT '0',
   `comment` text,
@@ -23,9 +23,7 @@ INSERT INTO `phase_definitions` (`zoneId`, `entry`, `phasemask`, `phaseId`, `ter
 (1637, 2, 257,  0,   0,   0, 'Orgrimmar: [H] Warchiefs Command: Hyjal'),
 (1637, 3, 513,  0,   0,   0, 'Orgrimmar: [H] Warchiefs Command: Deepholm'),
 (1637, 4, 1025, 0,   0,   0, 'Orgrimmar: [H] Warchiefs Command: Uldum'),
-(1637, 5, 2049, 0,   0,   0, 'Orgrimmar: [H] Warchiefs Command: Twilight Highlands'),
-(4755, 1, 0,    102, 638, 0, 'Gilneas: Default Terrainswap'),
-( 616, 1, 0,    165, 719, 0, 'Mount Hyjal: Default Terrainswap');
+(1637, 5, 2049, 0,   0,   0, 'Orgrimmar: [H] Warchiefs Command: Twilight Highlands');
 
 DROP TABLE IF EXISTS `spell_phase_dbc`;
 CREATE TABLE `spell_phase_dbc` (
@@ -52,7 +50,16 @@ DELETE FROM `command` WHERE `name` IN('debug phase', 'debug send setphaseshift')
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('debug phase', 1, 'Syntax: .debug phase\r\n\r\nSends a phase debug report of a player to you.');
 
--- Test Condition (SourceGroup -> ZoneId, SourceEntry -> Entry)
-DELETE FROM `conditions` WHERE  `SourceTypeOrReferenceId`=23 AND `SourceGroup`=1519 AND `SourceEntry`=1;
+/*
+Conditions (SourceGroup -> ZoneId, SourceEntry -> Entry)
+
+If you visit the Gm Island as a alliance race you are automatically phased into phase 2.
+
+DELETE FROM `conditions` WHERE  `SourceTypeOrReferenceId`=23 AND `SourceGroup`=876 AND `SourceEntry`=1;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(23, 1519, 1, 0, 0, 6, 0, 469, 0, 0, 0, 0, '', 'Phase Condition: Vashj''ir phase only visible for alliance members (for debug)');
+(23, 876, 1, 0, 0, 6, 0, 469, 0, 0, 0, 0, '', 'Phase Definitions Example: Phase is only visible for Alliance Members');
+
+DELETE FROM `phase_definitions` WHERE  `zoneId`=876 AND `entry`=1;
+INSERT INTO `phase_definitions` (`zoneId`, `entry`, `phasemask`, `phaseId`, `terrainswapmap`, `flags`, `comment`) VALUES
+(876, 1, 2, 0, 0, 0, '[Example] Gm Island');
+*/
