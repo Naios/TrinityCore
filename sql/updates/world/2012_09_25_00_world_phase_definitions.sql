@@ -40,13 +40,13 @@ COLLATE='utf8_general_ci';
 
 DELETE FROM `trinity_string` WHERE `entry` BETWEEN 176 AND 182;
 INSERT INTO `trinity_string` (`entry`, `content_default`) VALUES
-(176, '|cffFF0000Phasing: Report for player: %s, zoneId: %u, level: %u, team: %u, phaseupdateflag: %u|r'),
-(177, '|cffFF0000Phasing: There are no definitions defined for zoneId %u.|r'),
-(178, '|cffFF0000Phasing: Success - added %s %u to the players phase.|r'),
+(176, '|cff0099FFPhasing: Report for player: %s, zoneId: %u, level: %u, team: %u, phaseupdateflag: %u|r'),
+(177, '|cff663399Phasing: There are no definitions defined for zoneId %u.|r'),
+(178, '|cff0066FFPhasing: Success - added %s %u to the players phase.|r'),
 (179, '|cffFF0000Phasing: Condition for phase %u (entry: %u, zoneId: %u) failed.|r'),
 (180, '|cffFF0000Phasing: Condition for phase %u (entry: %u, zoneId: %u) has last phasemask flag. Skipped other definitions.|r'),
-(181, '|cffFF0000Phasing: The player gets phasemask %u through definitions, %u through phasing auras, and phase %u through custom phase.|r'),
-(182, '|cffFF0000Phasing: The player has phasemask %u (real: %u).|r');
+(181, '|cff6699FFPhasing: The player gets phasemask %u through definitions, %u through phasing auras, and phase %u through custom phase.|r'),
+(182, '|cff0099FFPhasing: The player has phasemask %u (real: %u).|r');
 
 DELETE FROM `command` WHERE `name` IN('debug phase', 'debug send setphaseshift');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES

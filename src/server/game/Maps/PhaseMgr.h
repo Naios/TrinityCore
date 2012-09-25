@@ -133,7 +133,7 @@ public:
 
     // Phase definitions update handling
     void NotifyConditionChanged(PhaseUpdateData const updateData);
-    void NotifyStoresReloaded() { Recalculate(); }
+    void NotifyStoresReloaded() { Recalculate(); Update(); }
 
     void Update();
 
