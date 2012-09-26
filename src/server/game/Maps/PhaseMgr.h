@@ -132,7 +132,7 @@ public:
     inline uint32 GetPhaseMaskForSpawn() { return phaseData.GetCurrentPhasemask(); }
 
     // Phase definitions update handling
-    void NotifyConditionChanged(PhaseUpdateData const updateData);
+    void NotifyConditionChanged(PhaseUpdateData const& updateData);
     void NotifyStoresReloaded() { Recalculate(); Update(); }
 
     void Update();
@@ -142,8 +142,8 @@ public:
     void UnRegisterPhasingAuraEffect(AuraEffect const* auraEffect);
 
     // Update flags (delayed phasing)
-    void AddUpdateFlag(PhaseUpdateFlag updateFlag) { _UpdateFlags |= updateFlag; }
-    void RemoveUpdateFlag(PhaseUpdateFlag updateFlag);
+    void AddUpdateFlag(PhaseUpdateFlag const updateFlag) { _UpdateFlags |= updateFlag; }
+    void RemoveUpdateFlag(PhaseUpdateFlag const updateFlag);
 
     // Needed for modify phase command
     void SetCustomPhase(uint32 const phaseMask);

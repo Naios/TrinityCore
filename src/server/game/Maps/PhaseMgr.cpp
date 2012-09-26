@@ -64,7 +64,7 @@ void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
 /////////////////////////////////////////////////////////////////
 // Notifier
 
-void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const updateData)
+void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const& updateData)
 {
     if (NeedsPhaseUpdateWithData(updateData))
     {
