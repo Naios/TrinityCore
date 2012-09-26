@@ -59,6 +59,7 @@ public:
             { "qpartymsg",      SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestPartyMsgCommand,  "", NULL },
             { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "", NULL },
             { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "", NULL },
+            { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "", NULL },
             { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
         };
@@ -940,6 +941,29 @@ public:
         while (ss.str().size() < 128000)
             ss << stuffingString;
         handler->SendSysMessage(ss.str().c_str());
+        return true;
+    }
+
+    static bool HandleDebugSendSetPhaseShiftCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* t = strtok((char*)args, " ");
+        char* p = strtok(NULL, " ");
+
+        if (!t)
+            return false;
+
+        std::set<uint32> terrainswap;
+        std::set<uint32> phaseId;
+
+        terrainswap.insert((uint32)atoi(t));
+
+        if (p)
+            phaseId.insert((uint32)atoi(p));
+
+        handler->GetSession()->SendSetPhaseShift(phaseId, terrainswap);
         return true;
     }
 
