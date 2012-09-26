@@ -124,7 +124,7 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK                = 20,
     CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21,
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
-    CONDITION_SOURCE_TYPE_PHASE_TEMPLATE                 = 23,
+    CONDITION_SOURCE_TYPE_PHASE_DEFINITION               = 23,
     CONDITION_SOURCE_TYPE_MAX                            = 24  //MAX
 };
 
@@ -212,7 +212,7 @@ typedef std::map<uint32, ConditionList> ConditionTypeContainer;
 typedef std::map<ConditionSourceType, ConditionTypeContainer> ConditionContainer;
 typedef std::map<uint32, ConditionTypeContainer> CreatureSpellConditionContainer;
 typedef std::map<std::pair<int32, uint32 /*SAI source_type*/>, ConditionTypeContainer> SmartEventConditionContainer;
-typedef std::map<int32 /*zoneId*/, ConditionTypeContainer> PhaseTemplateConditionContainer;
+typedef std::map<int32 /*zoneId*/, ConditionTypeContainer> PhaseDefinitionConditionContainer;
 
 typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used for references
 
@@ -247,7 +247,6 @@ class ConditionMgr
         bool addToGossipMenus(Condition* cond);
         bool addToGossipMenuItems(Condition* cond);
         bool addToSpellImplicitTargetConditions(Condition* cond);
-        bool addToPhaseTemplateConditions(Condition* cond);
         bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
 
         void Clean(); // free up resources
@@ -258,7 +257,7 @@ class ConditionMgr
         CreatureSpellConditionContainer   VehicleSpellConditionStore;
         CreatureSpellConditionContainer   SpellClickEventConditionStore;
         SmartEventConditionContainer      SmartEventConditionStore;
-        PhaseTemplateConditionContainer   PhaseTemplateConditionStore;
+        PhaseDefinitionConditionContainer PhaseDefinitionsConditionStore;
 };
 
 template <class T> bool CompareValues(ComparisionType type,  T val1, T val2)

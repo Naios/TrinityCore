@@ -612,7 +612,7 @@ bool ConditionMgr::CanHaveSourceGroupSet(ConditionSourceType sourceType) const
             sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET ||
             sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT ||
             sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT ||
-            sourceType == CONDITION_SOURCE_TYPE_PHASE_TEMPLATE);
+            sourceType == CONDITION_SOURCE_TYPE_PHASE_DEFINITION);
 }
 
 bool ConditionMgr::CanHaveSourceIdSet(ConditionSourceType sourceType) const
@@ -691,8 +691,8 @@ ConditionList ConditionMgr::GetConditionsForSmartEvent(int32 entryOrGuid, uint32
 ConditionList ConditionMgr::GetConditionsForPhaseDefinition(uint32 zone, uint32 entry)
 {
     ConditionList cond;
-    PhaseTemplateConditionContainer::const_iterator itr = PhaseTemplateConditionStore.find(zone);
-    if (itr != PhaseTemplateConditionStore.end())
+    PhaseDefinitionConditionContainer::const_iterator itr = PhaseDefinitionsConditionStore.find(zone);
+    if (itr != PhaseDefinitionsConditionStore.end())
     {
         ConditionTypeContainer::const_iterator i = (*itr).second.find(entry);
         if (i != (*itr).second.end())
@@ -916,9 +916,9 @@ void ConditionMgr::LoadConditions(bool isReload)
                     ++count;
                     continue;
                 }
-                case CONDITION_SOURCE_TYPE_PHASE_TEMPLATE:
+                case CONDITION_SOURCE_TYPE_PHASE_DEFINITION:
                 {
-                    PhaseTemplateConditionStore[cond->SourceGroup][cond->SourceEntry].push_back(cond);
+                    PhaseDefinitionsConditionStore[cond->SourceGroup][cond->SourceEntry].push_back(cond);
                     valid = true;
                     ++count;
                     continue;
@@ -1414,10 +1414,10 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                 return false;
             }
             break;
-        case CONDITION_SOURCE_TYPE_PHASE_TEMPLATE:
+        case CONDITION_SOURCE_TYPE_PHASE_DEFINITION:
             if (!PhaseMgr::IsConditionTypeSupported(cond->ConditionType))
             {
-                sLog->outError(LOG_FILTER_SQL, "Condition source type `CONDITION_SOURCE_TYPE_PHASE_TEMPLATE` does not support condition type %u, ignoring.", cond->ConditionType);
+                sLog->outError(LOG_FILTER_SQL, "Condition source type `CONDITION_SOURCE_TYPE_PHASE_DEFINITION` does not support condition type %u, ignoring.", cond->ConditionType);
                 return false;
             }
             break;
@@ -1973,7 +1973,7 @@ void ConditionMgr::Clean()
 
     SpellClickEventConditionStore.clear();
 
-    for (PhaseTemplateConditionContainer::iterator itr = PhaseTemplateConditionStore.begin(); itr != PhaseTemplateConditionStore.end(); ++itr)
+    for (PhaseDefinitionConditionContainer::iterator itr = PhaseDefinitionsConditionStore.begin(); itr != PhaseDefinitionsConditionStore.end(); ++itr)
     {
         for (ConditionTypeContainer::iterator it = itr->second.begin(); it != itr->second.end(); ++it)
         {
@@ -1984,7 +1984,7 @@ void ConditionMgr::Clean()
         itr->second.clear();
     }
 
-    PhaseTemplateConditionStore.clear();
+    PhaseDefinitionsConditionStore.clear();
 
     // this is a BIG hack, feel free to fix it if you can figure out the ConditionMgr ;)
     for (std::list<Condition*>::const_iterator itr = AllocatedMemoryStore.begin(); itr != AllocatedMemoryStore.end(); ++itr)
