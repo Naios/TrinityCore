@@ -124,7 +124,8 @@ const char *ChatHandler::GetTrinityString(int32 entry) const
 bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 {
     // check security level only for simple  command (without child commands)
-    return m_session->GetSecurity() >= AccountTypes(cmd.SecurityLevel);
+    // aam todo check each group of the player
+    return cmd.securitsGroups.find(m_session->GetSecurity()) != cmd.securitsGroups.end();
 }
 
 bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid, bool strong)
@@ -370,7 +371,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, co
     return false;
 }
 
-bool ChatHandler::SetDataForCommandInTable(ChatCommand* table, char const* text, uint32 security, std::string const& help, std::string const& fullcommand)
+bool ChatHandler::SetDataForCommandInTable(ChatCommand* table, char const* text, std::set<uint32> _securityGroups, std::string const& help, std::string const& fullcommand)
 {
     std::string cmd = "";
 
@@ -405,11 +406,16 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand* table, char const* text,
             return false;
         }
 
-        if (table[i].SecurityLevel != security)
-            sLog->outInfo(LOG_FILTER_GENERAL, "Table `command` overwrite for command '%s' default security (%u) by %u", fullcommand.c_str(), table[i].SecurityLevel, security);
+        if (_securityGroups.empty())
+        {
+            sLog->outInfo(LOG_FILTER_GENERAL, "Table `command_security` has no Security group assigned, setted to SEC_GROUP_CONSOLE");
+            table[i].securitsGroups.insert(6);
+        }
+        else
+            table[i].securitsGroups = _securityGroups;
 
-        table[i].SecurityLevel = security;
-        table[i].Help          = help;
+        table[i].securitsGroups = _securityGroups;
+        table[i].Help           = help;
         return true;
     }
 

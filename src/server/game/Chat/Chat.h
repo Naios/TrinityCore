@@ -36,11 +36,11 @@ class ChatCommand
 {
     public:
         const char *       Name;
-        uint32             SecurityLevel;                   // function pointer required correct align (use uint32)
+        std::set<uint32>   securitsGroups;
         bool               AllowConsole;
         bool (*Handler)(ChatHandler*, const char* args);
         std::string        Help;
-        ChatCommand*      ChildCommands;
+        ChatCommand*       ChildCommands;
 };
 
 class ChatHandler
