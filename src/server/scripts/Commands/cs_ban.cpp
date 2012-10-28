@@ -37,41 +37,41 @@ public:
     {
         static ChatCommand unbanCommandTable[] =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountCommand,          "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleUnBanCharacterCommand,        "", NULL },
-            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountByCharCommand,    "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleUnBanIPCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        true,  &HandleUnBanAccountCommand,          "", NULL },
+            { "character",      true,  &HandleUnBanCharacterCommand,        "", NULL },
+            { "playeraccount",  true,  &HandleUnBanAccountByCharCommand,    "", NULL },
+            { "ip",             true,  &HandleUnBanIPCommand,               "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand banlistCommandTable[] =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanListAccountCommand,        "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanListCharacterCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanListIPCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        true,  &HandleBanListAccountCommand,        "", NULL },
+            { "character",      true,  &HandleBanListCharacterCommand,      "", NULL },
+            { "ip",             true,  &HandleBanListIPCommand,             "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand baninfoCommandTable[] =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanInfoAccountCommand,        "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanInfoCharacterCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanInfoIPCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        true,  &HandleBanInfoAccountCommand,        "", NULL },
+            { "character",      true,  &HandleBanInfoCharacterCommand,      "", NULL },
+            { "ip",             true,  &HandleBanInfoIPCommand,             "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand banCommandTable[] =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanAccountCommand,            "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanCharacterCommand,          "", NULL },
-            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleBanAccountByCharCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanIPCommand,                 "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        true,  &HandleBanAccountCommand,            "", NULL },
+            { "character",      true,  &HandleBanCharacterCommand,          "", NULL },
+            { "playeraccount",  true,  &HandleBanAccountByCharCommand,      "", NULL },
+            { "ip",             true,  &HandleBanIPCommand,                 "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "ban",            SEC_ADMINISTRATOR,  true,  NULL,                                "", banCommandTable },
-            { "baninfo",        SEC_ADMINISTRATOR,  true,  NULL,                                "", baninfoCommandTable },
-            { "banlist",        SEC_ADMINISTRATOR,  true,  NULL,                                "", banlistCommandTable },
-            { "unban",          SEC_ADMINISTRATOR,  true,  NULL,                                "", unbanCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "ban",            true,  NULL,                                "", banCommandTable },
+            { "baninfo",        true,  NULL,                                "", baninfoCommandTable },
+            { "banlist",        true,  NULL,                                "", banlistCommandTable },
+            { "unban",          true,  NULL,                                "", unbanCommandTable },
+            { NULL,             false, NULL,                                "", NULL }
         };
         return commandTable;
     }

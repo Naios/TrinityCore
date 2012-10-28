@@ -36,19 +36,19 @@ public:
     {
         static ChatCommand wpCommandTable[] =
         {
-            { "add",            SEC_GAMEMASTER,     false, &HandleWpAddCommand,                "", NULL },
-            { "event",          SEC_GAMEMASTER,     false, &HandleWpEventCommand,              "", NULL },
-            { "load",           SEC_GAMEMASTER,     false, &HandleWpLoadCommand,               "", NULL },
-            { "modify",         SEC_GAMEMASTER,     false, &HandleWpModifyCommand,             "", NULL },
-            { "unload",         SEC_GAMEMASTER,     false, &HandleWpUnLoadCommand,             "", NULL },
-            { "reload",         SEC_ADMINISTRATOR,  false, &HandleWpReloadCommand,             "", NULL },
-            { "show",           SEC_GAMEMASTER,     false, &HandleWpShowCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "add",            false, &HandleWpAddCommand,                "", NULL },
+            { "event",          false, &HandleWpEventCommand,              "", NULL },
+            { "load",           false, &HandleWpLoadCommand,               "", NULL },
+            { "modify",         false, &HandleWpModifyCommand,             "", NULL },
+            { "unload",         false, &HandleWpUnLoadCommand,             "", NULL },
+            { "reload",         false, &HandleWpReloadCommand,             "", NULL },
+            { "show",           false, &HandleWpShowCommand,               "", NULL },
+            { NULL,             false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "wp",             SEC_GAMEMASTER,     false, NULL,                     "", wpCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "wp",             false, NULL,                     "", wpCommandTable },
+            { NULL,             false, NULL,                               "", NULL }
         };
         return commandTable;
     }

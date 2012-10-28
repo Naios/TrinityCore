@@ -35,21 +35,21 @@ public:
     {
         static ChatCommand titlesSetCommandTable[] =
         {
-            { "mask",           SEC_GAMEMASTER,     false, &HandleTitlesSetMaskCommand,        "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "mask",           false, &HandleTitlesSetMaskCommand,        "", NULL },
+            { NULL,             false, NULL,                               "", NULL }
         };
         static ChatCommand titlesCommandTable[] =
         {
-            { "add",            SEC_GAMEMASTER,     false, &HandleTitlesAddCommand,            "", NULL },
-            { "current",        SEC_GAMEMASTER,     false, &HandleTitlesCurrentCommand,        "", NULL },
-            { "remove",         SEC_GAMEMASTER,     false, &HandleTitlesRemoveCommand,         "", NULL },
-            { "set",            SEC_GAMEMASTER,     false, NULL,              "", titlesSetCommandTable },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "add",            false, &HandleTitlesAddCommand,            "", NULL },
+            { "current",        false, &HandleTitlesCurrentCommand,        "", NULL },
+            { "remove",         false, &HandleTitlesRemoveCommand,         "", NULL },
+            { "set",            false, NULL,              "", titlesSetCommandTable },
+            { NULL,             false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "titles",         SEC_GAMEMASTER,     false, NULL,                 "", titlesCommandTable },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "titles",         false, NULL,                 "", titlesCommandTable },
+            { NULL,             false, NULL,                               "", NULL }
         };
         return commandTable;
     }

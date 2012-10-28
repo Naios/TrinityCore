@@ -37,39 +37,39 @@ public:
     {
         static ChatCommand pdumpCommandTable[] =
         {
-            { "load",           SEC_ADMINISTRATOR,  true,  &HandlePDumpLoadCommand,                 "", NULL },
-            { "write",          SEC_ADMINISTRATOR,  true,  &HandlePDumpWriteCommand,                "", NULL },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "load",           true,  &HandlePDumpLoadCommand,                 "", NULL },
+            { "write",          true,  &HandlePDumpWriteCommand,                "", NULL },
+            { NULL,             false, NULL,                                    "", NULL }
         };
         static ChatCommand characterDeletedCommandTable[] =
         {
-            { "delete",         SEC_CONSOLE,        true,  &HandleCharacterDeletedDeleteCommand,   "", NULL },
-            { "list",           SEC_ADMINISTRATOR,  true,  &HandleCharacterDeletedListCommand,     "", NULL },
-            { "restore",        SEC_ADMINISTRATOR,  true,  &HandleCharacterDeletedRestoreCommand,  "", NULL },
-            { "old",            SEC_CONSOLE,        true,  &HandleCharacterDeletedOldCommand,      "", NULL },
-            { NULL,             0,                  false, NULL,                                   "", NULL }
+            { "delete",         true,  &HandleCharacterDeletedDeleteCommand,   "", NULL },
+            { "list",           true,  &HandleCharacterDeletedListCommand,     "", NULL },
+            { "restore",        true,  &HandleCharacterDeletedRestoreCommand,  "", NULL },
+            { "old",            true,  &HandleCharacterDeletedOldCommand,      "", NULL },
+            { NULL,             false, NULL,                                   "", NULL }
         };
 
         static ChatCommand characterCommandTable[] =
         {
-            { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "", NULL },
-            { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "", NULL },
-            { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "", NULL },
-            { "deleted",        SEC_GAMEMASTER,     true,  NULL,                                   "", characterDeletedCommandTable },
-            { "erase",          SEC_CONSOLE,        true,  &HandleCharacterEraseCommand,           "", NULL },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleCharacterLevelCommand,           "", NULL },
-            { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "", NULL },
-            { "reputation",     SEC_GAMEMASTER,     true,  &HandleCharacterReputationCommand,      "", NULL },
-            { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "", NULL },
-            { NULL,             0,                  false, NULL,                                   "", NULL }
+            { "customize",      true,  &HandleCharacterCustomizeCommand,       "", NULL },
+            { "changefaction",  true,  &HandleCharacterChangeFactionCommand,   "", NULL },
+            { "changerace",     true,  &HandleCharacterChangeRaceCommand,      "", NULL },
+            { "deleted",        true,  NULL,                                   "", characterDeletedCommandTable },
+            { "erase",          true,  &HandleCharacterEraseCommand,           "", NULL },
+            { "level",          true,  &HandleCharacterLevelCommand,           "", NULL },
+            { "rename",         true,  &HandleCharacterRenameCommand,          "", NULL },
+            { "reputation",     true,  &HandleCharacterReputationCommand,      "", NULL },
+            { "titles",         true,  &HandleCharacterTitlesCommand,          "", NULL },
+            { NULL,             false, NULL,                                   "", NULL }
         };
 
         static ChatCommand commandTable[] =
         {
-            { "character",      SEC_GAMEMASTER,     true,  NULL,                                   "", characterCommandTable },
-            { "levelup",        SEC_ADMINISTRATOR,  false, &HandleLevelUpCommand,                  "", NULL },
-            { "pdump",          SEC_ADMINISTRATOR,  true,  NULL,                                   "", pdumpCommandTable },
-            { NULL,             0,                  false, NULL,                                   "", NULL }
+            { "character",      true,  NULL,                                   "", characterCommandTable },
+            { "levelup",        false, &HandleLevelUpCommand,                  "", NULL },
+            { "pdump",          true,  NULL,                                   "", pdumpCommandTable },
+            { NULL,             false, NULL,                                   "", NULL }
         };
         return commandTable;
     }

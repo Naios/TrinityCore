@@ -35,16 +35,16 @@ public:
     {
         static ChatCommand questCommandTable[] =
         {
-            { "add",            SEC_ADMINISTRATOR,  false, &HandleQuestAdd,                    "", NULL },
-            { "complete",       SEC_ADMINISTRATOR,  false, &HandleQuestComplete,               "", NULL },
-            { "remove",         SEC_ADMINISTRATOR,  false, &HandleQuestRemove,                 "", NULL },
-            { "reward",         SEC_ADMINISTRATOR,  false, &HandleQuestReward,                 "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "add",            false, &HandleQuestAdd,                    "", NULL },
+            { "complete",       false, &HandleQuestComplete,               "", NULL },
+            { "remove",         false, &HandleQuestRemove,                 "", NULL },
+            { "reward",         false, &HandleQuestReward,                 "", NULL },
+            { NULL,             false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "quest",          SEC_ADMINISTRATOR,  false, NULL,                  "", questCommandTable },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "quest",          false, NULL,                  "", questCommandTable },
+            { NULL,             false, NULL,                               "", NULL }
         };
         return commandTable;
     }

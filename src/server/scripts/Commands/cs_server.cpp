@@ -37,60 +37,60 @@ public:
     {
         static ChatCommand serverIdleRestartCommandTable[] =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "", NULL },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "", NULL },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "cancel",         true,  &HandleServerShutDownCancelCommand,      "", NULL },
+            { ""   ,            true,  &HandleServerIdleRestartCommand,         "", NULL },
+            { NULL,             false, NULL,                                    "", NULL }
         };
 
         static ChatCommand serverIdleShutdownCommandTable[] =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "", NULL },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "", NULL },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "cancel",         true,  &HandleServerShutDownCancelCommand,      "", NULL },
+            { ""   ,            true,  &HandleServerIdleShutDownCommand,        "", NULL },
+            { NULL,             false, NULL,                                    "", NULL }
         };
 
         static ChatCommand serverRestartCommandTable[] =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "", NULL },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "cancel",         true,  &HandleServerShutDownCancelCommand,      "", NULL },
+            { ""   ,            true,  &HandleServerRestartCommand,             "", NULL },
+            { NULL,             false, NULL,                                    "", NULL }
         };
 
         static ChatCommand serverShutdownCommandTable[] =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "", NULL },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "", NULL },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "cancel",         true,  &HandleServerShutDownCancelCommand,      "", NULL },
+            { ""   ,            true,  &HandleServerShutDownCommand,            "", NULL },
+            { NULL,             false, NULL,                                    "", NULL }
         };
 
         static ChatCommand serverSetCommandTable[] =
         {
-            { "difftime",       SEC_CONSOLE,        true,  &HandleServerSetDiffTimeCommand,         "", NULL },
-            { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "", NULL },
-            { "motd",           SEC_ADMINISTRATOR,  true,  &HandleServerSetMotdCommand,             "", NULL },
-            { "closed",         SEC_ADMINISTRATOR,  true,  &HandleServerSetClosedCommand,           "", NULL },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "difftime",       true,  &HandleServerSetDiffTimeCommand,         "", NULL },
+            { "loglevel",       true,  &HandleServerSetLogLevelCommand,         "", NULL },
+            { "motd",           true,  &HandleServerSetMotdCommand,             "", NULL },
+            { "closed",         true,  &HandleServerSetClosedCommand,           "", NULL },
+            { NULL,             false, NULL,                                    "", NULL }
         };
 
         static ChatCommand serverCommandTable[] =
         {
-            { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "", NULL },
-            { "exit",           SEC_CONSOLE,        true,  &HandleServerExitCommand,                "", NULL },
-            { "idlerestart",    SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverIdleRestartCommandTable },
-            { "idleshutdown",   SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverIdleShutdownCommandTable },
-            { "info",           SEC_PLAYER,         true,  &HandleServerInfoCommand,                "", NULL },
-            { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "", NULL },
-            { "plimit",         SEC_ADMINISTRATOR,  true,  &HandleServerPLimitCommand,              "", NULL },
-            { "restart",        SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverRestartCommandTable },
-            { "shutdown",       SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverShutdownCommandTable },
-            { "set",            SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverSetCommandTable },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "corpses",        true,  &HandleServerCorpsesCommand,             "", NULL },
+            { "exit",           true,  &HandleServerExitCommand,                "", NULL },
+            { "idlerestart",    true,  NULL,                                    "", serverIdleRestartCommandTable },
+            { "idleshutdown",   true,  NULL,                                    "", serverIdleShutdownCommandTable },
+            { "info",           true,  &HandleServerInfoCommand,                "", NULL },
+            { "motd",           true,  &HandleServerMotdCommand,                "", NULL },
+            { "plimit",         true,  &HandleServerPLimitCommand,              "", NULL },
+            { "restart",        true,  NULL,                                    "", serverRestartCommandTable },
+            { "shutdown",       true,  NULL,                                    "", serverShutdownCommandTable },
+            { "set",            true,  NULL,                                    "", serverSetCommandTable },
+            { NULL,             false, NULL,                                    "", NULL }
         };
 
          static ChatCommand commandTable[] =
         {
-            { "server",         SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverCommandTable },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "server",         true,  NULL,                                    "", serverCommandTable },
+            { NULL,             false, NULL,                                    "", NULL }
         };
         return commandTable;
     }

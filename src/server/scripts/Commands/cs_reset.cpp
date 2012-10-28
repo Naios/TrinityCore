@@ -35,19 +35,19 @@ public:
     {
         static ChatCommand resetCommandTable[] =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "", NULL },
-            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "", NULL },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "", NULL },
-            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "", NULL },
-            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "", NULL },
-            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "", NULL },
-            { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "achievements",   true,  &HandleResetAchievementsCommand,     "", NULL },
+            { "honor",          true,  &HandleResetHonorCommand,            "", NULL },
+            { "level",          true,  &HandleResetLevelCommand,            "", NULL },
+            { "spells",         true,  &HandleResetSpellsCommand,           "", NULL },
+            { "stats",          true,  &HandleResetStatsCommand,            "", NULL },
+            { "talents",        true,  &HandleResetTalentsCommand,          "", NULL },
+            { "all",            true,  &HandleResetAllCommand,              "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "reset",          SEC_ADMINISTRATOR,  true, NULL,                                 "", resetCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "reset",          true,  NULL,                                "", resetCommandTable },
+            { NULL,             false, NULL,                                "", NULL }
         };
         return commandTable;
     }

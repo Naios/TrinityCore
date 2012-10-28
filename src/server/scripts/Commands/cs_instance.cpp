@@ -38,16 +38,16 @@ public:
     {
         static ChatCommand instanceCommandTable[] =
         {
-            { "listbinds",      SEC_ADMINISTRATOR,  false,  &HandleInstanceListBindsCommand,    "", NULL },
-            { "unbind",         SEC_ADMINISTRATOR,  false,  &HandleInstanceUnbindCommand,       "", NULL },
-            { "stats",          SEC_ADMINISTRATOR,  true,   &HandleInstanceStatsCommand,        "", NULL },
-            { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "", NULL },
+            { "listbinds",      false,  &HandleInstanceListBindsCommand,    "", NULL },
+            { "unbind",         false,  &HandleInstanceUnbindCommand,       "", NULL },
+            { "stats",          true,   &HandleInstanceStatsCommand,        "", NULL },
+            { "savedata",       false,  &HandleInstanceSaveDataCommand,     "", NULL },
             { NULL,             0,                  false,  NULL,                               "", NULL }
         };
 
         static ChatCommand commandTable[] =
         {
-            { "instance",       SEC_ADMINISTRATOR,  true,   NULL,                               "", instanceCommandTable },
+            { "instance",       true,   NULL,                               "", instanceCommandTable },
             { NULL,             0,                  false,  NULL,                               "", NULL }
         };
 

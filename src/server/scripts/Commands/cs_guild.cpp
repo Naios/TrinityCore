@@ -37,17 +37,17 @@ public:
     {
         static ChatCommand guildCommandTable[] =
         {
-            { "create",         SEC_GAMEMASTER,     true,  &HandleGuildCreateCommand,           "", NULL },
-            { "delete",         SEC_GAMEMASTER,     true,  &HandleGuildDeleteCommand,           "", NULL },
-            { "invite",         SEC_GAMEMASTER,     true,  &HandleGuildInviteCommand,           "", NULL },
-            { "uninvite",       SEC_GAMEMASTER,     true,  &HandleGuildUninviteCommand,         "", NULL },
-            { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "create",         true,  &HandleGuildCreateCommand,           "", NULL },
+            { "delete",         true,  &HandleGuildDeleteCommand,           "", NULL },
+            { "invite",         true,  &HandleGuildInviteCommand,           "", NULL },
+            { "uninvite",       true,  &HandleGuildUninviteCommand,         "", NULL },
+            { "rank",           true,  &HandleGuildRankCommand,             "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "guild",          SEC_ADMINISTRATOR,  true, NULL,                                 "", guildCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "guild",          true, NULL,                                 "", guildCommandTable },
+            { NULL,             false, NULL,                                "", NULL }
         };
         return commandTable;
     }

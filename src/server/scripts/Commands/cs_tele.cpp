@@ -37,17 +37,17 @@ public:
     {
         static ChatCommand teleCommandTable[] =
         {
-            { "add",            SEC_ADMINISTRATOR,  false, &HandleTeleAddCommand,             "", NULL },
-            { "del",            SEC_ADMINISTRATOR,  true,  &HandleTeleDelCommand,             "", NULL },
-            { "name",           SEC_MODERATOR,      true,  &HandleTeleNameCommand,            "", NULL },
-            { "group",          SEC_MODERATOR,      false, &HandleTeleGroupCommand,           "", NULL },
-            { "",               SEC_MODERATOR,      false, &HandleTeleCommand,                "", NULL },
+            { "add",            false, &HandleTeleAddCommand,             "", NULL },
+            { "del",            true,  &HandleTeleDelCommand,             "", NULL },
+            { "name",           true,  &HandleTeleNameCommand,            "", NULL },
+            { "group",          false, &HandleTeleGroupCommand,           "", NULL },
+            { "",               false, &HandleTeleCommand,                "", NULL },
             { NULL,             0,                  false, NULL,                              "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "tele",           SEC_MODERATOR,      false, NULL,                   "", teleCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "tele",           false, NULL,                   "", teleCommandTable },
+            { NULL,             false, NULL,                               "", NULL }
         };
         return commandTable;
     }

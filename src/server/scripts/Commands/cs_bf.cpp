@@ -35,17 +35,17 @@ public:
     {
         static ChatCommand battlefieldcommandTable[] =
         {
-            { "start",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldStart,            "", NULL },
-            { "stop",           SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnd,              "", NULL },
-            { "switch",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldSwitch,           "", NULL },
-            { "timer",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldTimer,            "", NULL },
-            { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "start",          false, &HandleBattlefieldStart,            "", NULL },
+            { "stop",           false, &HandleBattlefieldEnd,              "", NULL },
+            { "switch",         false, &HandleBattlefieldSwitch,           "", NULL },
+            { "timer",          false, &HandleBattlefieldTimer,            "", NULL },
+            { "enable",         false, &HandleBattlefieldEnable,           "", NULL },
+            { NULL,             false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "bf",             SEC_ADMINISTRATOR,  false, NULL,            "", battlefieldcommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "bf",             false, NULL,            "", battlefieldcommandTable },
+            { NULL,             false, NULL,                               "", NULL }
         };
         return commandTable;
     }

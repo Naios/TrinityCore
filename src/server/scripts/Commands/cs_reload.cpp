@@ -48,18 +48,18 @@ public:
     {
         static ChatCommand reloadAllCommandTable[] =
         {
-            { "achievement", SEC_ADMINISTRATOR,  true,  &HandleReloadAllAchievementCommand, "", NULL },
-            { "area",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllAreaCommand,       "", NULL },
-            { "eventai",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllEventAICommand,    "", NULL },
-            { "gossips",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllGossipsCommand,    "", NULL },
-            { "item",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllItemCommand,       "", NULL },
-            { "locales",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllLocalesCommand,    "", NULL },
-            { "loot",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllLootCommand,       "", NULL },
-            { "npc",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllNpcCommand,        "", NULL },
-            { "quest",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllQuestCommand,      "", NULL },
-            { "scripts",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllScriptsCommand,    "", NULL },
-            { "spell",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllSpellCommand,      "", NULL },
-            { "",           SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "", NULL },
+            { "achievement", true,  &HandleReloadAllAchievementCommand, "", NULL },
+            { "area",       true,  &HandleReloadAllAreaCommand,       "", NULL },
+            { "eventai",    true,  &HandleReloadAllEventAICommand,    "", NULL },
+            { "gossips",    true,  &HandleReloadAllGossipsCommand,    "", NULL },
+            { "item",       true,  &HandleReloadAllItemCommand,       "", NULL },
+            { "locales",    true,  &HandleReloadAllLocalesCommand,    "", NULL },
+            { "loot",       true,  &HandleReloadAllLootCommand,       "", NULL },
+            { "npc",        true,  &HandleReloadAllNpcCommand,        "", NULL },
+            { "quest",      true,  &HandleReloadAllQuestCommand,      "", NULL },
+            { "scripts",    true,  &HandleReloadAllScriptsCommand,    "", NULL },
+            { "spell",      true,  &HandleReloadAllSpellCommand,      "", NULL },
+            { "",           true,  &HandleReloadAllCommand,           "", NULL },
             { NULL,         0,                  false, NULL,                              "", NULL }
         };
         static ChatCommand reloadCommandTable[] =
@@ -162,8 +162,8 @@ public:
         };
         static ChatCommand commandTable[] =
         {
-            { "reload",         SEC_ADMINISTRATOR,  true,  NULL,                 "", reloadCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "reload",         true,  NULL,                 "", reloadCommandTable },
+            { NULL,             false, NULL,                               "", NULL }
         };
         return commandTable;
     }

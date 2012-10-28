@@ -35,24 +35,24 @@ public:
     {
         static ChatCommand channelSetCommandTable[] =
         {
-            { "ownership",      SEC_ADMINISTRATOR,  false,  &HandleChannelSetOwnership,         "", NULL },
+            { "ownership",      false,  &HandleChannelSetOwnership,         "", NULL },
             { NULL,             0,                  false,  NULL,                               "", NULL }
         };
         static ChatCommand channelCommandTable[] =
         {
-            { "set",            SEC_ADMINISTRATOR,  true,   NULL,                               "", channelSetCommandTable },
+            { "set",            true,   NULL,                               "", channelSetCommandTable },
             { NULL,             0,                  false,  NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "channel",        SEC_ADMINISTRATOR,  true,   NULL,                               "", channelCommandTable  },
-            { "nameannounce",   SEC_MODERATOR,      true,   &HandleNameAnnounceCommand,         "", NULL },
-            { "gmnameannounce", SEC_MODERATOR,      true,   &HandleGMNameAnnounceCommand,       "", NULL },
-            { "announce",       SEC_MODERATOR,      true,   &HandleAnnounceCommand,             "", NULL },
-            { "gmannounce",     SEC_MODERATOR,      true,   &HandleGMAnnounceCommand,           "", NULL },
-            { "notify",         SEC_MODERATOR,      true,   &HandleNotifyCommand,               "", NULL },
-            { "gmnotify",       SEC_MODERATOR,      true,   &HandleGMNotifyCommand,             "", NULL },
-            { "whispers",       SEC_MODERATOR,      false,  &HandleWhispersCommand,             "", NULL },
+            { "channel",        true,   NULL,                               "", channelCommandTable  },
+            { "nameannounce",   true,   &HandleNameAnnounceCommand,         "", NULL },
+            { "gmnameannounce", true,   &HandleGMNameAnnounceCommand,       "", NULL },
+            { "announce",       true,   &HandleAnnounceCommand,             "", NULL },
+            { "gmannounce",     true,   &HandleGMAnnounceCommand,           "", NULL },
+            { "notify",         true,   &HandleNotifyCommand,               "", NULL },
+            { "gmnotify",       true,   &HandleGMNotifyCommand,             "", NULL },
+            { "whispers",       false,  &HandleWhispersCommand,             "", NULL },
             { NULL,             0,                  false,  NULL,                               "", NULL }
         };
         return commandTable;

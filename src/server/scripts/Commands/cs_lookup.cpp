@@ -38,34 +38,34 @@ public:
     {
         static ChatCommand lookupPlayerCommandTable[] =
         {
-            { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "", NULL },
-            { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "", NULL },
-            { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "ip",             true,  &HandleLookupPlayerIpCommand,        "", NULL },
+            { "account",        true,  &HandleLookupPlayerAccountCommand,   "", NULL },
+            { "email",          true,  &HandleLookupPlayerEmailCommand,     "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand lookupCommandTable[] =
         {
-            { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,            "", NULL },
-            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleLookupCreatureCommand,        "", NULL },
-            { "event",          SEC_GAMEMASTER,     true,  &HandleLookupEventCommand,           "", NULL },
-            { "faction",        SEC_ADMINISTRATOR,  true,  &HandleLookupFactionCommand,         "", NULL },
-            { "item",           SEC_ADMINISTRATOR,  true,  &HandleLookupItemCommand,            "", NULL },
-            { "itemset",        SEC_ADMINISTRATOR,  true,  &HandleLookupItemSetCommand,         "", NULL },
-            { "object",         SEC_ADMINISTRATOR,  true,  &HandleLookupObjectCommand,          "", NULL },
-            { "quest",          SEC_ADMINISTRATOR,  true,  &HandleLookupQuestCommand,           "", NULL },
-            { "player",         SEC_GAMEMASTER,     true,  NULL,                                "", lookupPlayerCommandTable },
-            { "skill",          SEC_ADMINISTRATOR,  true,  &HandleLookupSkillCommand,           "", NULL },
-            { "spell",          SEC_ADMINISTRATOR,  true,  &HandleLookupSpellCommand,           "", NULL },
-            { "taxinode",       SEC_ADMINISTRATOR,  true,  &HandleLookupTaxiNodeCommand,        "", NULL },
-            { "tele",           SEC_MODERATOR,      true,  &HandleLookupTeleCommand,            "", NULL },
-            { "title",          SEC_GAMEMASTER,     true,  &HandleLookupTitleCommand,           "", NULL },
-            { "map",            SEC_ADMINISTRATOR,  true,  &HandleLookupMapCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "area",           true,  &HandleLookupAreaCommand,            "", NULL },
+            { "creature",       true,  &HandleLookupCreatureCommand,        "", NULL },
+            { "event",          true,  &HandleLookupEventCommand,           "", NULL },
+            { "faction",        true,  &HandleLookupFactionCommand,         "", NULL },
+            { "item",           true,  &HandleLookupItemCommand,            "", NULL },
+            { "itemset",        true,  &HandleLookupItemSetCommand,         "", NULL },
+            { "object",         true,  &HandleLookupObjectCommand,          "", NULL },
+            { "quest",          true,  &HandleLookupQuestCommand,           "", NULL },
+            { "player",         true,  NULL,                                "", lookupPlayerCommandTable },
+            { "skill",          true,  &HandleLookupSkillCommand,           "", NULL },
+            { "spell",          true,  &HandleLookupSpellCommand,           "", NULL },
+            { "taxinode",       true,  &HandleLookupTaxiNodeCommand,        "", NULL },
+            { "tele",           true,  &HandleLookupTeleCommand,            "", NULL },
+            { "title",          true,  &HandleLookupTitleCommand,           "", NULL },
+            { "map",            true,  &HandleLookupMapCommand,             "", NULL },
+            { NULL,             false, NULL,                                "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-            { "lookup",         SEC_ADMINISTRATOR,  true,  NULL,                                "", lookupCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "lookup",         true,  NULL,                                "", lookupCommandTable },
+            { NULL,             false, NULL,                                "", NULL }
         };
         return commandTable;
     }
