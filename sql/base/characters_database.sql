@@ -2891,3 +2891,55 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2015-01-27 22:41:44
+
+-- Updates base tables
+DROP TABLE IF EXISTS `updates`;
+CREATE TABLE `updates` (
+    `name` VARCHAR(200) NOT NULL COMMENT 'filename with extension of the update.',
+    `hash` CHAR(32) NULL DEFAULT '' COMMENT 'md5 hash of the sql file.',
+    `state` ENUM('RELEASED','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
+    `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'timestamp when the query was applied.',
+    `speed` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'time the query takes to apply in ms.',
+    PRIMARY KEY (`name`)
+)
+COMMENT='List of all applied updates in this database.'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `updates_include`;
+CREATE TABLE `updates_include` (
+    `path` VARCHAR(200) NOT NULL COMMENT 'directory to include. $ means relative to the source directory.',
+    `state` ENUM('RELEASED','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if the directory contains released or archived updates.',
+    PRIMARY KEY (`path`)
+)
+COMMENT='List of directories where we want to include sql updates.'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM;
+
+-- Characters database update data
+TRUNCATE TABLE `updates_include`;
+INSERT INTO `updates_include` (`path`, `state`) VALUES
+('$/sql/updates/characters', 'RELEASED'),
+('$/sql/custom/characters', 'RELEASED');
+
+INSERT IGNORE INTO `updates` (`name`, `hash`) VALUES
+('2014_10_20_00_characters.sql', '31505AFE4C052869EDFB509B3F397E64'),
+('2014_10_23_00_characters.sql', 'B5F7AA992F120310BFEC8B02A5D9D772'),
+('2014_10_23_01_characters.sql', '5AAF347350528BF5E87B9147B47B84DD'),
+('2014_10_23_02_characters.sql', '0389EF27AA5149D0E459E0C1424DD5DE'),
+('2014_10_24_00_characters.sql', 'C0BA2E11899C9676B00CC1F788AFA3FF'),
+('2014_10_25_00_characters.sql', '7094F47B83F8668EF506920B5DEEB509'),
+('2014_10_26_00_characters.sql', '37B987C276AD17D9F39950DDBA17A184'),
+('2014_11_12_00_characters.sql', 'A0BA65AD71816BA8F67E31C907A9A6AC'),
+('2014_12_23_00_characters.sql', '38A051A3472A26B6D02C0EC5CAEA043B'),
+('2014_12_28_00_characters.sql', 'DE59215A6BE8EE0BD82458F58600B5C3'),
+('2014_12_31_00_characters.sql', '0CC6B79EAF26DB9F059E4B0AD9EEED83'),
+('2015_01_02_00_characters.sql', '70FB818C3090B0B5C576A1194AE69981'),
+('2015_01_10_00_characters.sql', 'D2EF0855571A85976816A2C708037E2C'),
+('2015_01_16_00_characters.sql', '1DFC0917959FE1AACCB37DEEB74810C1'),
+('2015_01_27_00_characters.sql', 'D936A4BDE44282553FA80AC96C17B441'),
+('2015_02_13_00_characters.sql', '853A7900146960FC3432751705BCB5B6'),
+('2015_02_13_01_characters.sql', '387D79E7545E4667A982B3554B95DCF6'),
+('2015_02_17_00_characters.sql', '4EC6228ADAFFB70A25D58AA1F68B3839'),
+('2015_02_20_00_characters.sql', '96B9DB091B33E9D58B90CBB961B06D88'),
+('2015_02_20_01_characters.sql', '2725A859DFF1639C4D39EEFA956288CF');
