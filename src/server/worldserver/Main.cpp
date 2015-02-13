@@ -44,6 +44,7 @@
 #include "WorldSocketMgr.h"
 #include "BattlenetServerManager.h"
 #include "Realm/Realm.h"
+#include "DBUpdater.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include <boost/asio/io_service.hpp>
@@ -536,6 +537,12 @@ bool LoadRealmInfo()
 /// Initialize connection to the databases
 bool StartDB()
 {
+    // Enable automatic updates
+    bool const enableUpdates = sConfigMgr->GetBoolDefault("Updates.Enabled", false);
+
+    // Enable auto setup (imports full dumps if database is empty) - depends on Updates.Enabled
+    bool const autoSetup = enableUpdates ? sConfigMgr->GetBoolDefault("Updates.AutoSetup", true) : false;
+
     MySQL::Library_Init();
 
     std::string dbString;
@@ -558,10 +565,15 @@ bool StartDB()
 
     synchThreads = uint8(sConfigMgr->GetIntDefault("WorldDatabase.SynchThreads", 1));
     ///- Initialize the world database
-    if (!WorldDatabase.Open(dbString, asyncThreads, synchThreads))
+    WorldDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
+    if (!WorldDatabase.Open())
     {
-        TC_LOG_ERROR("server.worldserver", "Cannot connect to world database %s", dbString.c_str());
-        return false;
+        // Try to create the database and connect again if auto setup is enabled
+        if (!(autoSetup && DBUpdater<WorldDatabaseConnection>::Create(WorldDatabase) && WorldDatabase.Open()))
+        {
+            TC_LOG_ERROR("server.worldserver", "Cannot connect to world database %s", dbString.c_str());
+            return false;
+        }
     }
 
     ///- Get character database info from configuration file
@@ -583,10 +595,15 @@ bool StartDB()
     synchThreads = uint8(sConfigMgr->GetIntDefault("CharacterDatabase.SynchThreads", 2));
 
     ///- Initialize the Character database
-    if (!CharacterDatabase.Open(dbString, asyncThreads, synchThreads))
+    CharacterDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
+    if (!CharacterDatabase.Open())
     {
-        TC_LOG_ERROR("server.worldserver", "Cannot connect to Character database %s", dbString.c_str());
-        return false;
+        // Try to create the database and connect again if auto setup is enabled
+        if (!(autoSetup && DBUpdater<CharacterDatabaseConnection>::Create(CharacterDatabase) && CharacterDatabase.Open()))
+        {
+            TC_LOG_ERROR("server.worldserver", "Cannot connect to character database %s", dbString.c_str());
+            return false;
+        }
     }
 
     ///- Get hotfixes database info from configuration file
@@ -608,10 +625,15 @@ bool StartDB()
     synchThreads = uint8(sConfigMgr->GetIntDefault("HotfixDatabase.SynchThreads", 2));
 
     ///- Initialize the hotfixes database
-    if (!HotfixDatabase.Open(dbString, asyncThreads, synchThreads))
+    HotfixDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
+    if (!HotfixDatabase.Open())
     {
-        TC_LOG_ERROR("server.worldserver", "Cannot connect to the hotfix database %s", dbString.c_str());
-        return false;
+        // Try to create the database and connect again if auto setup is enabled
+        if (!(autoSetup && DBUpdater<HotfixDatabaseConnection>::Create(HotfixDatabase) && HotfixDatabase.Open()))
+        {
+            TC_LOG_ERROR("server.worldserver", "Cannot connect to hotfix database %s", dbString.c_str());
+            return false;
+        }
     }
 
     ///- Get login database info from configuration file
@@ -631,10 +653,97 @@ bool StartDB()
     }
 
     synchThreads = uint8(sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1));
+
     ///- Initialise the login database
-    if (!LoginDatabase.Open(dbString, asyncThreads, synchThreads))
+    LoginDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
+    if (!LoginDatabase.Open())
     {
-        TC_LOG_ERROR("server.worldserver", "Cannot connect to login database %s", dbString.c_str());
+        // Try to create the database and connect again if auto setup is enabled
+        if (!(autoSetup && DBUpdater<LoginDatabaseConnection>::Create(LoginDatabase) && LoginDatabase.Open()))
+        {
+            TC_LOG_ERROR("server.worldserver", "Cannot connect to login database %s", dbString.c_str());
+            return false;
+        }
+    }
+
+    if (enableUpdates)
+    {
+        if (autoSetup)
+        {
+            // Populate DBs if needed
+            if (!DBUpdater<LoginDatabaseConnection>::Populate(LoginDatabase))
+            {
+                TC_LOG_ERROR("server.worldserver", "Could not populate the login database, see log for details.");
+                return false;
+            }
+
+            if (!DBUpdater<CharacterDatabaseConnection>::Populate(CharacterDatabase))
+            {
+                TC_LOG_ERROR("server.worldserver", "Could not populate the character database, see log for details.");
+                return false;
+            }
+
+            if (!DBUpdater<WorldDatabaseConnection>::Populate(WorldDatabase))
+            {
+                TC_LOG_ERROR("server.worldserver", "Could not populate the world database, see log for details.");
+                return false;
+            }
+
+            if (!DBUpdater<HotfixDatabaseConnection>::Populate(HotfixDatabase))
+            {
+                TC_LOG_ERROR("server.worldserver", "Could not populate the hotfix database, see log for details.");
+                return false;
+            }
+        }
+
+        // Auto Update our databases
+        if (!DBUpdater<LoginDatabaseConnection>::Update(LoginDatabase))
+        {
+            TC_LOG_ERROR("server.worldserver", "Could not update the login database, see log for details.");
+            return false;
+        }
+
+        if (!DBUpdater<CharacterDatabaseConnection>::Update(CharacterDatabase))
+        {
+            TC_LOG_ERROR("server.worldserver", "Could not update the character database, see log for details.");
+            return false;
+        }
+
+        if (!DBUpdater<WorldDatabaseConnection>::Update(WorldDatabase))
+        {
+            TC_LOG_ERROR("server.worldserver", "Could not update the world database, see log for details.");
+            return false;
+        }
+
+        if (!DBUpdater<HotfixDatabaseConnection>::Update(HotfixDatabase))
+        {
+            TC_LOG_ERROR("server.worldserver", "Could not update the hotfix database, see log for details.");
+            return false;
+        }
+    }
+
+    // Prepare statements
+    if (!WorldDatabase.PrepareStatements())
+    {
+        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for world database!");
+        return false;
+    }
+
+    if (!CharacterDatabase.PrepareStatements())
+    {
+        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for character database!");
+        return false;
+    }
+
+    if (!HotfixDatabase.PrepareStatements())
+    {
+        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for hotfix database!");
+        return false;
+    }
+
+    if (!LoginDatabase.PrepareStatements())
+    {
+        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for login database!");
         return false;
     }
 
@@ -646,6 +755,7 @@ bool StartDB()
         return false;
     }
 
+    // Realm Handles
     QueryResult realmIdQuery = LoginDatabase.PQuery("SELECT `Region`,`Battlegroup` FROM `realmlist` WHERE `id`=%u", realmHandle.Index);
     if (!realmIdQuery)
     {

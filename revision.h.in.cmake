@@ -3,6 +3,8 @@
  #define _HASH                      "@rev_hash@"
  #define _DATE                      "@rev_date@"
  #define _BRANCH                    "@rev_branch@"
+ #define _SOURCE_DIRECTORY          "@CMAKE_SOURCE_DIR@"
+ #define _MYSQL_EXECUTABLE          "@MYSQL_EXECUTABLE@"
  #define VER_COMPANYNAME_STR        "TrinityCore Developers"
  #define VER_LEGALCOPYRIGHT_STR     "(c)2008-2015 TrinityCore"
  #define VER_FILEVERSION            0,0,0

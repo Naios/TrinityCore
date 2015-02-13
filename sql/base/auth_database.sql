@@ -622,3 +622,55 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2014-12-28 23:10:07
+
+-- Updates base tables
+DROP TABLE IF EXISTS `updates`;
+CREATE TABLE `updates` (
+    `name` VARCHAR(200) NOT NULL COMMENT 'filename with extension of the update.',
+    `hash` CHAR(32) NULL DEFAULT '' COMMENT 'md5 hash of the sql file.',
+    `state` ENUM('RELEASED','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
+    `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'timestamp when the query was applied.',
+    `speed` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'time the query takes to apply in ms.',
+    PRIMARY KEY (`name`)
+)
+COMMENT='List of all applied updates in this database.'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `updates_include`;
+CREATE TABLE `updates_include` (
+    `path` VARCHAR(200) NOT NULL COMMENT 'directory to include. $ means relative to the source directory.',
+    `state` ENUM('RELEASED','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if the directory contains released or archived updates.',
+    PRIMARY KEY (`path`)
+)
+COMMENT='List of directories where we want to include sql updates.'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM;
+
+-- Auth database update data
+TRUNCATE TABLE `updates_include`;
+INSERT INTO `updates_include` (`path`, `state`) VALUES
+('$/sql/updates/auth', 'RELEASED'),
+('$/sql/custom/auth', 'RELEASED');
+
+INSERT IGNORE INTO `updates` (`name`, `hash`) VALUES
+('2014_10_04_00_auth.sql', 'FA3173BE578026BBD904BEB9730BDC05'),
+('2014_10_19_00_auth.sql', 'A05A1EED62362BCFBAA3163F51F3630A'),
+('2014_10_26_00_auth.sql', 'AF1C0F00AC9F59509415110A4E188379'),
+('2014_11_03_00_auth.sql', 'A0D857F2C93C7D99097E2EE810DE48A3'),
+('2014_11_04_00_auth.sql', 'A59885DF33ED559294714EC1B0893C8B'),
+('2014_11_09_00_auth.sql', '756983A3B47BECCD67DF367D0BF1BC3D'),
+('2014_11_10_00_auth.sql', '536FA516D4DD14BD512ED94756C5581D'),
+('2014_11_10_00_auth_from_335.sql', '00DCC591CBFD7C8AAFC579BB5D1D143E'),
+('2014_11_10_01_auth.sql', '7B20203B3AEAEADCF268BD5155C502BF'),
+('2014_11_23_00_auth.sql', '0FE3F9B5F0C0D3470B20346A3D9F4E99'),
+('2014_11_25_00_auth.sql', '0468D408D326A897A0115486B817C737'),
+('2014_12_05_00_auth.sql', '2E7D984F0B280947F98C9728E4E14766'),
+('2014_12_10_00_auth.sql', 'EEBEE84BFF7FE1240D2EF3E49099C3D3'),
+('2014_12_19_00_auth.sql', 'D86C0A736417484D4207F8B0B0E81B53'),
+('2014_12_20_00_auth.sql', '1B041F83EC94A5700E579220363CDDCD'),
+('2014_12_25_00_auth.sql', 'F145E30BD7F193AA04856EAD4F1DAB4C'),
+('2014_12_27_00_auth.sql', '8F5C9E3327FC0E35A0890F8C128F4A1D'),
+('2014_12_28_00_auth.sql', '0E57A536D9BA06E301891D9957469ACD'),
+('2015_02_20_00_auth.sql', '96B9DB091B33E9D58B90CBB961B06D88'),
+('2015_02_20_01_auth.sql', 'A3F5EC22253E96B0F8B753C46AEECA55');

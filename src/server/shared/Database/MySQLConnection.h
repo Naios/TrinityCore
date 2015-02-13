@@ -75,6 +75,8 @@ class MySQLConnection
         virtual bool Open();
         void Close();
 
+        bool PrepareStatements();
+
     public:
         bool Execute(const char* sql);
         bool Execute(PreparedStatement* stmt);
@@ -111,7 +113,6 @@ class MySQLConnection
         MySQLPreparedStatement* GetPreparedStatement(uint32 index);
         void PrepareStatement(uint32 index, const char* sql, ConnectionFlags flags);
 
-        bool PrepareStatements();
         virtual void DoPrepareStatements() = 0;
 
     protected:
