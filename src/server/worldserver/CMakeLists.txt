@@ -13,6 +13,11 @@ file(GLOB_RECURSE sources_RemoteAccess RemoteAccess/*.cpp RemoteAccess/*.h)
 file(GLOB_RECURSE sources_TCSoap TCSoap/*.cpp TCSoap/*.h)
 file(GLOB sources_localdir *.cpp *.h)
 
+source_group(CommandLine FILES ${sources_CommandLine})
+source_group(RemoteAccess FILES ${sources_RemoteAccess})
+source_group(TCSoap FILES ${sources_TCSoap})
+source_group(Root FILES ${sources_localdir})
+
 if (USE_COREPCH)
   set(worldserver_PCH_HDR PrecompiledHeaders/worldPCH.h)
   set(worldserver_PCH_SRC PrecompiledHeaders/worldPCH.cpp)

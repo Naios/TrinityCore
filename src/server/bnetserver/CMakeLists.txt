@@ -11,10 +11,16 @@
 ########### bnetserver ###############
 
 file(GLOB_RECURSE sources_authentication Authentication/*.cpp Authentication/*.h)
+file(GLOB_RECURSE sources_packets Packets/*.cpp Packets/*.h)
 file(GLOB_RECURSE sources_realms Realms/*.cpp Realms/*.h)
 file(GLOB_RECURSE sources_server Server/*.cpp Server/*.h)
-file(GLOB_RECURSE sources_packets Packets/*.cpp Packets/*.h)
 file(GLOB sources_localdir *.cpp *.h)
+
+source_group(Authentication FILES ${sources_Authentication})
+source_group(Packets FILES ${sources_Packets})
+source_group(Realms FILES ${sources_Realms})
+source_group(Server FILES ${sources_Server})
+source_group(Root FILES ${sources_localdir})
 
 if (USE_COREPCH)
   set(bnetserver_PCH_HDR PrecompiledHeaders/bnetPCH.h)

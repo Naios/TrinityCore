@@ -17,6 +17,11 @@ file(GLOB_RECURSE sources_Maps Maps/*.cpp Maps/*.h)
 file(GLOB_RECURSE sources_Models Models/*.cpp Models/*.h)
 file(GLOB sources_localdir *.cpp *.h)
 
+source_group(Management FILES ${sources_Management})
+source_group(Maps FILES ${sources_Maps})
+source_group(Models FILES ${sources_Models})
+source_group(Root FILES ${sources_localdir})
+
 if (USE_COREPCH)
   set(collision_STAT_PCH_HDR PrecompiledHeaders/collisionPCH.h)
   set(collision_STAT_PCH_SRC PrecompiledHeaders/collisionPCH.cpp)
