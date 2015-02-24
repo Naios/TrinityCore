@@ -36,7 +36,8 @@
 #include "SystemConfig.h"
 #include "Util.h"
 #include "ZmqContext.h"
-#include <DBUpdater.h>
+#include "DBUpdater.h"
+#include "DatabaseLoader.h"
 #include <cstdlib>
 #include <iostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -178,72 +179,31 @@ int main(int argc, char** argv)
 /// Initialize connection to the database
 bool StartDB()
 {
+    MySQL::Library_Init();
+
     // Enable automatic updates
     bool const enableUpdates = sConfigMgr->GetBoolDefault("Updates.Enabled", false);
 
     // Enable auto setup (imports full dumps if database is empty) - depends on Updates.Enabled
     bool const autoSetup = enableUpdates ? sConfigMgr->GetBoolDefault("Updates.AutoSetup", true) : false;
 
-    MySQL::Library_Init();
-
-    std::string dbString = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
-    if (dbString.empty())
-    {
-        TC_LOG_ERROR("server.bnetserver", "Database not specified");
-        return false;
-    }
-
-    int32 workerThreads = sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1);
-    if (workerThreads < 1 || workerThreads > 32)
-    {
-        TC_LOG_ERROR("server.bnetserver", "Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
-        workerThreads = 1;
-    }
-
-    int32 synchThreads = sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1);
-    if (synchThreads < 1 || synchThreads > 32)
-    {
-        TC_LOG_ERROR("server.bnetserver", "Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");
-        synchThreads = 1;
-    }
-
-    LoginDatabase.SetConnectionInfo(dbString, workerThreads, synchThreads);
-    if (!LoginDatabase.Open())
-    {
-        // Try to create the database and connect again if auto setup is enabled
-        if (!(autoSetup && DBUpdater<LoginDatabaseConnection>::Create(LoginDatabase) && LoginDatabase.Open()))
-        {
-            TC_LOG_ERROR("server.bnetserver", "Cannot connect to login database %s", dbString.c_str());
-            return false;
-        }
-    }
+    // Init database
+    DatabaseLoader loader("server.bnetserver");
+    loader
+        .AddDatabase(LoginDatabase, "Login");
 
     if (enableUpdates)
     {
         if (autoSetup)
-        {
-            // Populate DBs if needed
-            if (!DBUpdater<LoginDatabaseConnection>::Populate(LoginDatabase))
-            {
-                TC_LOG_ERROR("server.bnetserver", "Could not populate the login database, see log for details.");
+            if (!loader.PopulateDatabases())
                 return false;
-            }
-        }
 
-        // Auto Update our databases
-        if (!DBUpdater<LoginDatabaseConnection>::Update(LoginDatabase))
-        {
-            TC_LOG_ERROR("server.bnetserver", "Could not update the login database, see log for details.");
+        if (!loader.UpdateDatabases())
             return false;
-        }
     }
 
-    // Prepare statements
-    if (!LoginDatabase.PrepareStatements())
-    {
-        TC_LOG_ERROR("server.bnetserver", "Could not prepare statements for login database!");
+    if (!loader.PrepareStatements())
         return false;
-    }
 
     TC_LOG_INFO("server.bnetserver", "Started auth database connection pool.");
     sLog->SetRealmId(0); // Enables DB appenders when realm is set.

@@ -45,6 +45,7 @@
 #include "BattlenetServerManager.h"
 #include "Realm/Realm.h"
 #include "DBUpdater.h"
+#include "DatabaseLoader.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include <boost/asio/io_service.hpp>
@@ -537,215 +538,34 @@ bool LoadRealmInfo()
 /// Initialize connection to the databases
 bool StartDB()
 {
+    MySQL::Library_Init();
+
     // Enable automatic updates
     bool const enableUpdates = sConfigMgr->GetBoolDefault("Updates.Enabled", false);
 
     // Enable auto setup (imports full dumps if database is empty) - depends on Updates.Enabled
     bool const autoSetup = enableUpdates ? sConfigMgr->GetBoolDefault("Updates.AutoSetup", true) : false;
 
-    MySQL::Library_Init();
-
-    std::string dbString;
-    uint8 asyncThreads, synchThreads;
-
-    dbString = sConfigMgr->GetStringDefault("WorldDatabaseInfo", "");
-    if (dbString.empty())
-    {
-        TC_LOG_ERROR("server.worldserver", "World database not specified in configuration file");
-        return false;
-    }
-
-    asyncThreads = uint8(sConfigMgr->GetIntDefault("WorldDatabase.WorkerThreads", 1));
-    if (asyncThreads < 1 || asyncThreads > 32)
-    {
-        TC_LOG_ERROR("server.worldserver", "World database: invalid number of worker threads specified. "
-            "Please pick a value between 1 and 32.");
-        return false;
-    }
-
-    synchThreads = uint8(sConfigMgr->GetIntDefault("WorldDatabase.SynchThreads", 1));
-    ///- Initialize the world database
-    WorldDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
-    if (!WorldDatabase.Open())
-    {
-        // Try to create the database and connect again if auto setup is enabled
-        if (!(autoSetup && DBUpdater<WorldDatabaseConnection>::Create(WorldDatabase) && WorldDatabase.Open()))
-        {
-            TC_LOG_ERROR("server.worldserver", "Cannot connect to world database %s", dbString.c_str());
-            return false;
-        }
-    }
-
-    ///- Get character database info from configuration file
-    dbString = sConfigMgr->GetStringDefault("CharacterDatabaseInfo", "");
-    if (dbString.empty())
-    {
-        TC_LOG_ERROR("server.worldserver", "Character database not specified in configuration file");
-        return false;
-    }
-
-    asyncThreads = uint8(sConfigMgr->GetIntDefault("CharacterDatabase.WorkerThreads", 1));
-    if (asyncThreads < 1 || asyncThreads > 32)
-    {
-        TC_LOG_ERROR("server.worldserver", "Character database: invalid number of worker threads specified. "
-            "Please pick a value between 1 and 32.");
-        return false;
-    }
-
-    synchThreads = uint8(sConfigMgr->GetIntDefault("CharacterDatabase.SynchThreads", 2));
-
-    ///- Initialize the Character database
-    CharacterDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
-    if (!CharacterDatabase.Open())
-    {
-        // Try to create the database and connect again if auto setup is enabled
-        if (!(autoSetup && DBUpdater<CharacterDatabaseConnection>::Create(CharacterDatabase) && CharacterDatabase.Open()))
-        {
-            TC_LOG_ERROR("server.worldserver", "Cannot connect to character database %s", dbString.c_str());
-            return false;
-        }
-    }
-
-    ///- Get hotfixes database info from configuration file
-    dbString = sConfigMgr->GetStringDefault("HotfixDatabaseInfo", "");
-    if (dbString.empty())
-    {
-        TC_LOG_ERROR("server.worldserver", "Hotfixes database not specified in configuration file");
-        return false;
-    }
-
-    asyncThreads = uint8(sConfigMgr->GetIntDefault("HotfixDatabase.WorkerThreads", 1));
-    if (asyncThreads < 1 || asyncThreads > 32)
-    {
-        TC_LOG_ERROR("server.worldserver", "Hotfixes database: invalid number of worker threads specified. "
-            "Please pick a value between 1 and 32.");
-        return false;
-    }
-
-    synchThreads = uint8(sConfigMgr->GetIntDefault("HotfixDatabase.SynchThreads", 2));
-
-    ///- Initialize the hotfixes database
-    HotfixDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
-    if (!HotfixDatabase.Open())
-    {
-        // Try to create the database and connect again if auto setup is enabled
-        if (!(autoSetup && DBUpdater<HotfixDatabaseConnection>::Create(HotfixDatabase) && HotfixDatabase.Open()))
-        {
-            TC_LOG_ERROR("server.worldserver", "Cannot connect to hotfix database %s", dbString.c_str());
-            return false;
-        }
-    }
-
-    ///- Get login database info from configuration file
-    dbString = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
-    if (dbString.empty())
-    {
-        TC_LOG_ERROR("server.worldserver", "Login database not specified in configuration file");
-        return false;
-    }
-
-    asyncThreads = uint8(sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1));
-    if (asyncThreads < 1 || asyncThreads > 32)
-    {
-        TC_LOG_ERROR("server.worldserver", "Login database: invalid number of worker threads specified. "
-            "Please pick a value between 1 and 32.");
-        return false;
-    }
-
-    synchThreads = uint8(sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1));
-
-    ///- Initialise the login database
-    LoginDatabase.SetConnectionInfo(dbString, asyncThreads, synchThreads);
-    if (!LoginDatabase.Open())
-    {
-        // Try to create the database and connect again if auto setup is enabled
-        if (!(autoSetup && DBUpdater<LoginDatabaseConnection>::Create(LoginDatabase) && LoginDatabase.Open()))
-        {
-            TC_LOG_ERROR("server.worldserver", "Cannot connect to login database %s", dbString.c_str());
-            return false;
-        }
-    }
+    // Init databases
+    DatabaseLoader loader("server.worldserver");
+    loader
+        .AddDatabase(WorldDatabase, "World")
+        .AddDatabase(CharacterDatabase, "Character")
+        .AddDatabase(HotfixDatabase, "Hotfix")
+        .AddDatabase(LoginDatabase, "Login");
 
     if (enableUpdates)
     {
         if (autoSetup)
-        {
-            // Populate DBs if needed
-            if (!DBUpdater<LoginDatabaseConnection>::Populate(LoginDatabase))
-            {
-                TC_LOG_ERROR("server.worldserver", "Could not populate the login database, see log for details.");
+            if (!loader.PopulateDatabases())
                 return false;
-            }
 
-            if (!DBUpdater<CharacterDatabaseConnection>::Populate(CharacterDatabase))
-            {
-                TC_LOG_ERROR("server.worldserver", "Could not populate the character database, see log for details.");
-                return false;
-            }
-
-            if (!DBUpdater<WorldDatabaseConnection>::Populate(WorldDatabase))
-            {
-                TC_LOG_ERROR("server.worldserver", "Could not populate the world database, see log for details.");
-                return false;
-            }
-
-            if (!DBUpdater<HotfixDatabaseConnection>::Populate(HotfixDatabase))
-            {
-                TC_LOG_ERROR("server.worldserver", "Could not populate the hotfix database, see log for details.");
-                return false;
-            }
-        }
-
-        // Auto Update our databases
-        if (!DBUpdater<LoginDatabaseConnection>::Update(LoginDatabase))
-        {
-            TC_LOG_ERROR("server.worldserver", "Could not update the login database, see log for details.");
+        if (!loader.UpdateDatabases())
             return false;
-        }
-
-        if (!DBUpdater<CharacterDatabaseConnection>::Update(CharacterDatabase))
-        {
-            TC_LOG_ERROR("server.worldserver", "Could not update the character database, see log for details.");
-            return false;
-        }
-
-        if (!DBUpdater<WorldDatabaseConnection>::Update(WorldDatabase))
-        {
-            TC_LOG_ERROR("server.worldserver", "Could not update the world database, see log for details.");
-            return false;
-        }
-
-        if (!DBUpdater<HotfixDatabaseConnection>::Update(HotfixDatabase))
-        {
-            TC_LOG_ERROR("server.worldserver", "Could not update the hotfix database, see log for details.");
-            return false;
-        }
     }
 
-    // Prepare statements
-    if (!WorldDatabase.PrepareStatements())
-    {
-        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for world database!");
+    if (!loader.PrepareStatements())
         return false;
-    }
-
-    if (!CharacterDatabase.PrepareStatements())
-    {
-        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for character database!");
-        return false;
-    }
-
-    if (!HotfixDatabase.PrepareStatements())
-    {
-        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for hotfix database!");
-        return false;
-    }
-
-    if (!LoginDatabase.PrepareStatements())
-    {
-        TC_LOG_ERROR("server.worldserver", "Could not prepare statements for login database!");
-        return false;
-    }
 
     ///- Get the realm Id from the configuration file
     realmHandle.Index = sConfigMgr->GetIntDefault("RealmID", 0);

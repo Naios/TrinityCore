@@ -81,25 +81,27 @@ class DatabaseWorkerPool
             _synch_threads = synchThreads;
         }
 
-        bool Open()
+        uint32 Open()
         {
             WPFatal(_connectionInfo.get(), "Connection info was not set!");
 
             TC_LOG_INFO("sql.driver", "Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
                 GetDatabaseName(), _async_threads, _synch_threads);
 
-            bool res = OpenConnections(IDX_ASYNC, _async_threads);
+            uint32 errno = OpenConnections(IDX_ASYNC, _async_threads);
 
-            if (!res)
-                return res;
+            if (errno)
+                return errno;
 
-            res = OpenConnections(IDX_SYNCH, _synch_threads);
+            errno = OpenConnections(IDX_SYNCH, _synch_threads);
 
-            if (res)
+            if (!errno)
+            {
                 TC_LOG_INFO("sql.driver", "DatabasePool '%s' opened successfully. %u total connections running.", GetDatabaseName(),
                     (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
+            }
 
-            return res;
+            return errno;
         }
 
         void Close()
@@ -493,7 +495,7 @@ class DatabaseWorkerPool
         }
 
     private:
-        bool OpenConnections(InternalIndex type, uint8 numConnections)
+        uint32 OpenConnections(InternalIndex type, uint8 numConnections)
         {
             _connections[type].resize(numConnections);
             for (uint8 i = 0; i < numConnections; ++i)
@@ -510,9 +512,9 @@ class DatabaseWorkerPool
                 _connections[type][i] = t;
                 ++_connectionCount[type];
 
-                bool res = t->Open();
+                uint32 const errno = t->Open();
 
-                if (res)
+                if (!errno)
                 {
                     if (mysql_get_server_version(t->GetHandle()) < MIN_MYSQL_SERVER_VERSION)
                     {
@@ -522,7 +524,7 @@ class DatabaseWorkerPool
                 }
 
                 // Failed to open a connection or invalid version, abort and cleanup
-                if (!res)
+                if (errno)
                 {
                     ShowDatabaseError();
 
@@ -532,11 +534,12 @@ class DatabaseWorkerPool
                         delete t;
                         --_connectionCount[type];
                     }
-                    return false;
+                    return errno;
                 }
             }
 
-            return true;
+            // Everything is fine
+            return 0;
         }
 
         void ShowDatabaseError()
