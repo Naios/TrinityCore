@@ -88,20 +88,20 @@ class DatabaseWorkerPool
             TC_LOG_INFO("sql.driver", "Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
                 GetDatabaseName(), _async_threads, _synch_threads);
 
-            uint32 errno = OpenConnections(IDX_ASYNC, _async_threads);
+            uint32 error = OpenConnections(IDX_ASYNC, _async_threads);
 
-            if (errno)
-                return errno;
+            if (error)
+                return error;
 
-            errno = OpenConnections(IDX_SYNCH, _synch_threads);
+            error = OpenConnections(IDX_SYNCH, _synch_threads);
 
-            if (!errno)
+            if (!error)
             {
                 TC_LOG_INFO("sql.driver", "DatabasePool '%s' opened successfully. %u total connections running.", GetDatabaseName(),
                     (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
             }
 
-            return errno;
+            return error;
         }
 
         void Close()
@@ -512,19 +512,19 @@ class DatabaseWorkerPool
                 _connections[type][i] = t;
                 ++_connectionCount[type];
 
-                uint32 const errno = t->Open();
+                uint32 error = t->Open();
 
-                if (!errno)
+                if (!error)
                 {
                     if (mysql_get_server_version(t->GetHandle()) < MIN_MYSQL_SERVER_VERSION)
                     {
                         TC_LOG_ERROR("sql.driver", "TrinityCore does not support MySQL versions below 5.1");
-                        res = false;
+                        error = 1;
                     }
                 }
 
                 // Failed to open a connection or invalid version, abort and cleanup
-                if (errno)
+                if (error)
                 {
                     ShowDatabaseError();
 
@@ -534,7 +534,7 @@ class DatabaseWorkerPool
                         delete t;
                         --_connectionCount[type];
                     }
-                    return errno;
+                    return error;
                 }
             }
 

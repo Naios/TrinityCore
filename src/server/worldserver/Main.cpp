@@ -547,12 +547,15 @@ bool StartDB()
     bool const autoSetup = enableUpdates ? sConfigMgr->GetBoolDefault("Updates.AutoSetup", true) : false;
 
     // Init databases
-    DatabaseLoader loader("server.worldserver");
+    DatabaseLoader loader("server.worldserver", autoSetup);
     loader
         .AddDatabase(WorldDatabase, "World")
         .AddDatabase(CharacterDatabase, "Character")
         .AddDatabase(HotfixDatabase, "Hotfix")
         .AddDatabase(LoginDatabase, "Login");
+
+    if (!loader.OpenDatabases())
+        return false;
 
     if (enableUpdates)
     {

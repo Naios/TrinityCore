@@ -30,12 +30,13 @@ class DatabaseLoader
     using Call = std::function <bool()> ;
 
 public:
-    DatabaseLoader(std::string const& logger) : _logger(logger) { }
+    DatabaseLoader(std::string const& logger, bool const autoSetup) :
+        _logger(logger), _autoSetup(autoSetup) {}
 
     template <class T>
     DatabaseLoader& AddDatabase(DatabaseWorkerPool<T>& pool, std::string const& name);
 
-    bool LoadDatabases();
+    bool OpenDatabases();
 
     bool PopulateDatabases();
 
@@ -44,11 +45,12 @@ public:
     bool PrepareStatements();
     
 private:
-    bool Process(std::stack<Call>& stack);
+    static bool Process(std::stack<Call>& stack);
 
+    bool const _autoSetup;
     std::string const _logger;
-    std::stack<std::pair<Call, std::function<void()>>> _load;
-    std::stack<std::function<void()>> _unload;
+    std::stack<std::pair<Call, std::function<void()>>> _open;
+    std::stack<std::function<void()>> _close;
     std::stack<Call> _populate, _update, _prepare;
 };
 

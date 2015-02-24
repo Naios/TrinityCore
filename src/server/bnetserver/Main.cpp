@@ -188,9 +188,12 @@ bool StartDB()
     bool const autoSetup = enableUpdates ? sConfigMgr->GetBoolDefault("Updates.AutoSetup", true) : false;
 
     // Init database
-    DatabaseLoader loader("server.bnetserver");
+    DatabaseLoader loader("server.bnetserver", autoSetup);
     loader
         .AddDatabase(LoginDatabase, "Login");
+
+    if (!loader.OpenDatabases())
+        return false;
 
     if (enableUpdates)
     {

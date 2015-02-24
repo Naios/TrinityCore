@@ -16,12 +16,12 @@
 */
 
 #include "DatabaseLoader.h"
+#include "DBUpdater.h"
 
 template <class T>
-DatabaseLoader& DatabaseLoader::AddDatabase<T>(DatabaseWorkerPool<T>& pool, std::string const& name)
+DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::string const& name)
 {
-    _load.push(std::make_pair(
-    [&]()
+    _open.push(std::make_pair([&]() -> bool
     {
         std::string const dbString = sConfigMgr->GetStringDefault(name + "DatabaseInfo", "");
         if (dbString.empty())
@@ -43,19 +43,20 @@ DatabaseLoader& DatabaseLoader::AddDatabase<T>(DatabaseWorkerPool<T>& pool, std:
         if (!pool.Open())
         {
             // Try to create the database and connect again if auto setup is enabled
-            if (!(autoSetup && DBUpdater<T>::Create(pool) && pool.Open()))
+            if (!(_autoSetup && DBUpdater<T>::Create(pool) && pool.Open()))
             {
                 TC_LOG_ERROR(_logger.c_str(), "Cannot connect to %s database.", name.c_str());
                 return false;
             }
         }
+        return true;
     },
-    [&]()
+    [&pool]()
     {
         pool.Close();
     }));
 
-    _populate.push([&]()
+    _populate.push([&]() -> bool
     {
         if (!DBUpdater<T>::Populate(pool))
         {
@@ -65,7 +66,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase<T>(DatabaseWorkerPool<T>& pool, std:
         return true;
     });
 
-    _update.push([&]()
+    _update.push([&]() -> bool
     {
         if (!DBUpdater<T>::Update(pool))
         {
@@ -75,9 +76,9 @@ DatabaseLoader& DatabaseLoader::AddDatabase<T>(DatabaseWorkerPool<T>& pool, std:
         return true;
     });
 
-    _prepare.push([&]()
+    _prepare.push([&]() -> bool
     {
-        if (!DBUpdater<T>::PrepareStatements(pool))
+        if (!pool.PrepareStatements())
         {
             TC_LOG_ERROR(_logger.c_str(), "Could not prepare statements of the %s database, see log for details.", name.c_str());
             return false;
@@ -88,26 +89,27 @@ DatabaseLoader& DatabaseLoader::AddDatabase<T>(DatabaseWorkerPool<T>& pool, std:
     return *this;
 }
 
-bool DatabaseLoader::LoadDatabases()
+bool DatabaseLoader::OpenDatabases()
 {
-    while (!_load.empty())
+    while (!_open.empty())
     {
-        std::pair<Call, std::function<void()>> const load = _load.top();
+        std::pair<Call, std::function<void()>> const load = _open.top();
         if (load.first())
-            _unload.push(load.second);
+            _close.push(load.second);
         else
         {
             // Close all loaded databases
-            while (!_unload.empty())
+            while (!_close.empty())
             {
-                _unload.top()();
-                _unload.pop();
+                _close.top()();
+                _close.pop();
             }
             return false;
         }
 
-        _load.pop();
+        _open.pop();
     }
+    return true;
 }
 
 bool DatabaseLoader::Process(std::stack<Call>& stack)
@@ -119,6 +121,7 @@ bool DatabaseLoader::Process(std::stack<Call>& stack)
 
         stack.pop();
     }
+    return true;
 }
 
 bool DatabaseLoader::PopulateDatabases()
@@ -135,3 +138,12 @@ bool DatabaseLoader::PrepareStatements()
 {
     return Process(_prepare);
 }
+
+template
+DatabaseLoader& DatabaseLoader::AddDatabase<LoginDatabaseConnection>(DatabaseWorkerPool<LoginDatabaseConnection>& pool, std::string const& name);
+template
+DatabaseLoader& DatabaseLoader::AddDatabase<WorldDatabaseConnection>(DatabaseWorkerPool<WorldDatabaseConnection>& pool, std::string const& name);
+template
+DatabaseLoader& DatabaseLoader::AddDatabase<CharacterDatabaseConnection>(DatabaseWorkerPool<CharacterDatabaseConnection>& pool, std::string const& name);
+template
+DatabaseLoader& DatabaseLoader::AddDatabase<HotfixDatabaseConnection>(DatabaseWorkerPool<HotfixDatabaseConnection>& pool, std::string const& name);
