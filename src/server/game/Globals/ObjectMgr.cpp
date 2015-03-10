@@ -3734,8 +3734,16 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->RequiredMinRepValue && qinfo->RequiredMinRepValue > ReputationMgr::Reputation_Cap)
         {
+            /*
+            TODO:
+            [0m../game/libgame.a(ObjectMgr.cpp.o): In function `ObjectMgr::LoadQuests()':
+            /home/travis/build/TrinityCore/TrinityCore/src/server/game/Globals/ObjectMgr.cpp:(.text+0x40af7): undefined reference to `ReputationMgr::Reputation_Cap'
+            */
+
+            auto const test = ReputationMgr::Reputation_Cap;
+
             TC_LOG_ERROR("sql.sql", "Quest %u has `RequiredMinRepValue` = %d but max reputation is %u, quest can't be done.",
-                qinfo->GetQuestId(), qinfo->RequiredMinRepValue, ReputationMgr::Reputation_Cap);
+                qinfo->GetQuestId(), qinfo->RequiredMinRepValue, test);
             // no changes, quest can't be done for this requirement
         }
 

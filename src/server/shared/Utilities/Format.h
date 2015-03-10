@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,23 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef APPENDERDB_H
-#define APPENDERDB_H
+#ifndef TRINITYCORE_FORMAT_H
+#define TRINITYCORE_FORMAT_H
 
-#include "Appender.h"
+// Use variadic templates
+#define TINYFORMAT_USE_VARIADIC_TEMPLATES 1
 
-class AppenderDB: public Appender
+#include <tinyformat.h>
+
+//! Default TC string format function
+template<typename... Args>
+inline std::string format(const char* fmt, Args const&... args)
 {
-    public:
-        AppenderDB(uint8 _id, std::string const& _name, LogLevel level);
-        ~AppenderDB();
-
-        void setRealmId(uint32 realmId);
-
-    private:
-        uint32 realmId;
-        bool enabled;
-        void _write(LogMessage const* message) override;
-};
+    return tfm::format(fmt, args...);
+}
 
 #endif

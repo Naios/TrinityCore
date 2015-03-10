@@ -94,6 +94,7 @@ public:
             { "moveflags",     rbac::RBAC_PERM_COMMAND_DEBUG_MOVEFLAGS,     false, &HandleDebugMoveflagsCommand,        "", NULL },
             { "transport",     rbac::RBAC_PERM_COMMAND_DEBUG_TRANSPORT,     false, &HandleDebugTransportCommand,        "", NULL },
             { "phase",         rbac::RBAC_PERM_COMMAND_DEBUG_PHASE,         false, &HandleDebugPhaseCommand,            "", NULL },
+            { "encoding",      rbac::RBAC_PERM_COMMAND_DEBUG_ENCODING,      true,  &HandleDebugEncoding,                "", NULL },
             { NULL,            0,                                     false, NULL,                                "", NULL }
         };
         static ChatCommand commandTable[] =
@@ -1398,6 +1399,13 @@ public:
         if (unit && unit->GetTypeId() == TYPEID_PLAYER)
             player = unit->ToPlayer();
         */
+        return true;
+    }
+
+    static bool HandleDebugEncoding(ChatHandler* handler, char const* args)
+    {
+        TC_LOG_INFO("server.server", "TC_LOG_INFO: \"%s\".", args);
+        handler->PSendSysMessage("PSendSysMessage: %s", args);
         return true;
     }
 };

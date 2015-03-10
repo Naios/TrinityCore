@@ -20,6 +20,10 @@ SFMT (SIMD-oriented Fast Mersenne Twister)
   Based on http://agner.org/random/
   Version: 2010-Aug-03
 
+tinyformat (type safe format library)
+  https://github.com/c42f/tinyformat
+  Version: 325199ff49e092ed96fd854ed7d26e74ab6c2622
+
 utf8-cpp (UTF-8 with C++ in a Portable Way)
   http://utfcpp.sourceforge.net/
   Version: 2.3.4
