@@ -21,6 +21,7 @@
 
 #include "Define.h"
 #include "Errors.h"
+#include "Format.h"
 
 #include <algorithm>
 #include <string>
@@ -359,8 +360,14 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
 bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
 bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
 bool Utf8FitTo(const std::string& str, std::wstring const& search);
-void utf8printf(FILE* out, const char *str, ...);
-void vutf8printf(FILE* out, const char *str, va_list* ap);
+
+template<typename... Args>
+inline void utf8printf(FILE* out, const char* fmt, Args const&... args)
+{
+    vutf8printf(out, format(fmt, args...));
+}
+
+void vutf8printf(FILE* out, std::string const& str);
 bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
