@@ -53,6 +53,8 @@ include(CheckPlatform)
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
 set(OPENSSL_EXPECTED_VERSION 1.0.0)
 
+include(GroupSources)
+
 find_package(PCHSupport)
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)

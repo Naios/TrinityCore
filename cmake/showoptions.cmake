@@ -62,6 +62,21 @@ else()
   message("* Use coreside debug     : No  (default)")
 endif()
 
+if( WITH_SOURCE_TREE )
+  # TODO: Remove this after Debian 8 is released and set general required version to 2.8.12
+  #       Debian 7 is shipped with CMake 2.8.9 . But DIRECTORY flag of get_filename_component requires 2.8.12 .
+  if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
+    set(_WITH_SOURCE_TREE ON CACHE INTERNAL "WITH_SOURCE_TREE support enabled.")
+    message("* Show source tree       : Yes")
+  else()
+    set(_WITH_SOURCE_TREE OFF CACHE INTERNAL "WITH_SOURCE_TREE support disabled.")
+    message(WARNING "* Show source tree       : Disabled! (only supported if cmake >= 2.8.12)")
+  endif()
+else()
+  message("* Show source tree       : No  (default)")
+  set(_WITH_SOURCE_TREE OFF CACHE INTERNAL "WITH_SOURCE_TREE support disabled.")
+endif()
+
 if ( WITHOUT_GIT )
   message("* Use GIT revision hash  : No")
   message("")
