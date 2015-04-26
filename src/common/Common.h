@@ -43,6 +43,8 @@
 #include <vector>
 #include <array>
 
+#include <boost/optional.hpp>
+#include <boost/utility/in_place_factory.hpp>
 #include <boost/functional/hash.hpp>
 
 #include "Debugging/Errors.h"
@@ -150,6 +152,10 @@ typedef std::vector<std::string> StringVector;
 #endif
 
 #define MAX_QUERY_LEN 32*1024
+
+//! Optional helper class to wrap optional values within.
+template <typename T>
+using Optional = boost::optional<T>;
 
 namespace Trinity
 {
