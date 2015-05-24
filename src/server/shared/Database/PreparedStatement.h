@@ -78,7 +78,7 @@ class PreparedStatement
     friend class MySQLConnection;
 
     public:
-        explicit PreparedStatement(uint32 index);
+        explicit PreparedStatement(uint32 index, uint8 capacity);
         ~PreparedStatement();
 
         void setBool(const uint8 index, const bool value);
@@ -97,12 +97,12 @@ class PreparedStatement
         void setNull(const uint8 index);
 
     protected:
-        void BindParameters();
+        //- Copy the parameters to a real MySQLPreparedStatement
+        void BindParameters(MySQLPreparedStatement* m_stmt) const;
 
-    protected:
-        MySQLPreparedStatement* m_stmt;
         uint32 m_index;
-        std::vector<PreparedStatementData> statement_data;    //- Buffer of parameters, not tied to MySQL in any way yet
+        //- Buffer of parameters, not tied to MySQL in any way yet
+        std::vector<PreparedStatementData> statement_data;
 
         PreparedStatement(PreparedStatement const& right) = delete;
         PreparedStatement& operator=(PreparedStatement const& right) = delete;
@@ -139,7 +139,7 @@ class MySQLPreparedStatement
         MYSQL_BIND* GetBind() { return m_bind; }
         PreparedStatement* m_stmt;
         void ClearParameters();
-        bool CheckValidIndex(uint8 index);
+        void AssertValidIndex(uint8 index);
         std::string getQueryString(std::string const& sqlPattern) const;
 
     private:

@@ -190,9 +190,8 @@ bool MySQLConnection::Execute(PreparedStatement* stmt)
         MySQLPreparedStatement* m_mStmt = GetPreparedStatement(index);
         ASSERT(m_mStmt);            // Can only be null if preparation failed, server side error or bad query
         m_mStmt->m_stmt = stmt;     // Cross reference them for debug output
-        stmt->m_stmt = m_mStmt;     /// @todo Cleaner way
 
-        stmt->BindParameters();
+        stmt->BindParameters(m_mStmt);
 
         MYSQL_STMT* msql_STMT = m_mStmt->GetSTMT();
         MYSQL_BIND* msql_BIND = m_mStmt->GetBind();
@@ -240,9 +239,8 @@ bool MySQLConnection::_Query(PreparedStatement* stmt, MYSQL_RES **pResult, uint6
         MySQLPreparedStatement* m_mStmt = GetPreparedStatement(index);
         ASSERT(m_mStmt);            // Can only be null if preparation failed, server side error or bad query
         m_mStmt->m_stmt = stmt;     // Cross reference them for debug output
-        stmt->m_stmt = m_mStmt;     /// @todo Cleaner way
 
-        stmt->BindParameters();
+        stmt->BindParameters(m_mStmt);
 
         MYSQL_STMT* msql_STMT = m_mStmt->GetSTMT();
         MYSQL_BIND* msql_BIND = m_mStmt->GetBind();
@@ -422,12 +420,20 @@ MySQLPreparedStatement* MySQLConnection::GetPreparedStatement(uint32 index)
     return ret;
 }
 
-void MySQLConnection::PrepareStatement(uint32 index, const char* sql, ConnectionFlags flags)
+void MySQLConnection::PrepareStatement(uint32 index, std::string const& sql, ConnectionFlags flags)
 {
-    m_queries.insert(PreparedStatementMap::value_type(index, std::make_pair(sql, flags)));
+    if (!m_reconnecting)
+    {
+        // Pre-calculate the size of the prepared statements
+        size_t const m_argument_count = std::count(sql.begin(), sql.end(), '?');
 
+        // TC only supports uint8 indices.
+        ASSERT(m_argument_count < std::numeric_limits<uint8>::max());
+
+        m_queries.insert(std::make_pair(index, PreparedStatementInfo(sql, static_cast<uint8>(m_argument_count), flags)));
+    }
     // For reconnection case
-    if (m_reconnecting)
+    else
         delete m_stmts[index];
 
     // Check if specified query should be prepared on this connection

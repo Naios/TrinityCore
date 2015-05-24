@@ -60,7 +60,19 @@ struct MySQLConnectionInfo
     std::string port_or_socket;
 };
 
-typedef std::map<uint32 /*index*/, std::pair<std::string /*query*/, ConnectionFlags /*sync/async*/> > PreparedStatementMap;
+struct PreparedStatementInfo
+{
+    PreparedStatementInfo(std::string const& query_, uint8 const capacity_, ConnectionFlags const flags_) :
+        query(query_), capacity(capacity_), flags(flags_) { }
+
+    std::string const query;
+
+    uint8 const capacity; // argument count
+
+    ConnectionFlags const flags; // sync/async
+};
+
+typedef std::map<uint32 /*index*/, PreparedStatementInfo > PreparedStatementMap;
 
 class MySQLConnection
 {
@@ -111,7 +123,7 @@ class MySQLConnection
 
         MYSQL* GetHandle()  { return m_Mysql; }
         MySQLPreparedStatement* GetPreparedStatement(uint32 index);
-        void PrepareStatement(uint32 index, const char* sql, ConnectionFlags flags);
+        void PrepareStatement(uint32 index, std::string const& sql, ConnectionFlags flags);
 
         virtual void DoPrepareStatements() = 0;
 
