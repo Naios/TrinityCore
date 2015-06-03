@@ -143,11 +143,11 @@ struct npc_simple_scheduler_test : public CreatureAI
             // how often the task was repeated (best to use with dialogs or events).
             scheduler.Schedule(Seconds(3), [this](TaskContext context)
             {
-                switch (context->GetRepeatCounter())
+                switch (context.GetRepeatCounter())
                 {
                     case 0:
                         me->Yell("O shit!", LANG_UNIVERSAL);
-                        context->Repeat(Seconds(3));
+                        context.Repeat(Seconds(3));
                         return;
                     case 1:
                         me->Yell("I see it was a mistake to fight you.", LANG_UNIVERSAL);
@@ -167,13 +167,13 @@ struct npc_simple_scheduler_test : public CreatureAI
                 // Repeat the event with...
 
                 // ... the same time again
-                // context->Repeat();
+                // context.Repeat();
 
                 // ... a constant time
-                // context->Repeat(Seconds(4));
+                // context.Repeat(Seconds(4));
 
                 // ... a random time between min and max
-                context->Repeat(Seconds(4), Seconds(6));
+                context.Repeat(Seconds(4), Seconds(6));
             });
         }
         else if (outro)

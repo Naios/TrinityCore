@@ -420,14 +420,14 @@ class npc_watcher_gashra : public CreatureScript
 
             void Reset() override
             {
-                _events.Reset();
+                _scheduler.CancelAll();
             }
 
             void EnterCombat(Unit* /*who*/) override
             {
                 DoCast(me, SPELL_ENRAGE, true);
-                _events.ScheduleEvent(EVENT_WEB_WRAP_GASHRA, 11000);
-                _events.ScheduleEvent(EVENT_INFECTED_BITE_GASHRA, 4000);
+                // _events.ScheduleEvent(EVENT_WEB_WRAP_GASHRA, 11000);
+                // _events.ScheduleEvent(EVENT_INFECTED_BITE_GASHRA, 4000);
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -442,11 +442,12 @@ class npc_watcher_gashra : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                _events.Update(diff);
+                _scheduler.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
+                /*
                 while (uint32 eventId = _events.ExecuteEvent())
                 {
                     switch (eventId)
@@ -466,10 +467,11 @@ class npc_watcher_gashra : public CreatureScript
                 }
 
                 DoMeleeAttackIfReady();
+                */
             }
 
             private:
-                TaskScheduler _events;
+                TaskScheduler _scheduler;
                 InstanceScript* _instance;
         };
 
@@ -504,21 +506,21 @@ class npc_watcher_narjil : public CreatureScript
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_WEB_WRAP, true);
 
-                    context->Repeat(Seconds(15));
+                    context.Repeat(Seconds(15));
                 });
 
                 // EVENT_INFECTED_BITE_NARJIL
                 _scheduler.Schedule(Seconds(4), [this](TaskContext context)
                 {
                     DoCastVictim(SPELL_INFECTED_BITE, true);
-                    context->Repeat(Seconds(11));
+                    context.Repeat(Seconds(11));
                 });
 
                 // EVENT_BINDING_WEBS
                 _scheduler.Schedule(Seconds(17), [this](TaskContext context)
                 {
                     DoCastVictim(SPELL_BLINDING_WEBS, true);
-                    context->Repeat();
+                    context.Repeat();
                 });
             }
 
@@ -578,7 +580,7 @@ class npc_watcher_silthik : public CreatureScript
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_WEB_WRAP, true);
 
-                    context->Repeat(Seconds(15));
+                    context.Repeat(Seconds(15));
                 });
 
                 // EVENT_INFECTED_BITE_SILTHIK
@@ -587,14 +589,14 @@ class npc_watcher_silthik : public CreatureScript
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_WEB_WRAP, true);
 
-                    context->Repeat(Seconds(11));
+                    context.Repeat(Seconds(11));
                 });
 
                 // EVENT_POISON_SPRAY
                 _scheduler.Schedule(Seconds(15), [this](TaskContext context)
                 {
                     DoCastVictim(SPELL_INFECTED_BITE, true);
-                    context->Repeat(Seconds(17));
+                    context.Repeat(Seconds(17));
                 });
             }
 
