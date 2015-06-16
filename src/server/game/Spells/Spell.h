@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "SpellInfo.h"
 #include "PathGenerator.h"
+#include "Callback.h"
 
 class Unit;
 class Player;
@@ -352,7 +353,8 @@ class Spell
 
         typedef std::set<Aura*> UsedSpellMods;
 
-        Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, ObjectGuid originalCasterGUID = ObjectGuid::Empty, bool skipCheck = false);
+        Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
+            ObjectGuid originalCasterGUID = ObjectGuid::Empty, bool skipCheck = false, Optional<Callback<SpellCastResult>> callback = boost::none);
         ~Spell();
 
         void InitExplicitTargets(SpellCastTargets const& targets);
@@ -515,6 +517,15 @@ class Spell
         Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
 
         Spell** m_selfContainer;                            // pointer to our spell container (if applicable)
+
+        Optional<Callback<SpellCastResult>> m_callback;     // Optional callback
+
+        inline void InvokeCallback(SpellCastResult result)
+        {
+            // Invoke the callback if there is any.
+            if (m_callback)
+                (*m_callback)(result);
+        }
 
         //Spell data
         SpellSchoolMask m_spellSchoolMask;                  // Spell school (can be overwrite for some spells (wand shoot for example)
