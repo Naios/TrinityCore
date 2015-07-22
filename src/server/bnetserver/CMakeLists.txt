@@ -46,6 +46,7 @@ endif()
 include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/dep/cppformat
+  ${CMAKE_SOURCE_DIR}/dep/concurrentqueue
   ${CMAKE_SOURCE_DIR}/dep/zmqpp
   ${CMAKE_SOURCE_DIR}/dep/process
   ${CMAKE_SOURCE_DIR}/src/server/shared

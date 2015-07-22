@@ -64,6 +64,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/dep/SFMT
   ${CMAKE_SOURCE_DIR}/dep/cppformat
+  ${CMAKE_SOURCE_DIR}/dep/concurrentqueue
   ${CMAKE_SOURCE_DIR}/dep/utf8cpp
   ${CMAKE_SOURCE_DIR}/dep/process
   ${CMAKE_SOURCE_DIR}/src/server
