@@ -51,6 +51,10 @@ message(STATUS "MSVC: Disabled NON-SECURE warnings")
 add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
 message(STATUS "MSVC: Disabled POSIX warnings")
 
+# Disable deprecated <functional> includes like std::auto_ptr
+add_definitions(-D_HAS_AUTO_PTR_ETC=0)
+message(STATUS "MSVC: Disabled deprecated <functional> includes")
+
 # Ignore specific warnings
 # C4351: new behavior: elements of array 'x' will be default initialized
 # C4091: 'typedef ': ignored on left of '' when no variable is declared
