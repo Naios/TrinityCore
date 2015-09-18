@@ -80,10 +80,6 @@ uint32 _worldLoopCounter(0);
 uint32 _lastChangeMsTime(0);
 uint32 _maxCoreStuckTimeInMs(0);
 
-WorldDatabaseWorkerPool WorldDatabase;                      ///< Accessor to the world database
-CharacterDatabaseWorkerPool CharacterDatabase;              ///< Accessor to the character database
-HotfixDatabaseWorkerPool HotfixDatabase;                    ///< Accessor to the hotfix database
-LoginDatabaseWorkerPool LoginDatabase;                      ///< Accessor to the realm/login database
 Battlenet::RealmHandle realmHandle;                         ///< Id of the realm
 Realm realm;
 
