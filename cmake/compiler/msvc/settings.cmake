@@ -67,7 +67,9 @@ message(STATUS "MSVC: Disabled POSIX warnings")
 # Ignore specific warnings
 # C4351: new behavior: elements of array 'x' will be default initialized
 # C4091: 'typedef ': ignored on left of '' when no variable is declared
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4351 /wd4091")
+# C4251: needs to have dll-interface to be used by clients of class '...'
+# C4275: non dll-interface class ...' used as base for dll-interface class '...'
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4351 /wd4091 /wd4251 /wd4275")
 
 if(NOT WITH_WARNINGS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /wd4619 /wd4512")

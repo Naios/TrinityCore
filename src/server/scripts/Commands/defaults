@@ -1,0 +1,5 @@
+# TrinityCore defaults file
+# 4. line default script value for SCRIPTS=1
+# 5. line default script value for SCRIPTS=0
+static
+static
