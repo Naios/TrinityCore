@@ -48,6 +48,8 @@ if( NOPCH )
   set(USE_SCRIPTPCH 0)
 endif()
 
+include(ConfigureScripts)
+
 include(CheckPlatform)
 
 include(GroupSources)
