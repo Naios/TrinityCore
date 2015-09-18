@@ -25,7 +25,7 @@
 
 struct bignum_st;
 
-class BigNumber
+class TRINITY_COMMON_API BigNumber
 {
     public:
         BigNumber();
