@@ -15,32 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _WORKERTHREAD_H
-#define _WORKERTHREAD_H
+#include "DatabaseEnv.h"
 
-#include <thread>
-#include "ProducerConsumerQueue.h"
-
-class MySQLConnection;
-class SQLOperation;
-
-class TRINITY_DATABASE_API DatabaseWorker
-{
-    public:
-        DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection);
-        ~DatabaseWorker();
-
-    private:
-        ProducerConsumerQueue<SQLOperation*>* _queue;
-        MySQLConnection* _connection;
-
-        void WorkerThread();
-        std::thread _workerThread;
-
-        std::atomic_bool _cancelationToken;
-
-        DatabaseWorker(DatabaseWorker const& right) = delete;
-        DatabaseWorker& operator=(DatabaseWorker const& right) = delete;
-};
-
-#endif
+WorldDatabaseWorkerPool WorldDatabase;
+CharacterDatabaseWorkerPool CharacterDatabase;
+LoginDatabaseWorkerPool LoginDatabase;
+HotfixDatabaseWorkerPool HotfixDatabase;
