@@ -64,10 +64,35 @@ include_directories(
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(database STATIC
-  ${database_STAT_SRCS}
-  ${database_STAT_PCH_SRC}
-)
+if (WITH_DYNAMIC_LINKING)
+  add_definitions(-DTRINITY_API_EXPORT_DATABASE)
+
+  add_library(database SHARED
+    ${database_STAT_SRCS}
+    ${database_STAT_PCH_SRC}
+  )
+
+  target_link_libraries(database
+    common
+    ipc
+    g3dlib
+    Detour
+    format
+    ${MYSQL_LIBRARY}
+    ${JEMALLOC_LIBRARY}
+    ${READLINE_LIBRARY}
+    ${TERMCAP_LIBRARY}
+    ${OPENSSL_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Boost_LIBRARIES}
+  )
+
+else()
+  add_library(database STATIC
+    ${database_STAT_SRCS}
+    ${database_STAT_PCH_SRC}
+  )
+endif()
 
 # Generate precompiled header
 if (USE_COREPCH)

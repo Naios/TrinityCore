@@ -53,7 +53,7 @@ union SQLResultSetUnion
 
 class MySQLConnection;
 
-class SQLOperation
+class TRINITY_DATABASE_API SQLOperation
 {
     public:
         SQLOperation(): m_conn(NULL) { }

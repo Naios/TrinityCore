@@ -78,7 +78,6 @@ variables_map GetConsoleArguments(int argc, char** argv, std::string& configFile
 static boost::asio::io_service* _ioService;
 static boost::asio::deadline_timer* _dbPingTimer;
 static uint32 _dbPingInterval;
-LoginDatabaseWorkerPool LoginDatabase;
 
 int main(int argc, char** argv)
 {

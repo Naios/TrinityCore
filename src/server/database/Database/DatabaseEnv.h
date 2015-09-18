@@ -39,10 +39,15 @@
 #include "Implementation/WorldDatabase.h"
 #include "Implementation/HotfixDatabase.h"
 
-extern WorldDatabaseWorkerPool WorldDatabase;
-extern CharacterDatabaseWorkerPool CharacterDatabase;
-extern LoginDatabaseWorkerPool LoginDatabase;
-extern HotfixDatabaseWorkerPool HotfixDatabase;
+TRINITY_DATABASE_API WorldDatabaseWorkerPool& GetWorldDatabaseInstance();
+TRINITY_DATABASE_API CharacterDatabaseWorkerPool& GetCharacterDatabaseInstance();
+TRINITY_DATABASE_API LoginDatabaseWorkerPool& GetLoginDatabaseInstance();
+TRINITY_DATABASE_API HotfixDatabaseWorkerPool& GetHotfixDatabaseInstance();
+
+// TODO Improve this dirty workaround
+#define WorldDatabase GetWorldDatabaseInstance()
+#define CharacterDatabase GetCharacterDatabaseInstance()
+#define LoginDatabase GetLoginDatabaseInstance()
+#define HotfixDatabase GetHotfixDatabaseInstance()
 
 #endif
-
