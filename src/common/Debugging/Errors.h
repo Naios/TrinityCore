@@ -23,16 +23,16 @@
 
 namespace Trinity
 {
-    DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, char const* message) ATTR_NORETURN;
-    DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, char const* message, char const* format, ...) ATTR_NORETURN ATTR_PRINTF(5, 6);
+    DECLSPEC_NORETURN TRINITY_COMMON_API void Assert(char const* file, int line, char const* function, char const* message) ATTR_NORETURN;
+    DECLSPEC_NORETURN TRINITY_COMMON_API void Assert(char const* file, int line, char const* function, char const* message, char const* format, ...) ATTR_NORETURN ATTR_PRINTF(5, 6);
 
-    DECLSPEC_NORETURN void Fatal(char const* file, int line, char const* function, char const* message) ATTR_NORETURN;
+    DECLSPEC_NORETURN TRINITY_COMMON_API void Fatal(char const* file, int line, char const* function, char const* message) ATTR_NORETURN;
 
-    DECLSPEC_NORETURN void Error(char const* file, int line, char const* function, char const* message) ATTR_NORETURN;
-    
-    DECLSPEC_NORETURN void Abort(char const* file, int line, char const* function) ATTR_NORETURN;
+    DECLSPEC_NORETURN TRINITY_COMMON_API void Abort(char const* file, int line, char const* function) ATTR_NORETURN;
 
-    void Warning(char const* file, int line, char const* function, char const* message);
+    DECLSPEC_NORETURN TRINITY_COMMON_API void Error(char const* file, int line, char const* function, char const* message) ATTR_NORETURN;
+
+    TRINITY_COMMON_API void Warning(char const* file, int line, char const* function, char const* message);
 
 } // namespace Trinity
 
