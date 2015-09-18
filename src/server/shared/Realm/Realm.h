@@ -43,7 +43,7 @@ namespace Battlenet
 {
     struct RealmHandle;
 
-    struct RealmId
+    struct TRINITY_SHARED_API RealmId
     {
         RealmId() : Region(0), Battlegroup(0), Index(0), Build(0) { }
         RealmId(uint8 region, uint8 battlegroup, uint32 index, uint32 build)
@@ -64,7 +64,7 @@ namespace Battlenet
 #pragma pack(pop)
 
 // Storage object for a realm
-struct Realm
+struct TRINITY_SHARED_API Realm
 {
     Battlenet::RealmId Id;
     ip::address ExternalAddress;
