@@ -39,10 +39,9 @@
 #include "Implementation/WorldDatabase.h"
 #include "Implementation/HotfixDatabase.h"
 
-extern WorldDatabaseWorkerPool WorldDatabase;
-extern CharacterDatabaseWorkerPool CharacterDatabase;
-extern LoginDatabaseWorkerPool LoginDatabase;
-extern HotfixDatabaseWorkerPool HotfixDatabase;
+TRINITY_DATABASE_API extern WorldDatabaseWorkerPool WorldDatabase;
+TRINITY_DATABASE_API extern CharacterDatabaseWorkerPool CharacterDatabase;
+TRINITY_DATABASE_API extern LoginDatabaseWorkerPool LoginDatabase;
+TRINITY_DATABASE_API extern HotfixDatabaseWorkerPool HotfixDatabase;
 
 #endif
-
