@@ -10,6 +10,12 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 message(STATUS "GCC: Enabled c++11 support")
 
+if (WITH_DYNAMIC_LINKING)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fvisibility=hidden")
+
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --no-undefined")
+endif()
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 message(STATUS "GCC: Enabled C99 support")
 
