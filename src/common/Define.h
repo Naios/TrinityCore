@@ -95,6 +95,51 @@
 #endif
 #endif //COMPILER == COMPILER_GNU
 
+#ifdef TRINITY_API_USE_DYNAMIC_LINKING
+#  if COMPILER == COMPILER_MICROSOFT
+#    define TRINITY_API_EXPORT __declspec(dllexport)
+#    define TRINITY_API_IMPORT __declspec(dllimport)
+#  elif COMPILER == COMPILER_GNU
+#    define TRINITY_API_EXPORT __attribute__((visibility("default")))
+#    define TRINITY_API_IMPORT
+#  else
+#    error compiler not supported!
+#  endif
+#else
+#  define TRINITY_API_EXPORT
+#  define TRINITY_API_IMPORT
+#endif
+
+#ifdef TRINITY_API_EXPORT_IPC
+#  define TRINITY_IPC_API TRINITY_API_EXPORT
+#else
+#  define TRINITY_IPC_API TRINITY_API_IMPORT
+#endif
+
+#ifdef TRINITY_API_EXPORT_COMMON
+#  define TRINITY_COMMON_API TRINITY_API_EXPORT
+#else
+#  define TRINITY_COMMON_API TRINITY_API_IMPORT
+#endif
+
+#ifdef TRINITY_API_EXPORT_DATABASE
+#  define TRINITY_DATABASE_API TRINITY_API_EXPORT
+#else
+#  define TRINITY_DATABASE_API TRINITY_API_IMPORT
+#endif
+
+#ifdef TRINITY_API_EXPORT_SHARED
+#  define TRINITY_SHARED_API TRINITY_API_EXPORT
+#else
+#  define TRINITY_SHARED_API TRINITY_API_IMPORT
+#endif
+
+#ifdef TRINITY_API_EXPORT_GAME
+#  define TRINITY_GAME_API TRINITY_API_EXPORT
+#else
+#  define TRINITY_GAME_API TRINITY_API_IMPORT
+#endif
+
 #define UI64FMTD "%" PRIu64
 #define UI64LIT(N) UINT64_C(N)
 
