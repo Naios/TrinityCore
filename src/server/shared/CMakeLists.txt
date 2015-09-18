@@ -18,9 +18,6 @@ file(GLOB_RECURSE sources_Dynamic Dynamic/*.cpp Dynamic/*.h)
 file(GLOB_RECURSE sources_Networking Networking/*.cpp Networking/*.h)
 file(GLOB_RECURSE sources_Packets Packets/*.cpp Packets/*.h)
 file(GLOB_RECURSE sources_Realm Realm/*.cpp Realm/*.h)
-if(WIN32)
-  file(GLOB_RECURSE sources_Service Service/*.cpp Service/*.h)
-endif(WIN32)
 
 file(GLOB sources_localdir *.cpp *.h)
 
@@ -68,10 +65,40 @@ include_directories(
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(shared STATIC
-  ${shared_STAT_SRCS}
-  ${shared_STAT_PCH_SRC}
-)
+if (WITH_DYNAMIC_LINKING)
+  add_definitions(-DTRINITY_API_EXPORT_SHARED)
+
+  add_library(shared SHARED
+    ${shared_STAT_SRCS}
+    ${shared_STAT_PCH_SRC}
+  )
+
+  target_link_libraries(shared
+    common
+    database
+    format
+    ${JEMALLOC_LIBRARY}
+    ${READLINE_LIBRARY}
+    ${TERMCAP_LIBRARY}
+    ${OPENSSL_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Boost_LIBRARIES}
+  )
+
+  if( UNIX )
+    install(TARGETS shared DESTINATION lib)
+  elseif( WIN32 )
+    install(TARGETS shared
+      RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  endif()
+
+else()
+  add_library(shared STATIC
+    ${shared_STAT_SRCS}
+    ${shared_STAT_PCH_SRC}
+  )
+endif()
 
 add_dependencies(shared revision_data.h)
 
