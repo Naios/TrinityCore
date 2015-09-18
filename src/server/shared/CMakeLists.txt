@@ -68,10 +68,34 @@ include_directories(
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(shared STATIC
-  ${shared_STAT_SRCS}
-  ${shared_STAT_PCH_SRC}
-)
+if (WITH_DYNAMIC_LINKING)
+  add_definitions(-DTRINITY_API_EXPORT_SHARED)
+
+  add_library(shared SHARED
+    ${shared_STAT_SRCS}
+    ${shared_STAT_PCH_SRC}
+  )
+
+  target_link_libraries(shared
+    common
+    database
+    format
+    # todo remove this
+    ${MYSQL_LIBRARY}
+    ${JEMALLOC_LIBRARY}
+    ${READLINE_LIBRARY}
+    ${TERMCAP_LIBRARY}
+    ${OPENSSL_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Boost_LIBRARIES}
+  )
+
+else()
+  add_library(shared STATIC
+    ${shared_STAT_SRCS}
+    ${shared_STAT_PCH_SRC}
+  )
+endif()
 
 add_dependencies(shared revision_data.h)
 

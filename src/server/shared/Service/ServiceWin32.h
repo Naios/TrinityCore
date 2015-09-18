@@ -20,10 +20,11 @@
 #ifndef _WIN32_SERVICE_
 #define _WIN32_SERVICE_
 
-bool WinServiceInstall();
-bool WinServiceUninstall();
-bool WinServiceRun();
+#include "Define.h"
+
+inline bool WinServiceInstall() { return false; }
+inline bool WinServiceUninstall() { return false; }
+inline bool WinServiceRun() { return false; }
 
 #endif                                                      // _WIN32_SERVICE_
 #endif                                                      // _WIN32
-

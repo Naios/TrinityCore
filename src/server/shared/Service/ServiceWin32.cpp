@@ -18,6 +18,11 @@
 
 #ifdef _WIN32
 
+/*
+
+TODO: Fix this
+
+#include "ServiceWin32.h"
 #include "Common.h"
 #include "Log.h"
 #include <cstring>
@@ -260,5 +265,6 @@ bool WinServiceRun()
     }
     return true;
 }
+*/
 #endif
 
