@@ -34,7 +34,7 @@
 
 #define LOGGER_ROOT "root"
 
-class Log
+class TRINITY_COMMON_API Log
 {
     typedef std::unordered_map<std::string, Logger> LoggerMap;
 

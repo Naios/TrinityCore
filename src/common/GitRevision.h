@@ -22,20 +22,20 @@
 
 namespace GitRevision
 {
-    char const* GetHash();
-    char const* GetDate();
-    char const* GetBranch();
-    char const* GetSourceDirectory();
-    char const* GetMySQLExecutable();
-    char const* GetFullDatabase();
-    char const* GetHotfixesDatabase();
-    char const* GetFullVersion();
-    char const* GetCompanyNameStr();
-    char const* GetLegalCopyrightStr();
-    char const* GetFileVersionStr();
-    char const* GetProductVersionStr();
-    char const* GetCompilerCFlags();
-    char const* GetCompilerCXXFlags();
+    TRINITY_COMMON_API char const* GetHash();
+    TRINITY_COMMON_API char const* GetDate();
+    TRINITY_COMMON_API char const* GetBranch();
+    TRINITY_COMMON_API char const* GetSourceDirectory();
+    TRINITY_COMMON_API char const* GetMySQLExecutable();
+    TRINITY_COMMON_API char const* GetFullDatabase();
+    TRINITY_COMMON_API char const* GetHotfixesDatabase();
+    TRINITY_COMMON_API char const* GetFullVersion();
+    TRINITY_COMMON_API char const* GetCompanyNameStr();
+    TRINITY_COMMON_API char const* GetLegalCopyrightStr();
+    TRINITY_COMMON_API char const* GetFileVersionStr();
+    TRINITY_COMMON_API char const* GetProductVersionStr();
+    TRINITY_COMMON_API char const* GetCompilerCFlags();
+    TRINITY_COMMON_API char const* GetCompilerCXXFlags();
 }
 
 #endif

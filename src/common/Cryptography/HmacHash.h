@@ -31,7 +31,7 @@ class BigNumber;
 typedef EVP_MD const* (*HashCreateFn)();
 
 template<HashCreateFn HashCreator, uint32 DigestLength>
-class HmacHash
+class TRINITY_COMMON_API HmacHash
 {
     public:
         HmacHash(uint32 len, uint8 const* seed);

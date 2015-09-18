@@ -23,7 +23,7 @@
 class Logger;
 struct LogMessage;
 
-class LogOperation
+class TRINITY_COMMON_API LogOperation
 {
     public:
         LogOperation(Logger const* _logger, std::unique_ptr<LogMessage>&& _msg)
