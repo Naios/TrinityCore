@@ -468,7 +468,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
     }
 }
 
-template class DBUpdater<LoginDatabaseConnection>;
-template class DBUpdater<WorldDatabaseConnection>;
-template class DBUpdater<CharacterDatabaseConnection>;
-template class DBUpdater<HotfixDatabaseConnection>;
+template class TRINITY_DATABASE_API DBUpdater<LoginDatabaseConnection>;
+template class TRINITY_DATABASE_API DBUpdater<WorldDatabaseConnection>;
+template class TRINITY_DATABASE_API DBUpdater<CharacterDatabaseConnection>;
+template class TRINITY_DATABASE_API DBUpdater<HotfixDatabaseConnection>;

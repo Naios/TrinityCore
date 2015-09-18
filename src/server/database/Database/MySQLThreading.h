@@ -20,7 +20,7 @@
 
 #include "Log.h"
 
-class MySQL
+class TRINITY_DATABASE_API MySQL
 {
     public:
         static void Library_Init()
