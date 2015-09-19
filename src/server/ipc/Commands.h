@@ -70,14 +70,14 @@ namespace zmqpp
     class message;
 }
 
-zmqpp::message& operator>>(zmqpp::message& msg, IPCHeader& header);
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::RealmHandle& realm);
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::Header& header);
-zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::ToonHandle& toonHandle);
+TRINITY_IPC_API zmqpp::message& operator>>(zmqpp::message& msg, IPCHeader& header);
+TRINITY_IPC_API zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::RealmHandle& realm);
+TRINITY_IPC_API zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::Header& header);
+TRINITY_IPC_API zmqpp::message& operator>>(zmqpp::message& msg, Battlenet::ToonHandle& toonHandle);
 
-zmqpp::message& operator<<(zmqpp::message& msg, IPCHeader const& header);
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::RealmHandle const& realm);
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::Header const& header);
-zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::ToonHandle const& toonHandle);
+TRINITY_IPC_API zmqpp::message& operator<<(zmqpp::message& msg, IPCHeader const& header);
+TRINITY_IPC_API zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::RealmHandle const& realm);
+TRINITY_IPC_API zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::Header const& header);
+TRINITY_IPC_API zmqpp::message& operator<<(zmqpp::message& msg, Battlenet::ToonHandle const& toonHandle);
 
 #endif // _COMMANDS_H
