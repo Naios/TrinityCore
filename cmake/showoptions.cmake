@@ -123,7 +123,7 @@ if ( HELGRIND )
   add_definitions(-DHELGRIND)
 endif()
 
-if (${DYNAMIC_LINKING})
+if (DYNAMIC_LINKING)
   set(WITH_DYNAMIC_LINKING 1 CACHE INTERNAL "" FORCE)
 else()
   unset(WITH_DYNAMIC_LINKING)
