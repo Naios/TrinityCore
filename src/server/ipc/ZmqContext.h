@@ -21,19 +21,17 @@
 #include <zmqpp/zmqpp.hpp>
 #include <mutex>
 
+#include "Define.h"
+
 /*
  * We need to serialize access to zmq context otherwise stuff blows up.
  */
-class ZmqContext
+class TRINITY_IPC_API ZmqContext
 {
 public:
     ~ZmqContext();
 
-    static ZmqContext* Instance()
-    {
-        static ZmqContext instance;
-        return &instance;
-    }
+    static ZmqContext* Instance();
 
     zmqpp::socket* CreateNewSocket(zmqpp::socket_type);
     void Initialize();
