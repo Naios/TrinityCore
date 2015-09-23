@@ -23,7 +23,7 @@
 
 class Creature;
 
-class GuardAI : public ScriptedAI
+TRINITY_GAME_API class GuardAI : public ScriptedAI
 {
     public:
         explicit GuardAI(Creature* creature);

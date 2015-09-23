@@ -49,7 +49,7 @@ enum eEscortState
     STATE_ESCORT_PAUSED     = 0x004                         //will not proceed with waypoints before state is removed
 };
 
-struct npc_escortAI : public ScriptedAI
+TRINITY_GAME_API struct npc_escortAI : public ScriptedAI
 {
     public:
         explicit npc_escortAI(Creature* creature);

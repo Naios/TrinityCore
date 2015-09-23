@@ -63,7 +63,7 @@ enum SCEquip
     EQUIP_UNEQUIP   = 0
 };
 
-class CreatureAI : public UnitAI
+TRINITY_GAME_API class CreatureAI : public UnitAI
 {
     protected:
         Creature* const me;

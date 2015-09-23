@@ -29,7 +29,7 @@ class SpellInfo;
 
 //=================================================
 
-class HostileRefManager : public RefManager<Unit, ThreatManager>
+TRINITY_GAME_API class HostileRefManager : public RefManager<Unit, ThreatManager>
 {
     private:
         Unit* iOwner;

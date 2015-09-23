@@ -37,7 +37,7 @@ class WorldObject;
 
 struct GameTele;
 
-class ChatCommand
+TRINITY_GAME_API class ChatCommand
 {
     public:
         const char *       Name;
@@ -48,7 +48,7 @@ class ChatCommand
         ChatCommand*      ChildCommands;
 };
 
-class ChatHandler
+TRINITY_GAME_API class ChatHandler
 {
     public:
         WorldSession* GetSession() { return m_session; }
@@ -149,7 +149,7 @@ class ChatHandler
         bool sentErrorMessage;
 };
 
-class CliHandler : public ChatHandler
+TRINITY_GAME_API class CliHandler : public ChatHandler
 {
     public:
         typedef void Print(void*, char const*);

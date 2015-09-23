@@ -129,7 +129,7 @@ typedef std::vector<HotfixNotify> HotfixData;
         static bool Compare(structure const* left, structure const* right); \
     };
 
-class DB2Manager
+TRINITY_GAME_API class DB2Manager
 {
 public:
     DEFINE_DB2_SET_COMPARATOR(ChrClassesXPowerTypesEntry);

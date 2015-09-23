@@ -50,7 +50,7 @@ typedef std::map<uint32, rbac::RBACPermission*> RBACPermissionsContainer;
 typedef std::map<uint8, rbac::RBACPermissionContainer> RBACDefaultPermissionsContainer;
 }
 
-class AccountMgr
+TRINITY_GAME_API class AccountMgr
 {
     private:
         AccountMgr();

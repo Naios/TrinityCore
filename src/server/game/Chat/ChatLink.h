@@ -35,7 +35,7 @@ class Quest;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // ChatLink - abstract base class for various links
-class ChatLink
+TRINITY_GAME_API class ChatLink
 {
 public:
     ChatLink() : _color(0), _startPos(0), _endPos(0) { }
@@ -55,7 +55,7 @@ protected:
 };
 
 // ItemChatLink - link to item
-class ItemChatLink : public ChatLink
+TRINITY_GAME_API class ItemChatLink : public ChatLink
 {
 public:
     ItemChatLink() : ChatLink(), _item(NULL), _suffix(NULL), _property(NULL)
@@ -76,7 +76,7 @@ protected:
 };
 
 // QuestChatLink - link to quest
-class QuestChatLink : public ChatLink
+TRINITY_GAME_API class QuestChatLink : public ChatLink
 {
 public:
     QuestChatLink() : ChatLink(), _quest(nullptr), _questLevel(0) { }
@@ -89,7 +89,7 @@ protected:
 };
 
 // SpellChatLink - link to quest
-class SpellChatLink : public ChatLink
+TRINITY_GAME_API class SpellChatLink : public ChatLink
 {
 public:
     SpellChatLink() : ChatLink(), _spell(nullptr) { }
@@ -101,7 +101,7 @@ protected:
 };
 
 // AchievementChatLink - link to quest
-class AchievementChatLink : public ChatLink
+TRINITY_GAME_API class AchievementChatLink : public ChatLink
 {
 public:
     AchievementChatLink() : ChatLink(), _guid(0), _achievement(NULL)
@@ -118,7 +118,7 @@ protected:
 };
 
 // TradeChatLink - link to trade info
-class TradeChatLink : public SpellChatLink
+TRINITY_GAME_API class TradeChatLink : public SpellChatLink
 {
 public:
     TradeChatLink() : SpellChatLink(), _minSkillLevel(0), _maxSkillLevel(0), _guid(0) { }
@@ -131,7 +131,7 @@ private:
 };
 
 // TalentChatLink - link to talent
-class TalentChatLink : public SpellChatLink
+TRINITY_GAME_API class TalentChatLink : public SpellChatLink
 {
 public:
     TalentChatLink() : SpellChatLink(), _talentId(0), _rankId(0) { }
@@ -143,7 +143,7 @@ private:
 };
 
 // EnchantmentChatLink - link to enchantment
-class EnchantmentChatLink : public SpellChatLink
+TRINITY_GAME_API class EnchantmentChatLink : public SpellChatLink
 {
 public:
     EnchantmentChatLink() : SpellChatLink() { }
@@ -151,7 +151,7 @@ public:
 };
 
 // GlyphChatLink - link to glyph
-class GlyphChatLink : public SpellChatLink
+TRINITY_GAME_API class GlyphChatLink : public SpellChatLink
 {
 public:
     GlyphChatLink() : SpellChatLink(), _slotId(0), _glyph(NULL) { }
@@ -161,7 +161,7 @@ private:
     GlyphPropertiesEntry const* _glyph;
 };
 
-class LinkExtractor
+TRINITY_GAME_API class LinkExtractor
 {
 public:
     explicit LinkExtractor(const char* msg);

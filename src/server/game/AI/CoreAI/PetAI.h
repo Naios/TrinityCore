@@ -25,7 +25,7 @@
 class Creature;
 class Spell;
 
-class PetAI : public CreatureAI
+TRINITY_GAME_API class PetAI : public CreatureAI
 {
     public:
 

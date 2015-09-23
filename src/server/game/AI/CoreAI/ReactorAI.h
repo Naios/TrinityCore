@@ -23,7 +23,7 @@
 
 class Unit;
 
-class ReactorAI : public CreatureAI
+TRINITY_GAME_API class ReactorAI : public CreatureAI
 {
     public:
 
