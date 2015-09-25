@@ -18,11 +18,9 @@ if(PLATFORM EQUAL 64)
   add_definitions("-D_WIN64")
   message(STATUS "MSVC: 64-bit platform, enforced -D_WIN64 parameter")
 
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.23026.0)
-    #Enable extended object support for debug compiles on X64 (not required on X86)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
-    message(STATUS "MSVC: Enabled increased number of sections in object files")
-  endif()
+  # Enable extended object support for debug compiles on X64 (not required on X86)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+  message(STATUS "MSVC: 64-bit Platform, enabled increased number of sections in object files")
 else()
   # mark 32 bit executables large address aware so they can use > 2GB address space
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
@@ -49,7 +47,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 if(NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.23026.0))
   # also enable /bigobj for ALL builds under visual studio 2015, increased number of templates in standard library 
   # makes this flag a requirement to build TC at all
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:throwingNew /bigobj")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:throwingNew")
 endif()
 
 # Define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES - eliminates the warning by changing the strcpy call to strcpy_s, which prevents buffer overruns
