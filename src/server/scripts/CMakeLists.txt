@@ -9,39 +9,10 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # Enable precompiled headers when using the GCC compiler.
-
 if (USE_SCRIPTPCH)
-  set(scripts_STAT_PCH_HDR PrecompiledHeaders/ScriptPCH.h)
-  set(scripts_STAT_PCH_SRC PrecompiledHeaders/ScriptPCH.cpp)
+  set(scripts_STAT_PCH_HDR ScriptPCH.h)
+  set(scripts_STAT_PCH_SRC ScriptPCH.cpp)
 endif ()
-
-message(STATUS "SCRIPT PREPARATIONS")
-include(Spells/CMakeLists.txt)
-
-include(Commands/CMakeLists.txt)
-
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
-  ../game/AI/ScriptedAI/ScriptedEscortAI.cpp
-  ../game/AI/ScriptedAI/ScriptedCreature.cpp
-  ../game/AI/ScriptedAI/ScriptedFollowerAI.cpp
-)
-
-if(SCRIPTS)
-  include(Custom/CMakeLists.txt)
-  include(World/CMakeLists.txt)
-  include(OutdoorPvP/CMakeLists.txt)
-  include(EasternKingdoms/CMakeLists.txt)
-  include(Kalimdor/CMakeLists.txt)
-  include(Outland/CMakeLists.txt)
-  include(Northrend/CMakeLists.txt)
-  include(Maelstrom/CMakeLists.txt)
-  include(Events/CMakeLists.txt)
-  include(Pet/CMakeLists.txt)
-endif()
-
-message(STATUS "SCRIPT PREPARATION COMPLETE")
-message("")
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/dep/cppformat
@@ -139,12 +110,72 @@ include_directories(
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
+message("")
+message("* Processing scripts...")
+
+foreach(SCRIPT_PROJECT ${SCRIPT_PROJECTS})
+  if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_PROJECT}")
+
+    # Extract the current status of the script project which could marked as:
+    # - static
+    # - dynamic
+    # - disabled
+    string(TOUPPER "${SCRIPT_PROJECT}" SCRIPT_PROJECT_VAR_NAME)
+    set(SCRIPT_PROJECT_VAR_NAME "SCRIPTS_${SCRIPT_PROJECT_VAR_NAME}")
+    set(SCRIPT_PROJECT_STATUS "${${SCRIPT_PROJECT_VAR_NAME}}")
+
+    message("  - ${SCRIPT_PROJECT} scripts -> [${SCRIPT_PROJECT_STATUS}]")
+
+    if (NOT "${SCRIPT_PROJECT_STATUS}" STREQUAL "disabled")
+
+      # Add all files of the script subdirectory to the project:
+      file(GLOB_RECURSE SCRIPT_PROJECT_SOURCES ${SCRIPT_PROJECT}/*.cpp ${SCRIPT_PROJECT}/*.h ${SCRIPT_PROJECT}/*.hpp)
+
+      # Determine the loader function ("Add##${NameOfDirectory}##Scripts()")
+      set(SCRIPT_PROJECT_LOADER_FUNCTION_NAME "Add${SCRIPT_PROJECT}Scripts()")
+
+      if ("${SCRIPT_PROJECT_STATUS}" STREQUAL "static")
+        # Static link the script module
+
+        # Add all static linked scripts to "script library"
+        set(scripts_STAT_SRC
+          ${scripts_STAT_SRC}
+          ${SCRIPT_PROJECT_SOURCES}
+        )
+
+        set(TRINITY_SCRIPTS_FORWARD_DECL "${TRINITY_SCRIPTS_FORWARD_DECL}void ${SCRIPT_PROJECT_LOADER_FUNCTION_NAME};\n")
+        set(TRINITY_SCRIPTS_INVOKE       "${TRINITY_SCRIPTS_INVOKE}    ${SCRIPT_PROJECT_LOADER_FUNCTION_NAME};\n")        
+
+      elseif ("${SCRIPT_PROJECT_STATUS}" STREQUAL "dynamic")
+        # Dynamic link the script module
+
+      else()
+        message(SEND_ERROR "Invalid option for var ${SCRIPT_PROJECT_VAR_NAME} = ${SCRIPT_PROJECT_STATUS}!")
+      endif()
+
+    endif()
+  endif()
+endforeach()
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in.cmake"
+  "${BUILDDIR}/ScriptLoader.cpp"
+  @ONLY
+)
+
+set(scripts_STAT_SRC
+  ${scripts_STAT_SRC}
+  ${BUILDDIR}/ScriptLoader.cpp
+)
+
+# Create a project for all static linked scripts.
 add_library(scripts STATIC
-  ${scripts_STAT_SRCS}
+  ${scripts_STAT_SRC}
   ${scripts_STAT_PCH_SRC}
 )
 
-# Generate precompiled header
 if (USE_SCRIPTPCH)
   add_cxx_pch(scripts ${scripts_STAT_PCH_HDR} ${scripts_STAT_PCH_SRC})
 endif()
+
+message("")

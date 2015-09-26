@@ -144,6 +144,7 @@ target_link_libraries(worldserver
   game
   common
   shared
+  scripts
   database
   ipc
   g3dlib
