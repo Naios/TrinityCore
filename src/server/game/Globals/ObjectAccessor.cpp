@@ -233,5 +233,5 @@ template <class T> typename HashMapHolder<T>::MapType HashMapHolder<T>::_objectM
 template <class T> boost::shared_mutex HashMapHolder<T>::_lock;
 
 /// Global definitions for the hashmap storage
-template class HashMapHolder<Player>;
-template class HashMapHolder<Transport>;
+template class TRINITY_GAME_API HashMapHolder<Player>;
+template class TRINITY_GAME_API HashMapHolder<Transport>;

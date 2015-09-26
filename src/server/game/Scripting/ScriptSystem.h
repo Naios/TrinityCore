@@ -59,7 +59,7 @@ struct ScriptPointMove
 
 typedef std::vector<ScriptPointMove> ScriptPointVector;
 
-class SystemMgr
+class TRINITY_GAME_API SystemMgr
 {
     private:
         SystemMgr() { }

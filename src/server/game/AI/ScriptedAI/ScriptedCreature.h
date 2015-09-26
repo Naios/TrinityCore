@@ -37,7 +37,7 @@ T* EnsureAI(U* ai)
 
 class InstanceScript;
 
-class SummonList
+class TRINITY_GAME_API SummonList
 {
 public:
     typedef GuidList StorageType;
@@ -122,7 +122,7 @@ private:
     StorageType storage_;
 };
 
-class EntryCheckPredicate
+class TRINITY_GAME_API EntryCheckPredicate
 {
     public:
         EntryCheckPredicate(uint32 entry) : _entry(entry) { }
@@ -132,13 +132,13 @@ class EntryCheckPredicate
         uint32 _entry;
 };
 
-class DummyEntryCheckPredicate
+class TRINITY_GAME_API DummyEntryCheckPredicate
 {
     public:
         bool operator()(ObjectGuid) { return true; }
 };
 
-struct ScriptedAI : public CreatureAI
+struct TRINITY_GAME_API ScriptedAI : public CreatureAI
 {
     explicit ScriptedAI(Creature* creature);
     virtual ~ScriptedAI() { }
@@ -336,7 +336,7 @@ struct ScriptedAI : public CreatureAI
         bool _isHeroic;
 };
 
-class BossAI : public ScriptedAI
+class TRINITY_GAME_API BossAI : public ScriptedAI
 {
     public:
         BossAI(Creature* creature, uint32 bossId);
@@ -388,7 +388,7 @@ class BossAI : public ScriptedAI
         uint32 const _bossId;
 };
 
-class WorldBossAI : public ScriptedAI
+class TRINITY_GAME_API WorldBossAI : public ScriptedAI
 {
     public:
         WorldBossAI(Creature* creature);
@@ -419,10 +419,10 @@ class WorldBossAI : public ScriptedAI
 };
 
 // SD2 grid searchers.
-Creature* GetClosestCreatureWithEntry(WorldObject* source, uint32 entry, float maxSearchRange, bool alive = true);
-GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange);
-void GetCreatureListWithEntryInGrid(std::list<Creature*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
-void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
-void GetPlayerListInGrid(std::list<Player*>& list, WorldObject* source, float maxSearchRange);
+TRINITY_GAME_API Creature* GetClosestCreatureWithEntry(WorldObject* source, uint32 entry, float maxSearchRange, bool alive = true);
+TRINITY_GAME_API GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange);
+TRINITY_GAME_API void GetCreatureListWithEntryInGrid(std::list<Creature*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
+TRINITY_GAME_API void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
+TRINITY_GAME_API void GetPlayerListInGrid(std::list<Player*>& list, WorldObject* source, float maxSearchRange);
 
 #endif // SCRIPTEDCREATURE_H_

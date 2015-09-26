@@ -29,18 +29,18 @@ namespace Battlenet
 {
     namespace AccountMgr
     {
-        AccountOpResult CreateBattlenetAccount(std::string email, std::string password, bool withGameAccount = true);
-        AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
-        bool CheckPassword(uint32 accountId, std::string password);
-        AccountOpResult LinkWithGameAccount(std::string const& email, std::string const& gameAccountName);
-        AccountOpResult UnlinkGameAccount(std::string const& gameAccountName);
+        TRINITY_GAME_API AccountOpResult CreateBattlenetAccount(std::string email, std::string password, bool withGameAccount = true);
+        TRINITY_GAME_API AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
+        TRINITY_GAME_API bool CheckPassword(uint32 accountId, std::string password);
+        TRINITY_GAME_API AccountOpResult LinkWithGameAccount(std::string const& email, std::string const& gameAccountName);
+        TRINITY_GAME_API AccountOpResult UnlinkGameAccount(std::string const& gameAccountName);
 
-        uint32 GetId(std::string const& username);
-        bool GetName(uint32 accountId, std::string& name);
-        uint32 GetIdByGameAccount(uint32 gameAccountId);
-        uint8 GetMaxIndex(uint32 accountId);
+        TRINITY_GAME_API uint32 GetId(std::string const& username);
+        TRINITY_GAME_API bool GetName(uint32 accountId, std::string& name);
+        TRINITY_GAME_API uint32 GetIdByGameAccount(uint32 gameAccountId);
+        TRINITY_GAME_API uint8 GetMaxIndex(uint32 accountId);
 
-        std::string CalculateShaPassHash(std::string const& name, std::string const& password);
+        TRINITY_GAME_API std::string CalculateShaPassHash(std::string const& name, std::string const& password);
     }
 }
 

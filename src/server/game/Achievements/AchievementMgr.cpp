@@ -2886,8 +2886,8 @@ char const* AchievementGlobalMgr::GetCriteriaTypeString(AchievementCriteriaTypes
     return "MISSING_TYPE";
 }
 
-template class AchievementMgr<Guild>;
-template class AchievementMgr<Player>;
+template class TRINITY_GAME_API AchievementMgr<Guild>;
+template class TRINITY_GAME_API AchievementMgr<Player>;
 
 //==========================================================
 AchievementGlobalMgr::~AchievementGlobalMgr()

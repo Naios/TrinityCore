@@ -32,7 +32,7 @@ enum Direction
 
 class WorldPacket;
 
-class PacketLog
+class TRINITY_GAME_API PacketLog
 {
     private:
         PacketLog();
