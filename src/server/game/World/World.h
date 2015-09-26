@@ -792,6 +792,11 @@ class TRINITY_GAME_API World
 
         void RemoveOldCorpses();
 
+        typedef void(*script_loader_function_t)();
+
+        void SetScriptLoader(script_loader_function_t script_loader_function) { m_script_loader_function = script_loader_function; }
+        script_loader_function_t GetScriptLoader() const { return m_script_loader_function; }
+
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -900,6 +905,8 @@ class TRINITY_GAME_API World
 
         void ProcessQueryCallbacks();
         std::deque<PreparedQueryResultFuture> m_realmCharCallbacks;
+
+        script_loader_function_t m_script_loader_function;
 };
 
 #define sWorld World::instance()
