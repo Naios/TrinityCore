@@ -1456,7 +1456,7 @@ void World::SetInitialWorldSettings()
     uint32 server_type = IsFFAPvPRealm() ? uint32(REALM_TYPE_PVP) : getIntConfig(CONFIG_GAME_TYPE);
     uint32 realm_zone = getIntConfig(CONFIG_REALM_ZONE);
 
-    LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realmHandle.Index);      // One-time query
+    LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, sRealmHandle->Index);      // One-time query
 
     TC_LOG_INFO("server.loading", "Initialize data stores...");
     ///- Load DBCs
@@ -1917,7 +1917,7 @@ void World::SetInitialWorldSettings()
     m_startTime = m_gameTime;
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
-                            realmHandle.Index, uint32(m_startTime), GitRevision::GetFullVersion());       // One-time query
+                            sRealmHandle->Index, uint32(m_startTime), GitRevision::GetFullVersion());       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
@@ -2201,7 +2201,7 @@ void World::Update(uint32 diff)
 
         stmt->setUInt32(0, tmpDiff);
         stmt->setUInt16(1, uint16(maxOnlinePlayers));
-        stmt->setUInt32(2, realmHandle.Index);
+        stmt->setUInt32(2, sRealmHandle->Index);
         stmt->setUInt32(3, uint32(m_startTime));
 
         LoginDatabase.Execute(stmt);
@@ -2918,13 +2918,13 @@ void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS_BY_REALM);
         stmt->setUInt32(0, accountId);
-        stmt->setUInt32(1, realmHandle.Index);
+        stmt->setUInt32(1, sRealmHandle->Index);
         LoginDatabase.Execute(stmt);
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_REALM_CHARACTERS);
         stmt->setUInt8(0, charCount);
         stmt->setUInt32(1, accountId);
-        stmt->setUInt32(2, realmHandle.Index);
+        stmt->setUInt32(2, sRealmHandle->Index);
         LoginDatabase.Execute(stmt);
     }
 }
@@ -3098,7 +3098,7 @@ void World::ResetCurrencyWeekCap()
 void World::LoadDBAllowedSecurityLevel()
 {
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALMLIST_SECURITY_LEVEL);
-    stmt->setInt32(0, int32(realmHandle.Index));
+    stmt->setInt32(0, int32(sRealmHandle->Index));
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     if (result)
@@ -3444,7 +3444,19 @@ void World::ReloadRBAC()
             session->InvalidateRBACData();
 }
 
+Battlenet::RealmHandle* GetRealmHandleInstance()
+{
+    static Battlenet::RealmHandle instance;
+    return &instance;
+}
+
+Realm* GetRealmInstance()
+{
+    static Realm instance;
+    return &instance;
+}
+
 uint32 GetVirtualRealmAddress()
 {
-    return uint32(realmHandle.Region) << 24 | uint32(realmHandle.Battlegroup) << 16 | realmHandle.Index;
+    return uint32(sRealmHandle->Region) << 24 | uint32(sRealmHandle->Battlegroup) << 16 | sRealmHandle->Index;
 }

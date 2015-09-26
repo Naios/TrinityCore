@@ -713,7 +713,7 @@ void WorldSession::Handle_EarlyProccess(WorldPacket& recvPacket)
 void WorldSession::SendConnectToInstance(WorldPackets::Auth::ConnectToSerial serial)
 {
     boost::system::error_code ignored_error;
-    boost::asio::ip::tcp::endpoint instanceAddress = realm.GetAddressForClient(boost::asio::ip::address::from_string(GetRemoteAddress(), ignored_error));
+    boost::asio::ip::tcp::endpoint instanceAddress = sRealm->GetAddressForClient(boost::asio::ip::address::from_string(GetRemoteAddress(), ignored_error));
     instanceAddress.port(sWorld->getIntConfig(CONFIG_PORT_INSTANCE));
 
     WorldPackets::Auth::ConnectTo connectTo;
@@ -1105,9 +1105,9 @@ void WorldSession::LoadPermissions()
     uint8 secLevel = GetSecurity();
 
     TC_LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: %u, Name: %s, realmId: %d, secLevel: %u]",
-        id, _accountName.c_str(), realmHandle.Index, secLevel);
+        id, _accountName.c_str(), sRealmHandle->Index, secLevel);
 
-    _RBACData = new rbac::RBACData(id, _accountName, realmHandle.Index, secLevel);
+    _RBACData = new rbac::RBACData(id, _accountName, sRealmHandle->Index, secLevel);
     _RBACData->LoadFromDB();
 }
 
@@ -1117,9 +1117,9 @@ PreparedQueryResultFuture WorldSession::LoadPermissionsAsync()
     uint8 secLevel = GetSecurity();
 
     TC_LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: %u, Name: %s, realmId: %d, secLevel: %u]",
-        id, _accountName.c_str(), realmHandle.Index, secLevel);
+        id, _accountName.c_str(), sRealmHandle->Index, secLevel);
 
-    _RBACData = new rbac::RBACData(id, _accountName, realmHandle.Index, secLevel);
+    _RBACData = new rbac::RBACData(id, _accountName, sRealmHandle->Index, secLevel);
     return _RBACData->LoadFromDBAsync();
 }
 
@@ -1248,7 +1248,7 @@ bool WorldSession::HasPermission(uint32 permission)
 
     bool hasPermission = _RBACData->HasPermission(permission);
     TC_LOG_DEBUG("rbac", "WorldSession::HasPermission [AccountId: %u, Name: %s, realmId: %d]",
-                   _RBACData->GetId(), _RBACData->GetName().c_str(), realmHandle.Index);
+                   _RBACData->GetId(), _RBACData->GetName().c_str(), sRealmHandle->Index);
 
     return hasPermission;
 }
@@ -1256,7 +1256,7 @@ bool WorldSession::HasPermission(uint32 permission)
 void WorldSession::InvalidateRBACData()
 {
     TC_LOG_DEBUG("rbac", "WorldSession::Invalidaterbac::RBACData [AccountId: %u, Name: %s, realmId: %d]",
-                   _RBACData->GetId(), _RBACData->GetName().c_str(), realmHandle.Index);
+                   _RBACData->GetId(), _RBACData->GetName().c_str(), sRealmHandle->Index);
     delete _RBACData;
     _RBACData = NULL;
 }

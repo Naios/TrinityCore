@@ -1198,7 +1198,7 @@ struct ResurrectionData
     uint32 Aura;
 };
 
-class KillRewarder
+class TRINITY_GAME_API KillRewarder
 {
 public:
     KillRewarder(Player* killer, Unit* victim, bool isBattleGround);
@@ -1233,7 +1233,7 @@ private:
 static uint32 const DefaultTalentRowLevels[MAX_TALENT_TIERS] = { 15, 30, 45, 60, 75, 90, 100 };
 static uint32 const DKTalentRowLevels[MAX_TALENT_TIERS] = { 57, 58, 59, 60, 75, 90, 100 };
 
-struct PlayerTalentInfo
+struct TRINITY_GAME_API PlayerTalentInfo
 {
     PlayerTalentInfo() :
         ResetTalentsCost(0), ResetTalentsTime(0),
@@ -1269,7 +1269,7 @@ private:
     PlayerTalentInfo(PlayerTalentInfo const&);
 };
 
-class Player : public Unit, public GridObject<Player>
+class TRINITY_GAME_API Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
     friend void Item::AddToUpdateQueueOf(Player* player);
@@ -2915,8 +2915,8 @@ class Player : public Unit, public GridObject<Player>
         bool _advancedCombatLoggingEnabled;
 };
 
-void AddItemsSetItem(Player* player, Item* item);
-void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
+TRINITY_GAME_API void AddItemsSetItem(Player* player, Item* item);
+TRINITY_GAME_API void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
 
 // "the bodies of template functions must be made available in a header file"
 template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell)

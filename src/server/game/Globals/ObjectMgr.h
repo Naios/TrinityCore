@@ -378,7 +378,7 @@ std::string GetScriptsTableNameByType(ScriptsType type);
 ScriptMapMap* GetScriptsMapByType(ScriptsType type);
 std::string GetScriptCommandName(ScriptCommands command);
 
-struct SpellClickInfo
+struct TRINITY_GAME_API SpellClickInfo
 {
     uint32 spellId;
     uint8 castFlags;
@@ -642,7 +642,7 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 #define MAX_PET_NAME             12                         // max allowed by client name length
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
 
-bool normalizePlayerName(std::string& name);
+TRINITY_GAME_API bool normalizePlayerName(std::string& name);
 
 struct ExtendedPlayerName
 {
@@ -688,7 +688,7 @@ typedef std::unordered_map<uint32, std::list<uint32>> PhaseInfo;
 
 class PlayerDumpReader;
 
-class ObjectMgr
+class TRINITY_GAME_API ObjectMgr
 {
     friend class PlayerDumpReader;
 
@@ -697,6 +697,12 @@ class ObjectMgr
         ~ObjectMgr();
 
     public:
+        ObjectMgr(ObjectMgr const&) = delete;
+        ObjectMgr(ObjectMgr&&) = delete;
+
+        ObjectMgr& operator= (ObjectMgr const&) = delete;
+        ObjectMgr& operator= (ObjectMgr&&) = delete;
+
         static ObjectMgr* instance()
         {
             static ObjectMgr instance;

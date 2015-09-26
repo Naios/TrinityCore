@@ -918,7 +918,7 @@ struct CleanDamage
 
 struct CalcDamageInfo;
 
-class DamageInfo
+class TRINITY_GAME_API DamageInfo
 {
 private:
     Unit* const m_attacker;
@@ -1294,7 +1294,7 @@ enum PlayerTotemType
 
 struct SpellProcEventEntry;                                 // used only privately
 
-class Unit : public WorldObject
+class TRINITY_GAME_API Unit : public WorldObject
 {
     public:
         typedef std::set<Unit*> AttackerSet;

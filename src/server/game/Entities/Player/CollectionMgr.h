@@ -22,7 +22,7 @@
 
 typedef std::map<uint32, bool> ToyBoxContainer;
 
-class CollectionMgr
+class TRINITY_GAME_API CollectionMgr
 {
 public:
     explicit CollectionMgr(WorldSession* owner) : _owner(owner) { }

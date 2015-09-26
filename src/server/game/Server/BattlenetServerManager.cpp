@@ -40,7 +40,7 @@ Battlenet::Header Battlenet::ServerManager::CreateHeader(BnetCommands command)
     Header header;
     header.Ipc.Channel = IPC_CHANNEL_BNET;
     header.Ipc.Command = command;
-    header.Realm = realmHandle;
+    header.Realm = *sRealmHandle;
     return header;
 }
 

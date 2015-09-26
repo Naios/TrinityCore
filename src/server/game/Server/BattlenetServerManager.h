@@ -29,7 +29,7 @@ namespace zmqpp
 
 namespace Battlenet
 {
-    class ServerManager
+    class TRINITY_GAME_API ServerManager
     {
         ServerManager() : _socket(nullptr) { }
 

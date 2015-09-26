@@ -22,7 +22,7 @@
 
 namespace WorldPackets
 {
-    class Packet
+    class TRINITY_GAME_API Packet
     {
     public:
         Packet(WorldPacket&& worldPacket) : _worldPacket(std::move(worldPacket)) { }

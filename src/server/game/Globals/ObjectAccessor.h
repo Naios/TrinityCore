@@ -85,7 +85,7 @@ class HashMapHolder
         static MapType _objectMap;
 };
 
-class ObjectAccessor
+class TRINITY_GAME_API ObjectAccessor
 {
     private:
         ObjectAccessor();

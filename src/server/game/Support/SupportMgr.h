@@ -43,7 +43,7 @@ enum GMSupportComplaintType
 
 using ChatLog = WorldPackets::Ticket::SupportTicketSubmitComplaint::SupportTicketChatLog;
 
-class Ticket
+class TRINITY_GAME_API Ticket
 {
 public:
     Ticket();
@@ -109,7 +109,7 @@ protected:
     std::string _comment;
 };
 
-class BugTicket : public Ticket
+class TRINITY_GAME_API BugTicket : public Ticket
 {
 public:
     BugTicket();
@@ -133,7 +133,7 @@ private:
     std::string _note;
 };
 
-class ComplaintTicket : public Ticket
+class TRINITY_GAME_API ComplaintTicket : public Ticket
 {
 public:
     ComplaintTicket();
@@ -169,7 +169,7 @@ private:
     std::string _note;
 };
 
-class SuggestionTicket : public Ticket
+class TRINITY_GAME_API SuggestionTicket : public Ticket
 {
 public:
     SuggestionTicket();
@@ -197,7 +197,7 @@ typedef std::map<uint32, BugTicket*> BugTicketList;
 typedef std::map<uint32, ComplaintTicket*> ComplaintTicketList;
 typedef std::map<uint32, SuggestionTicket*> SuggestionTicketList;
 
-class SupportMgr
+class TRINITY_GAME_API SupportMgr
 {
 private:
     SupportMgr();
