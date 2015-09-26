@@ -11,7 +11,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
- * You should have received a copy of the GNU General Public License along
+ * You should have received a copy of the GNU General Public License alongstatic GuildFinderMgr* instance()
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -24,14 +24,10 @@ class Player;
 class ZoneScript;
 
 // class to handle player enter / leave / areatrigger / GO use events
-class BattlefieldMgr
+class TRINITY_GAME_API BattlefieldMgr
 {
     public:
-        static BattlefieldMgr* instance()
-        {
-            static BattlefieldMgr instance;
-            return &instance;
-        }
+        static BattlefieldMgr* instance();
 
         // create battlefield events
         void InitBattlefield();

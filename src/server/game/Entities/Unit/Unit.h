@@ -609,8 +609,8 @@ enum UnitMoveType
 
 #define MAX_MOVE_TYPE     9
 
-extern float baseMoveSpeed[MAX_MOVE_TYPE];
-extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
+TRINITY_GAME_API extern float baseMoveSpeed[MAX_MOVE_TYPE];
+TRINITY_GAME_API extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
 
 enum WeaponAttackType : uint16
 {
@@ -918,7 +918,7 @@ struct CleanDamage
 
 struct CalcDamageInfo;
 
-class DamageInfo
+class TRINITY_GAME_API DamageInfo
 {
 private:
     Unit* const m_attacker;
@@ -973,7 +973,7 @@ public:
     uint32 GetHeal() const { return m_heal; }
 };
 
-class ProcEventInfo
+class TRINITY_GAME_API ProcEventInfo
 {
 public:
     ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask,
@@ -1031,7 +1031,7 @@ struct CalcDamageInfo
 };
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
-struct SpellNonMeleeDamage
+struct TRINITY_GAME_API SpellNonMeleeDamage
 {
     SpellNonMeleeDamage(Unit* _attacker, Unit* _target, uint32 _SpellID, uint32 _schoolMask);
 
@@ -1190,7 +1190,7 @@ enum ActionBarIndex
 
 #define MAX_UNIT_ACTION_BAR_INDEX (ACTION_BAR_INDEX_END-ACTION_BAR_INDEX_START)
 
-struct CharmInfo
+struct TRINITY_GAME_API CharmInfo
 {
     public:
         explicit CharmInfo(Unit* unit);
@@ -1294,7 +1294,7 @@ enum PlayerTotemType
 
 struct SpellProcEventEntry;                                 // used only privately
 
-class Unit : public WorldObject
+class TRINITY_GAME_API Unit : public WorldObject
 {
     public:
         typedef std::set<Unit*> AttackerSet;

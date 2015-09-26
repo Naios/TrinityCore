@@ -84,7 +84,7 @@ class Unit;
 struct GossipMenuItems;
 class OutdoorPvP;
 
-class OPvPCapturePoint
+class TRINITY_GAME_API OPvPCapturePoint
 {
     public:
 
@@ -185,7 +185,7 @@ class OPvPCapturePoint
 };
 
 // base class for specific outdoor pvp handlers
-class OutdoorPvP : public ZoneScript
+class TRINITY_GAME_API OutdoorPvP : public ZoneScript
 {
     friend class OutdoorPvPMgr;
 

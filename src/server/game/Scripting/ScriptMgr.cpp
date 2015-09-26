@@ -189,6 +189,12 @@ ScriptMgr::ScriptMgr() : _scriptCount(0), _scheduledScripts(0)
 
 ScriptMgr::~ScriptMgr() { }
 
+ScriptMgr* ScriptMgr::instance()
+{
+    static ScriptMgr instance;
+    return &instance;
+}
+
 void ScriptMgr::Initialize()
 {
     uint32 oldMSTime = getMSTime();
@@ -1637,32 +1643,32 @@ template<class TScript> std::map<uint32, TScript*> ScriptRegistry<TScript>::Scri
 template<class TScript> uint32 ScriptRegistry<TScript>::_scriptIdCounter = 0;
 
 // Specialize for each script type class like so:
-template class ScriptRegistry<SpellScriptLoader>;
-template class ScriptRegistry<ServerScript>;
-template class ScriptRegistry<WorldScript>;
-template class ScriptRegistry<FormulaScript>;
-template class ScriptRegistry<WorldMapScript>;
-template class ScriptRegistry<InstanceMapScript>;
-template class ScriptRegistry<BattlegroundMapScript>;
-template class ScriptRegistry<ItemScript>;
-template class ScriptRegistry<CreatureScript>;
-template class ScriptRegistry<GameObjectScript>;
-template class ScriptRegistry<AreaTriggerScript>;
-template class ScriptRegistry<BattlegroundScript>;
-template class ScriptRegistry<OutdoorPvPScript>;
-template class ScriptRegistry<CommandScript>;
-template class ScriptRegistry<WeatherScript>;
-template class ScriptRegistry<AuctionHouseScript>;
-template class ScriptRegistry<ConditionScript>;
-template class ScriptRegistry<VehicleScript>;
-template class ScriptRegistry<DynamicObjectScript>;
-template class ScriptRegistry<TransportScript>;
-template class ScriptRegistry<AchievementCriteriaScript>;
-template class ScriptRegistry<PlayerScript>;
-template class ScriptRegistry<GuildScript>;
-template class ScriptRegistry<GroupScript>;
-template class ScriptRegistry<UnitScript>;
-template class ScriptRegistry<AccountScript>;
+template class TRINITY_GAME_API ScriptRegistry<SpellScriptLoader>;
+template class TRINITY_GAME_API ScriptRegistry<ServerScript>;
+template class TRINITY_GAME_API ScriptRegistry<WorldScript>;
+template class TRINITY_GAME_API ScriptRegistry<FormulaScript>;
+template class TRINITY_GAME_API ScriptRegistry<WorldMapScript>;
+template class TRINITY_GAME_API ScriptRegistry<InstanceMapScript>;
+template class TRINITY_GAME_API ScriptRegistry<BattlegroundMapScript>;
+template class TRINITY_GAME_API ScriptRegistry<ItemScript>;
+template class TRINITY_GAME_API ScriptRegistry<CreatureScript>;
+template class TRINITY_GAME_API ScriptRegistry<GameObjectScript>;
+template class TRINITY_GAME_API ScriptRegistry<AreaTriggerScript>;
+template class TRINITY_GAME_API ScriptRegistry<BattlegroundScript>;
+template class TRINITY_GAME_API ScriptRegistry<OutdoorPvPScript>;
+template class TRINITY_GAME_API ScriptRegistry<CommandScript>;
+template class TRINITY_GAME_API ScriptRegistry<WeatherScript>;
+template class TRINITY_GAME_API ScriptRegistry<AuctionHouseScript>;
+template class TRINITY_GAME_API ScriptRegistry<ConditionScript>;
+template class TRINITY_GAME_API ScriptRegistry<VehicleScript>;
+template class TRINITY_GAME_API ScriptRegistry<DynamicObjectScript>;
+template class TRINITY_GAME_API ScriptRegistry<TransportScript>;
+template class TRINITY_GAME_API ScriptRegistry<AchievementCriteriaScript>;
+template class TRINITY_GAME_API ScriptRegistry<PlayerScript>;
+template class TRINITY_GAME_API ScriptRegistry<GuildScript>;
+template class TRINITY_GAME_API ScriptRegistry<GroupScript>;
+template class TRINITY_GAME_API ScriptRegistry<UnitScript>;
+template class TRINITY_GAME_API ScriptRegistry<AccountScript>;
 
 // Undefine utility macros.
 #undef GET_SCRIPT_RET

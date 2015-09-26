@@ -28,7 +28,7 @@
 #include "SmartScriptMgr.h"
 //#include "SmartAI.h"
 
-class SmartScript
+class TRINITY_GAME_API SmartScript
 {
     public:
         SmartScript();

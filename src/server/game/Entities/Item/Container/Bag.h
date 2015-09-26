@@ -25,7 +25,7 @@
 #include "Item.h"
 #include "ItemTemplate.h"
 
-class Bag : public Item
+class TRINITY_GAME_API Bag : public Item
 {
     public:
 

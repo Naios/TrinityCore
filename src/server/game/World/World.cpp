@@ -74,17 +74,18 @@
 
 #include <boost/algorithm/string.hpp>
 
-std::atomic<bool> World::m_stopEvent(false);
-uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
-std::atomic<uint32> World::m_worldLoopCounter(0);
+TRINITY_GAME_API std::atomic<bool> World::m_stopEvent(false);
+TRINITY_GAME_API uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 
-float World::m_MaxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
-float World::m_MaxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
-float World::m_MaxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
+TRINITY_GAME_API std::atomic<uint32> World::m_worldLoopCounter(0);
 
-int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
-int32 World::m_visibility_notify_periodInInstances  = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
-int32 World::m_visibility_notify_periodInBGArenas   = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
+TRINITY_GAME_API float World::m_MaxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
+TRINITY_GAME_API float World::m_MaxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
+TRINITY_GAME_API float World::m_MaxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
+
+TRINITY_GAME_API int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
+TRINITY_GAME_API int32 World::m_visibility_notify_periodInInstances  = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
+TRINITY_GAME_API int32 World::m_visibility_notify_periodInBGArenas   = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 
 /// World constructor
 World::World()
@@ -146,6 +147,12 @@ World::~World()
     MMAP::MMapFactory::clear();
 
     /// @todo free addSessQueue
+}
+
+World* World::instance()
+{
+    static World instance;
+    return &instance;
 }
 
 /// Find a player in a specified zone
@@ -3448,6 +3455,8 @@ void World::RemoveOldCorpses()
 {
     m_timers[WUPDATE_CORPSES].SetCurrent(m_timers[WUPDATE_CORPSES].GetInterval());
 }
+
+Realm realm;
 
 uint32 GetVirtualRealmAddress()
 {

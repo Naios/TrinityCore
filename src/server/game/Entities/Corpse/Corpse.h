@@ -46,7 +46,7 @@ enum CorpseFlags
     CORPSE_FLAG_LOOTABLE    = 0x20
 };
 
-class Corpse : public WorldObject, public GridObject<Corpse>
+class TRINITY_GAME_API Corpse : public WorldObject, public GridObject<Corpse>
 {
     public:
         explicit Corpse(CorpseType type = CORPSE_BONES);

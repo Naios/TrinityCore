@@ -549,14 +549,10 @@ struct CharacterInfo
 };
 
 /// The World
-class World
+class TRINITY_GAME_API World
 {
     public:
-        static World* instance()
-        {
-            static World instance;
-            return &instance;
-        }
+        static World* instance();
 
         static std::atomic<uint32> m_worldLoopCounter;
 
@@ -892,9 +888,11 @@ class World
         std::deque<PreparedQueryResultFuture> m_realmCharCallbacks;
 };
 
-extern Realm realm;
-uint32 GetVirtualRealmAddress();
+TRINITY_GAME_API extern Realm realm;
+
+TRINITY_GAME_API uint32 GetVirtualRealmAddress();
 
 #define sWorld World::instance()
+
 #endif
 /// @}
