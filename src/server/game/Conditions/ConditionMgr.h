@@ -180,7 +180,7 @@ enum MaxConditionTargets
     MAX_CONDITION_TARGETS = 3
 };
 
-struct ConditionSourceInfo
+struct TRINITY_GAME_API ConditionSourceInfo
 {
     WorldObject* mConditionTargets[MAX_CONDITION_TARGETS]; // an array of targets available for conditions
     Condition* mLastFailedCondition;
@@ -193,7 +193,7 @@ struct ConditionSourceInfo
     }
 };
 
-struct Condition
+struct TRINITY_GAME_API Condition
 {
     ConditionSourceType     SourceType;        //SourceTypeOrReferenceId
     uint32                  SourceGroup;
@@ -247,7 +247,7 @@ typedef std::map<std::pair<int32, uint32 /*SAI source_type*/>, ConditionTypeCont
 
 typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used for references
 
-class ConditionMgr
+class TRINITY_GAME_API ConditionMgr
 {
     private:
         ConditionMgr();

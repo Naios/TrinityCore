@@ -559,7 +559,7 @@ struct CharacterInfo
 };
 
 /// The World
-class World
+class TRINITY_GAME_API World
 {
     public:
         static World* instance()
@@ -902,10 +902,13 @@ class World
         std::deque<PreparedQueryResultFuture> m_realmCharCallbacks;
 };
 
-extern Battlenet::RealmHandle realmHandle;
-extern Realm realm;
-uint32 GetVirtualRealmAddress();
-
 #define sWorld World::instance()
+
+TRINITY_GAME_API extern Battlenet::RealmHandle realmHandle;
+
+TRINITY_GAME_API extern Realm realm;
+
+TRINITY_GAME_API uint32 GetVirtualRealmAddress();
+
 #endif
 /// @}

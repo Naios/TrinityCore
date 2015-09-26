@@ -26,7 +26,7 @@ namespace lfg
 /**
     Stores all lfg data needed about the player.
 */
-class LfgPlayerData
+class TRINITY_GAME_API LfgPlayerData
 {
     public:
         LfgPlayerData();

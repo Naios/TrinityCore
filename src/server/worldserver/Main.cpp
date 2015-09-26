@@ -80,9 +80,6 @@ uint32 _worldLoopCounter(0);
 uint32 _lastChangeMsTime(0);
 uint32 _maxCoreStuckTimeInMs(0);
 
-Battlenet::RealmHandle realmHandle;                         ///< Id of the realm
-Realm realm;
-
 void SignalHandler(const boost::system::error_code& error, int signalNumber);
 void FreezeDetectorHandler(const boost::system::error_code& error);
 AsyncAcceptor* StartRaSocketAcceptor(boost::asio::io_service& ioService);

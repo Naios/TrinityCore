@@ -137,7 +137,7 @@ typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
 typedef std::map<uint32 /*type*/, ObjectGuid /*guid*/> ObjectGuidMap;
 typedef std::map<uint32 /*entry*/, uint32 /*type*/> ObjectInfoMap;
 
-class InstanceScript : public ZoneScript
+class TRINITY_GAME_API InstanceScript : public ZoneScript
 {
     public:
         explicit InstanceScript(Map* map) : instance(map), completedEncounters(0) { }

@@ -3447,6 +3447,22 @@ void World::RemoveOldCorpses()
     m_timers[WUPDATE_CORPSES].SetCurrent(m_timers[WUPDATE_CORPSES].GetInterval());
 }
 
+Battlenet::RealmHandle* GetRealmHandleInstance()
+{
+    static Battlenet::RealmHandle instance;
+    return &instance;
+}
+
+Realm* GetRealmInstance()
+{
+    static Realm instance;
+    return &instance;
+}
+
+Battlenet::RealmHandle realmHandle;
+
+Realm realm;
+
 uint32 GetVirtualRealmAddress()
 {
     return uint32(realmHandle.Region) << 24 | uint32(realmHandle.Battlegroup) << 16 | realmHandle.Index;

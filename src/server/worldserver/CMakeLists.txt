@@ -145,7 +145,6 @@ target_link_libraries(worldserver
   common
   shared
   database
-  scripts
   ipc
   g3dlib
   gsoap

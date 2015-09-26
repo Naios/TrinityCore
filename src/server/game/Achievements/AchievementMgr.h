@@ -335,7 +335,7 @@ class AchievementMgr
         uint32 _achievementPoints;
 };
 
-class AchievementGlobalMgr
+class TRINITY_GAME_API AchievementGlobalMgr
 {
         AchievementGlobalMgr() { }
         ~AchievementGlobalMgr();

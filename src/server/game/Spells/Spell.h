@@ -167,7 +167,7 @@ struct SpellLogEffectFeedPetParams
     int32 ItemID        = 0;
 };
 
-class SpellCastTargets
+class TRINITY_GAME_API SpellCastTargets
 {
     public:
         SpellCastTargets();
@@ -291,7 +291,7 @@ enum SpellEffectHandleMode
 
 typedef std::list<std::pair<uint32, ObjectGuid>> DispelList;
 
-class Spell
+class TRINITY_GAME_API Spell
 {
     friend void Unit::SetCurrentCastSpell(Spell* pSpell);
     friend class SpellScript;
@@ -848,7 +848,7 @@ class Spell
 
 namespace Trinity
 {
-    struct WorldObjectSpellTargetCheck
+    struct TRINITY_GAME_API WorldObjectSpellTargetCheck
     {
         Unit* _caster;
         Unit* _referer;
@@ -863,7 +863,7 @@ namespace Trinity
         bool operator()(WorldObject* target);
     };
 
-    struct WorldObjectSpellNearbyTargetCheck : public WorldObjectSpellTargetCheck
+    struct TRINITY_GAME_API WorldObjectSpellNearbyTargetCheck : public WorldObjectSpellTargetCheck
     {
         float _range;
         Position const* _position;
@@ -881,7 +881,7 @@ namespace Trinity
         bool operator()(WorldObject* target);
     };
 
-    struct WorldObjectSpellConeTargetCheck : public WorldObjectSpellAreaTargetCheck
+    struct TRINITY_GAME_API WorldObjectSpellConeTargetCheck : public WorldObjectSpellAreaTargetCheck
     {
         float _coneAngle;
         WorldObjectSpellConeTargetCheck(float coneAngle, float range, Unit* caster,
@@ -898,7 +898,7 @@ namespace Trinity
 
 typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
 
-class SpellEvent : public BasicEvent
+class TRINITY_GAME_API SpellEvent : public BasicEvent
 {
     public:
         SpellEvent(Spell* spell);
