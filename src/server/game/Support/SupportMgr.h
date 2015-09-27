@@ -20,6 +20,8 @@
 
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Chat.h"
+#include "Language.h"
 #include "TicketPackets.h"
 
 class ChatHandler;
@@ -197,6 +199,42 @@ typedef std::map<uint32, BugTicket*> BugTicketList;
 typedef std::map<uint32, ComplaintTicket*> ComplaintTicketList;
 typedef std::map<uint32, SuggestionTicket*> SuggestionTicketList;
 
+template<typename Ticket, typename T>
+struct ContainerForTicket;
+
+template<typename T>
+struct ContainerForTicket<BugTicket>
+{
+    static T& Select(T& bugTicket, T&, T&)
+    {
+        return bugTicket;
+    }
+};
+
+template<typename T>
+struct ContainerForTicket<ComplaintTicket>
+{
+    static T& Select(T&, T& complaintTicket, T&)
+    {
+        return complaintTicket;
+    }
+};
+
+template<typename T>
+struct ContainerForTicket<SuggestionTicket>
+{
+    static T& Select(T&, T&, T& suggestionTicket)
+    {
+        return suggestionTicket;
+    }
+};
+
+template<typename Ticket, typename T>
+T& selectContainerForTicket(T& bugTicket, T& complaintTicket, T& suggestionTicket)
+{
+    return ContainerForTicket<Ticket>::Select(bugTicket, complaintTicket, suggestionTicket);
+}
+
 class TRINITY_GAME_API SupportMgr
 {
 private:
@@ -211,7 +249,15 @@ public:
     }
 
     template<typename T>
-    T* GetTicket(uint32 ticketId);
+    T* SupportMgr::GetTicket(uint32 Id)
+    {
+        auto& list = selectContainerForTicket<T>(_bugTicketList, _complaintTicketList, _suggestionTicketList);
+        auto itr = list.find(bugId);
+        if (itr != list.end())
+            return itr->second;
+
+        return nullptr;
+    }
 
     ComplaintTicketList GetComplaintsByPlayerGuid(ObjectGuid playerGuid) const
     {
@@ -231,8 +277,12 @@ public:
     bool GetComplaintSystemStatus() const { return _supportSystemStatus && _complaintSystemStatus; }
     bool GetSuggestionSystemStatus() const { return _supportSystemStatus && _suggestionSystemStatus; }
     uint64 GetLastChange() const { return _lastChange; }
+
     template<typename T>
-    uint32 GetOpenTicketCount() const;
+    uint32 GetOpenTicketCount() const
+    {
+        return selectContainerForTicket<T>(_openBugTicketCount, _openComplaintTicketCount, _openSuggestionTicketCount);
+    }
 
     void SetSupportSystemStatus(bool status) { _supportSystemStatus = status; }
     void SetTicketSystemStatus(bool status) { _ticketSystemStatus = status; }
@@ -249,10 +299,26 @@ public:
     void AddTicket(SuggestionTicket* ticket);
 
     template<typename T>
-    void RemoveTicket(uint32 ticketId);
+    void RemoveTicket(uint32 ticketId)
+    {
+        if (T* ticket = GetTicket<T>(ticketId))
+        {
+            ticket->DeleteFromDB();
+            delete ticket;
+        }
+    }
 
     template<typename T>
-    void CloseTicket(uint32 ticketId, ObjectGuid closedBy);
+    void CloseTicket(uint32 ticketId, ObjectGuid closedBy)
+    {
+        if (T* ticket = GetTicket<T>(ticketId))
+        {
+            ticket->SetClosedBy(closedBy);
+            if (!closedBy.IsEmpty())
+                --selectContainerForTicket<T>(_openBugTicketCount, _openComplaintTicketCount, _openSuggestionTicketCount);
+            ticket->SaveToDB();
+        }
+    }
 
     template<typename T>
     void ResetTickets();
@@ -291,5 +357,64 @@ private:
 };
 
 #define sSupportMgr SupportMgr::instance()
+
+
+
+
+
+
+template<>
+void SupportMgr::ShowList<BugTicket>(ChatHandler& handler) const
+{
+    handler.SendSysMessage(LANG_COMMAND_TICKETSHOWLIST);
+    for (BugTicketList::const_iterator itr = _bugTicketList.begin(); itr != _bugTicketList.end(); ++itr)
+        if (!itr->second->IsClosed())
+            handler.SendSysMessage(itr->second->FormatViewMessageString(handler).c_str());
+}
+
+template<>
+void SupportMgr::ShowList<ComplaintTicket>(ChatHandler& handler) const
+{
+    handler.SendSysMessage(LANG_COMMAND_TICKETSHOWLIST);
+    for (ComplaintTicketList::const_iterator itr = _complaintTicketList.begin(); itr != _complaintTicketList.end(); ++itr)
+        if (!itr->second->IsClosed())
+            handler.SendSysMessage(itr->second->FormatViewMessageString(handler).c_str());
+}
+
+template<>
+void SupportMgr::ShowList<SuggestionTicket>(ChatHandler& handler) const
+{
+    handler.SendSysMessage(LANG_COMMAND_TICKETSHOWLIST);
+    for (SuggestionTicketList::const_iterator itr = _suggestionTicketList.begin(); itr != _suggestionTicketList.end(); ++itr)
+        if (!itr->second->IsClosed())
+            handler.SendSysMessage(itr->second->FormatViewMessageString(handler).c_str());
+}
+
+template<>
+void SupportMgr::ShowClosedList<BugTicket>(ChatHandler& handler) const
+{
+    handler.SendSysMessage(LANG_COMMAND_TICKETSHOWCLOSEDLIST);
+    for (BugTicketList::const_iterator itr = _bugTicketList.begin(); itr != _bugTicketList.end(); ++itr)
+        if (itr->second->IsClosed())
+            handler.SendSysMessage(itr->second->FormatViewMessageString(handler).c_str());
+}
+
+template<>
+void SupportMgr::ShowClosedList<ComplaintTicket>(ChatHandler& handler) const
+{
+    handler.SendSysMessage(LANG_COMMAND_TICKETSHOWCLOSEDLIST);
+    for (ComplaintTicketList::const_iterator itr = _complaintTicketList.begin(); itr != _complaintTicketList.end(); ++itr)
+        if (itr->second->IsClosed())
+            handler.SendSysMessage(itr->second->FormatViewMessageString(handler).c_str());
+}
+
+template<>
+void SupportMgr::ShowClosedList<SuggestionTicket>(ChatHandler& handler) const
+{
+    handler.SendSysMessage(LANG_COMMAND_TICKETSHOWCLOSEDLIST);
+    for (SuggestionTicketList::const_iterator itr = _suggestionTicketList.begin(); itr != _suggestionTicketList.end(); ++itr)
+        if (itr->second->IsClosed())
+            handler.SendSysMessage(itr->second->FormatViewMessageString(handler).c_str());
+}
 
 #endif // SupportMgr_h__
