@@ -594,7 +594,7 @@ TRINITY_GAME_API DiminishingReturnsType GetDiminishingReturnsGroupType(Diminishi
 TRINITY_GAME_API DiminishingLevels GetDiminishingReturnsMaxLevel(DiminishingGroup group);
 TRINITY_GAME_API int32 GetDiminishingReturnsLimitDuration(SpellInfo const* spellproto);
 
-extern PetFamilySpellsStore                         sPetFamilySpellsStore;
+TRINITY_GAME_API extern PetFamilySpellsStore                         sPetFamilySpellsStore;
 
 class TRINITY_GAME_API SpellMgr
 {

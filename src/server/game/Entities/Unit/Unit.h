@@ -609,8 +609,8 @@ enum UnitMoveType
 
 #define MAX_MOVE_TYPE     9
 
-extern float baseMoveSpeed[MAX_MOVE_TYPE];
-extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
+TRINITY_GAME_API extern float baseMoveSpeed[MAX_MOVE_TYPE];
+TRINITY_GAME_API extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
 
 enum WeaponAttackType : uint16
 {

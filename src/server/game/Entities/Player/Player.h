@@ -114,7 +114,7 @@ struct PlayerSpell
     bool disabled          : 1;                             // first rank has been learned in result talent learn but currently talent unlearned, save max learned ranks
 };
 
-extern uint32 const MasterySpells[MAX_CLASSES];
+TRINITY_GAME_API extern uint32 const MasterySpells[MAX_CLASSES];
 
 enum TalentSpecialization // talent tabs
 {
@@ -1008,7 +1008,7 @@ enum PlayerDelayedOperations
 // Player summoning auto-decline time (in secs)
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
 // Maximum money amount : 2^31 - 1
-extern uint64 const MAX_MONEY_AMOUNT;
+TRINITY_GAME_API extern uint64 const MAX_MONEY_AMOUNT;
 
 struct InstancePlayerBind
 {

@@ -877,8 +877,8 @@ class TRINITY_GAME_API GroupScript : public ScriptObject
     typedef std::vector<ScriptObject*> UnusedScriptContainer;
     typedef std::list<std::string> UnusedScriptNamesContainer;
 
-    extern UnusedScriptContainer UnusedScripts;
-    extern UnusedScriptNamesContainer UnusedScriptNames;
+    TRINITY_GAME_API extern UnusedScriptContainer UnusedScripts;
+    TRINITY_GAME_API extern UnusedScriptNamesContainer UnusedScriptNames;
 // }
 
 // Manages registration, loading, and execution of scripts.

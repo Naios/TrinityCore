@@ -40,18 +40,18 @@ static Rates const qualityToRate[MAX_ITEM_QUALITY] =
     RATE_DROP_ITEM_ARTIFACT,                                // ITEM_QUALITY_ARTIFACT
 };
 
-TRINITY_GAME_API LootStore LootTemplates_Creature("creature_loot_template",           "creature entry",                  true);
-TRINITY_GAME_API LootStore LootTemplates_Disenchant("disenchant_loot_template",       "item disenchant id",              true);
-TRINITY_GAME_API LootStore LootTemplates_Fishing("fishing_loot_template",             "area id",                         true);
-TRINITY_GAME_API LootStore LootTemplates_Gameobject("gameobject_loot_template",       "gameobject entry",                true);
-TRINITY_GAME_API LootStore LootTemplates_Item("item_loot_template",                   "item entry",                      true);
-TRINITY_GAME_API LootStore LootTemplates_Mail("mail_loot_template",                   "mail template id",                false);
-TRINITY_GAME_API LootStore LootTemplates_Milling("milling_loot_template",             "item entry (herb)",               true);
-TRINITY_GAME_API LootStore LootTemplates_Pickpocketing("pickpocketing_loot_template", "creature pickpocket lootid",      true);
-TRINITY_GAME_API LootStore LootTemplates_Prospecting("prospecting_loot_template",     "item entry (ore)",                true);
-TRINITY_GAME_API LootStore LootTemplates_Reference("reference_loot_template",         "reference id",                    false);
-TRINITY_GAME_API LootStore LootTemplates_Skinning("skinning_loot_template",           "creature skinning id",            true);
-TRINITY_GAME_API LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (random item creating)", false);
+LootStore LootTemplates_Creature("creature_loot_template",           "creature entry",                  true);
+LootStore LootTemplates_Disenchant("disenchant_loot_template",       "item disenchant id",              true);
+LootStore LootTemplates_Fishing("fishing_loot_template",             "area id",                         true);
+LootStore LootTemplates_Gameobject("gameobject_loot_template",       "gameobject entry",                true);
+LootStore LootTemplates_Item("item_loot_template",                   "item entry",                      true);
+LootStore LootTemplates_Mail("mail_loot_template",                   "mail template id",                false);
+LootStore LootTemplates_Milling("milling_loot_template",             "item entry (herb)",               true);
+LootStore LootTemplates_Pickpocketing("pickpocketing_loot_template", "creature pickpocket lootid",      true);
+LootStore LootTemplates_Prospecting("prospecting_loot_template",     "item entry (ore)",                true);
+LootStore LootTemplates_Reference("reference_loot_template",         "reference id",                    false);
+LootStore LootTemplates_Skinning("skinning_loot_template",           "creature skinning id",            true);
+LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (random item creating)", false);
 
 // Selects invalid loot items to be removed from group possible entries (before rolling)
 struct LootGroupInvalidSelector : public std::unary_function<LootStoreItem*, bool>
@@ -1876,4 +1876,21 @@ void LoadLootTemplates_Reference()
     LootTemplates_Reference.ReportUnusedIds(lootIdSet);
 
     TC_LOG_INFO("server.loading", ">> Loaded refence loot templates in %u ms", GetMSTimeDiffToNow(oldMSTime));
+}
+
+void LoadLootTables()
+{
+    LoadLootTemplates_Creature();
+    LoadLootTemplates_Fishing();
+    LoadLootTemplates_Gameobject();
+    LoadLootTemplates_Item();
+    LoadLootTemplates_Mail();
+    LoadLootTemplates_Milling();
+    LoadLootTemplates_Pickpocketing();
+    LoadLootTemplates_Skinning();
+    LoadLootTemplates_Disenchant();
+    LoadLootTemplates_Prospecting();
+    LoadLootTemplates_Spell();
+
+    LoadLootTemplates_Reference();
 }

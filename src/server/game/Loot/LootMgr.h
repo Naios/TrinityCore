@@ -414,18 +414,18 @@ private:
     uint32 _difficultyBonusTreeMod;
 };
 
-extern TRINITY_GAME_API LootStore LootTemplates_Creature;
-extern TRINITY_GAME_API LootStore LootTemplates_Fishing;
-extern TRINITY_GAME_API LootStore LootTemplates_Gameobject;
-extern TRINITY_GAME_API LootStore LootTemplates_Item;
-extern TRINITY_GAME_API LootStore LootTemplates_Mail;
-extern TRINITY_GAME_API LootStore LootTemplates_Milling;
-extern TRINITY_GAME_API LootStore LootTemplates_Pickpocketing;
-extern TRINITY_GAME_API LootStore LootTemplates_Reference;
-extern TRINITY_GAME_API LootStore LootTemplates_Skinning;
-extern TRINITY_GAME_API LootStore LootTemplates_Disenchant;
-extern TRINITY_GAME_API LootStore LootTemplates_Prospecting;
-extern TRINITY_GAME_API LootStore LootTemplates_Spell;
+TRINITY_GAME_API extern LootStore LootTemplates_Creature;
+TRINITY_GAME_API extern LootStore LootTemplates_Fishing;
+TRINITY_GAME_API extern LootStore LootTemplates_Gameobject;
+TRINITY_GAME_API extern LootStore LootTemplates_Item;
+TRINITY_GAME_API extern LootStore LootTemplates_Mail;
+TRINITY_GAME_API extern LootStore LootTemplates_Milling;
+TRINITY_GAME_API extern LootStore LootTemplates_Pickpocketing;
+TRINITY_GAME_API extern LootStore LootTemplates_Reference;
+TRINITY_GAME_API extern LootStore LootTemplates_Skinning;
+TRINITY_GAME_API extern LootStore LootTemplates_Disenchant;
+TRINITY_GAME_API extern LootStore LootTemplates_Prospecting;
+TRINITY_GAME_API extern LootStore LootTemplates_Spell;
 
 TRINITY_GAME_API void LoadLootTemplates_Creature();
 TRINITY_GAME_API void LoadLootTemplates_Fishing();
@@ -441,21 +441,6 @@ TRINITY_GAME_API void LoadLootTemplates_Prospecting();
 TRINITY_GAME_API void LoadLootTemplates_Spell();
 TRINITY_GAME_API void LoadLootTemplates_Reference();
 
-void LoadLootTables()
-{
-    LoadLootTemplates_Creature();
-    LoadLootTemplates_Fishing();
-    LoadLootTemplates_Gameobject();
-    LoadLootTemplates_Item();
-    LoadLootTemplates_Mail();
-    LoadLootTemplates_Milling();
-    LoadLootTemplates_Pickpocketing();
-    LoadLootTemplates_Skinning();
-    LoadLootTemplates_Disenchant();
-    LoadLootTemplates_Prospecting();
-    LoadLootTemplates_Spell();
-
-    LoadLootTemplates_Reference();
-}
+TRINITY_GAME_API void LoadLootTables();
 
 #endif

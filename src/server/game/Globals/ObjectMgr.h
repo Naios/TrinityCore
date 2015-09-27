@@ -370,9 +370,9 @@ typedef std::multimap<uint32, ScriptInfo> ScriptMap;
 typedef std::map<uint32, ScriptMap > ScriptMapMap;
 typedef std::multimap<uint32, uint32> SpellScriptsContainer;
 typedef std::pair<SpellScriptsContainer::iterator, SpellScriptsContainer::iterator> SpellScriptsBounds;
-extern ScriptMapMap sSpellScripts;
-extern ScriptMapMap sEventScripts;
-extern ScriptMapMap sWaypointScripts;
+TRINITY_GAME_API extern ScriptMapMap sSpellScripts;
+TRINITY_GAME_API extern ScriptMapMap sEventScripts;
+TRINITY_GAME_API extern ScriptMapMap sWaypointScripts;
 
 std::string GetScriptsTableNameByType(ScriptsType type);
 ScriptMapMap* GetScriptsMapByType(ScriptsType type);
