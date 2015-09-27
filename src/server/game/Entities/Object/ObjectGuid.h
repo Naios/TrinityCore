@@ -184,9 +184,9 @@ class PackedGuid;
 
 class TRINITY_GAME_API ObjectGuid
 {
-    friend std::ostream& operator<<(std::ostream& stream, ObjectGuid const& guid);
-    friend ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
-    friend ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid& guid);
+    friend TRINITY_GAME_API std::ostream& operator<<(std::ostream& stream, ObjectGuid const& guid);
+    friend TRINITY_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
+    friend TRINITY_GAME_API ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid& guid);
 
     public:
         static ObjectGuid const Empty;
@@ -341,7 +341,7 @@ typedef std::unordered_set<ObjectGuid> GuidUnorderedSet;
 
 class TRINITY_GAME_API PackedGuid
 {
-        friend ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
+        friend TRINITY_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
 
     public:
         explicit PackedGuid() : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid << uint16(0); }
@@ -383,12 +383,12 @@ public:
     }
 };
 
-ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
-ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
+TRINITY_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
+TRINITY_GAME_API ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
 
-ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
+TRINITY_GAME_API ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
 
-std::ostream& operator<<(std::ostream& stream, ObjectGuid const& guid);
+TRINITY_GAME_API std::ostream& operator<<(std::ostream& stream, ObjectGuid const& guid);
 
 namespace std
 {
