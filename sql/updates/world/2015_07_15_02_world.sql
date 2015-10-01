@@ -1,5 +1,9 @@
 -- Drgaonblight - Woods of Lothalor + Indu'le Village + Moonrest Gardens
+aöaslaslök
 
+select insert
+
+sjsjhd;
 -- 1. Woods
 SET @NPC := 117136;
 SET @PATH := @NPC * 10;
