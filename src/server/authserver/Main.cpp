@@ -123,8 +123,20 @@ int main(int argc, char** argv)
     }
 
     // Initialize the database connection
-    if (!StartDB())
-        return 1;
+    {
+        bool const updateOnly = (vm.count("update") > 0);
+
+        bool const databaseStarted = StartDB();
+
+        if (updateOnly)
+        {
+            TC_LOG_INFO("server.authserver", "Server was started with \"--update\" argument, exiting...");
+            StopDB();
+        }
+
+        if (!databaseStarted || updateOnly)
+            return (!databaseStarted) ? 1 : 0;
+    }
 
     _ioService = new boost::asio::io_service();
 
@@ -268,6 +280,7 @@ variables_map GetConsoleArguments(int argc, char** argv, std::string& configFile
         ("help,h", "print usage message")
         ("version,v", "print version build info")
         ("config,c", value<std::string>(&configFile)->default_value(_TRINITY_REALM_CONFIG), "use <arg> as configuration file")
+        ("update,u", "run the database updater and exit.")
         ;
 #if PLATFORM == PLATFORM_WINDOWS
     options_description win("Windows platform specific options");
