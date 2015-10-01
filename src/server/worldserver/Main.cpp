@@ -186,10 +186,23 @@ extern int main(int argc, char** argv)
     SetProcessPriority("server.worldserver");
 
     // Start the databases
-    if (!StartDB())
     {
-        ShutdownThreadPool(threadPool);
-        return 1;
+        bool const updateOnly = (vm.count("update") > 0);
+
+        bool const databaseStarted = StartDB();
+
+        if (updateOnly)
+        {
+            TC_LOG_INFO("server.worldserver", "Server was started with \"--update\" argument, exiting...");
+            StopDB();
+        }
+
+        if (!databaseStarted || updateOnly)
+        {
+            ShutdownThreadPool(threadPool);
+            OpenSSLCrypto::threadsCleanup();
+            return (!databaseStarted) ? 1 : 0;
+        }
     }
 
     // Set server offline (not connectable)
@@ -597,6 +610,7 @@ variables_map GetConsoleArguments(int argc, char** argv, std::string& configFile
         ("help,h", "print usage message")
         ("version,v", "print version build info")
         ("config,c", value<std::string>(&configFile)->default_value(_TRINITY_CORE_CONFIG), "use <arg> as configuration file")
+        ("update,u", "run the database updater and exit.")
         ;
 #ifdef _WIN32
     options_description win("Windows platform specific options");
