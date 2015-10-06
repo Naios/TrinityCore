@@ -8,11 +8,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-# file(GLOB_RECURSE sources_Custom Custom/*.cpp Custom/*.h)
-
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
-#  ${sources_Custom}
-)
-
-message("  -> Prepared: Custom")
+# default linkage of module for SCRIPTS=0 (basic scripts only)
+set(PREFER_BASIC_SCRIPTS   "disabled")
+# default linkage of module for SCRIPTS=1 (prefer static linking)
+set(PREFER_STATIC_SCRIPTS  "static")
+# default linkage of module for SCRIPTS=2 (prefer dynamic linking)
+set(PREFER_DYNAMIC_SCRIPTS "dynamic")

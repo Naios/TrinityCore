@@ -257,4 +257,7 @@ class TRINITY_GAME_API SmartGameObjectAI : public GameObjectAI
     private:
         SmartScript mScript;
 };
+
+/*keep private*/ void AddSC_SmartScripts();
+
 #endif

@@ -22,7 +22,6 @@
 #include "DBCStores.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "ScriptLoader.h"
 #include "ScriptSystem.h"
 #include "Transport.h"
 #include "Vehicle.h"
@@ -33,6 +32,7 @@
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "SmartAI.h"
 
 // namespace
 // {
@@ -197,7 +197,12 @@ void ScriptMgr::Initialize()
     TC_LOG_INFO("server.loading", "Loading C++ scripts");
 
     FillSpellSummary();
-    AddScripts();
+
+    // Load SmartAI
+    AddSC_SmartScripts();
+
+    // Load all scripts through the script loader function.
+    sWorld->GetScriptLoader()();
 
 #ifdef SCRIPTS
     for (std::string const& scriptName : UnusedScriptNames)

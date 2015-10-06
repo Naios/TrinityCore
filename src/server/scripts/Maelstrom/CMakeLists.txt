@@ -1,3 +1,5 @@
+# Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+#
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
 # modifications, as long as this notice is preserved.
@@ -6,16 +8,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
-  Maelstrom/kezan.cpp
-  Maelstrom/Stonecore/instance_stonecore.cpp
-  Maelstrom/Stonecore/stonecore.cpp
-  Maelstrom/Stonecore/stonecore.h
-  Maelstrom/Stonecore/boss_corborus.cpp
-  Maelstrom/Stonecore/boss_slabhide.cpp
-  Maelstrom/Stonecore/boss_ozruk.cpp
-  Maelstrom/Stonecore/boss_high_priestess_azil.cpp
-)
-
-message("  -> Prepared: The Maelstrom")
+# default linkage of module for SCRIPTS=0 (basic scripts only)
+set(PREFER_BASIC_SCRIPTS   "disabled")
+# default linkage of module for SCRIPTS=1 (prefer static linking)
+set(PREFER_STATIC_SCRIPTS  "static")
+# default linkage of module for SCRIPTS=2 (prefer dynamic linking)
+set(PREFER_DYNAMIC_SCRIPTS "dynamic")

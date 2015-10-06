@@ -8,14 +8,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
-  Pet/pet_dk.cpp
-  Pet/pet_generic.cpp
-  Pet/pet_hunter.cpp
-  Pet/pet_mage.cpp
-  Pet/pet_priest.cpp
-  Pet/pet_shaman.cpp
-)
-
-message("  -> Prepared: Pet")
+# default linkage of module for SCRIPTS=0 (basic scripts only)
+set(PREFER_BASIC_SCRIPTS   "static")
+# default linkage of module for SCRIPTS=1 (prefer static linking)
+set(PREFER_STATIC_SCRIPTS  "static")
+# default linkage of module for SCRIPTS=2 (prefer dynamic linking)
+set(PREFER_DYNAMIC_SCRIPTS "dynamic")

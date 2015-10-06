@@ -92,6 +92,8 @@ void ShutdownThreadPool(std::vector<std::thread>& threadPool);
 bool LoadRealmInfo();
 variables_map GetConsoleArguments(int argc, char** argv, std::string& cfg_file, std::string& cfg_service);
 
+extern void AddScripts();
+
 /// Launch the Trinity server
 extern int main(int argc, char** argv)
 {
@@ -192,6 +194,8 @@ extern int main(int argc, char** argv)
 
     // Initialize the World
     sWorld->SetInitialWorldSettings();
+
+    sWorld->SetScriptLoader(AddScripts);
 
     // Launch CliRunnable thread
     std::thread* cliThread = nullptr;

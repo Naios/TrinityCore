@@ -8,23 +8,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
-  Spells/spell_shaman.cpp
-  Spells/spell_hunter.cpp
-  Spells/spell_rogue.cpp
-  Spells/spell_druid.cpp
-  Spells/spell_dk.cpp
-  Spells/spell_quest.cpp
-  Spells/spell_warrior.cpp
-  Spells/spell_generic.cpp
-  Spells/spell_warlock.cpp
-  Spells/spell_priest.cpp
-  Spells/spell_mage.cpp
-  Spells/spell_paladin.cpp
-  Spells/spell_item.cpp
-  Spells/spell_holiday.cpp
-  Spells/spell_pet.cpp
-)
-
-message("  -> Prepared: Spells")
+# default linkage of module for SCRIPTS=0 (basic scripts only)
+set(PREFER_BASIC_SCRIPTS   "static")
+# default linkage of module for SCRIPTS=1 (prefer static linking)
+set(PREFER_STATIC_SCRIPTS  "static")
+# default linkage of module for SCRIPTS=2 (prefer dynamic linking)
+set(PREFER_DYNAMIC_SCRIPTS "dynamic")

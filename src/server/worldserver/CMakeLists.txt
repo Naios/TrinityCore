@@ -144,6 +144,7 @@ target_link_libraries(worldserver
   game
   common
   shared
+  scripts
   database
   ipc
   g3dlib
@@ -161,6 +162,12 @@ target_link_libraries(worldserver
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
 )
+
+# Register the dynamic script modules as dependency to the worldserver
+# to ensure that all scripts are always built when building the worldserver.
+if (REGISTERED_DYNAMIC_SCRIPT_MODULES)
+  add_dependencies(worldserver ${REGISTERED_DYNAMIC_SCRIPT_MODULES})
+endif()
 
 if( WIN32 )
   if ( MSVC )
