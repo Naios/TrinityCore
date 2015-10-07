@@ -8,18 +8,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
-  OutdoorPvP/OutdoorPvPTF.cpp
-  OutdoorPvP/OutdoorPvPSI.cpp
-  OutdoorPvP/OutdoorPvPSI.h
-  OutdoorPvP/OutdoorPvPZM.cpp
-  OutdoorPvP/OutdoorPvPNA.cpp
-  OutdoorPvP/OutdoorPvPHP.cpp
-  OutdoorPvP/OutdoorPvPTF.h
-  OutdoorPvP/OutdoorPvPHP.h
-  OutdoorPvP/OutdoorPvPZM.h
-  OutdoorPvP/OutdoorPvPNA.h
-)
-
-message("  -> Prepared: Outdoor PVP Zones")
+# default linkage of module for SCRIPTS=0 (basic scripts only)
+set(PREFER_BASIC_SCRIPTS   "static")
+# default linkage of module for SCRIPTS=1 (prefer static linking)
+set(PREFER_STATIC_SCRIPTS  "static")
+# default linkage of module for SCRIPTS=2 (prefer dynamic linking)
+set(PREFER_DYNAMIC_SCRIPTS "dynamic")

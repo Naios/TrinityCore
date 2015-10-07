@@ -141,11 +141,12 @@ endif()
 set_target_properties(worldserver PROPERTIES LINK_FLAGS "${worldserver_LINK_FLAGS}")
 
 target_link_libraries(worldserver
-  game
   common
-  shared
-  database
   ipc
+  database
+  shared
+  game
+  scripts
   g3dlib
   gsoap
   Detour
@@ -161,6 +162,12 @@ target_link_libraries(worldserver
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
 )
+
+# Register the dynamic script modules as dependency to the worldserver
+# to ensure that all scripts are always built when building the worldserver.
+if (REGISTERED_DYNAMIC_SCRIPT_MODULES)
+  add_dependencies(worldserver ${REGISTERED_DYNAMIC_SCRIPT_MODULES})
+endif()
 
 if( WIN32 )
   if ( MSVC )

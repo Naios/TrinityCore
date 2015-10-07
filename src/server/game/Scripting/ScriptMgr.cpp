@@ -22,8 +22,8 @@
 #include "DBCStores.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "ScriptLoader.h"
 #include "ScriptSystem.h"
+#include "SmartAI.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "SpellInfo.h"
@@ -97,11 +97,13 @@ class ScriptRegistry
                         ScriptPointerList[id] = script;
                         sScriptMgr->IncrementScriptCount();
 
+                    /*
                     #ifdef SCRIPTS
                         UnusedScriptNamesContainer::iterator itr = std::lower_bound(UnusedScriptNames.begin(), UnusedScriptNames.end(), script->GetName());
                         if (itr != UnusedScriptNames.end() && *itr == script->GetName())
                             UnusedScriptNames.erase(itr);
                     #endif
+                    */
                     }
                     else
                     {
@@ -204,14 +206,21 @@ void ScriptMgr::Initialize()
     TC_LOG_INFO("server.loading", "Loading C++ scripts");
 
     FillSpellSummary();
-    AddScripts();
 
+    // Load SmartAI
+    AddSC_SmartScripts();
+
+    // Load all scripts through the script loader function.
+    sWorld->GetScriptLoader()();
+
+    /*
 #ifdef SCRIPTS
     for (std::string const& scriptName : UnusedScriptNames)
     {
         TC_LOG_ERROR("sql.sql", "ScriptName '%s' exists in database, but no core script found!", scriptName.c_str());
     }
 #endif
+    */
 
     UnloadUnusedScripts();
 

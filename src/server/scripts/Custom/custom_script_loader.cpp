@@ -15,9 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SC_SCRIPTLOADER_H
-#define SC_SCRIPTLOADER_H
+// Script loader forward declarations:
 
-void AddScripts();
 
-#endif
+// Don't change this functions name!
+// Name must match:
+// void Add##${NameOfDirectory}##Scripts()
+void AddCustomScripts()
+{
+}
