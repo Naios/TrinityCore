@@ -197,11 +197,7 @@ foreach(SCRIPT_PROJECT ${SCRIPT_PROJECTS})
           install(TARGETS ${SCRIPT_LIB_NAME} DESTINATION "${CMAKE_INSTALL_PREFIX}/scripts")
         endif()
 
-        if (USE_SCRIPTPCH)
-          add_cxx_pch(${SCRIPT_LIB_NAME} ${scripts_STAT_PCH_HDR} ${scripts_STAT_PCH_SRC})
-        endif()
-
-        # Add the script module to the worldserver dependencies
+        # Add the script module to the worldserver dependencies and to the pch list.
         list(APPEND REGISTERED_DYNAMIC_SCRIPT_MODULES ${SCRIPT_LIB_NAME})
 
         add_dependencies(${SCRIPT_LIB_NAME} revision_data.h)
@@ -239,7 +235,9 @@ add_library(scripts STATIC
 )
 
 if (USE_SCRIPTPCH)
-  add_cxx_pch(scripts ${scripts_STAT_PCH_HDR} ${scripts_STAT_PCH_SRC})
+  # Add the ScriptPCH to all script projects
+  list(APPEND REGISTER_MODULES_FOR_PATCH ${REGISTERED_DYNAMIC_SCRIPT_MODULES} scripts)
+  add_cxx_pch("${REGISTER_MODULES_FOR_PATCH}" ${scripts_STAT_PCH_HDR} ${scripts_STAT_PCH_SRC})
 endif()
 
 message("")
