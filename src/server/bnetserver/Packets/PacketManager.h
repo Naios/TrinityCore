@@ -88,11 +88,7 @@ namespace Battlenet
 
         bool IsHandled(PacketHeader const& header);
 
-        static PacketManager& Instance()
-        {
-            static PacketManager instance;
-            return instance;
-        }
+        static PacketManager& Instance();
 
     private:
         std::map<PacketHeader, PacketInfo> _clientPacketTable;

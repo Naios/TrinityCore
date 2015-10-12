@@ -47,11 +47,7 @@ namespace Battlenet
         typedef std::map<uint32, std::list<Session*>> SessionByAccountMap;
 
     public:
-        static SessionManager& Instance()
-        {
-            static SessionManager instance;
-            return instance;
-        }
+        static SessionManager& Instance();
 
         bool StartNetwork(boost::asio::io_service& service, std::string const& bindIp, uint16 port) override;
 
