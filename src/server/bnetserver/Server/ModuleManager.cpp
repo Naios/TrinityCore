@@ -57,6 +57,12 @@ Battlenet::ModuleInfo* Battlenet::ModuleManager::CreateModule(std::string const&
     return new ModuleInfo(*_modules.at(key));
 }
 
+Battlenet::ModuleManager* Battlenet::ModuleManager::instance()
+{
+    static ModuleManager instance;
+    return &instance;
+}
+
 std::string Battlenet::ModuleInfo::ToString() const
 {
     std::ostringstream stream;

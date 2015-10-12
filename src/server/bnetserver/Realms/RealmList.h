@@ -35,11 +35,7 @@ class RealmList
 public:
     typedef std::map<Battlenet::RealmHandle, Realm> RealmMap;
 
-    static RealmList* instance()
-    {
-        static RealmList instance;
-        return &instance;
-    }
+    static RealmList* instance();
 
     ~RealmList();
 

@@ -58,6 +58,12 @@ bool Battlenet::PacketManager::IsHandled(PacketHeader const& header)
     return packetInfo->second.HasHandler;
 }
 
+Battlenet::PacketManager& Battlenet::PacketManager::Instance()
+{
+    static PacketManager instance;
+    return instance;
+}
+
 Battlenet::PacketManager::PacketManager()
 {
     RegisterAuthenticationPackets();
