@@ -68,7 +68,7 @@ bool ConfigMgr::Reload(std::string& error)
     return LoadInitial(_filename, error);
 }
 
-std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def)
+std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def) const
 {
     std::string value = _config.get<std::string>(ptree::path_type(name, '/'), def);
 
@@ -77,7 +77,7 @@ std::string ConfigMgr::GetStringDefault(std::string const& name, const std::stri
     return value;
 }
 
-bool ConfigMgr::GetBoolDefault(std::string const& name, bool def)
+bool ConfigMgr::GetBoolDefault(std::string const& name, bool def) const
 {
     try
     {
@@ -91,12 +91,12 @@ bool ConfigMgr::GetBoolDefault(std::string const& name, bool def)
     }
 }
 
-int ConfigMgr::GetIntDefault(std::string const& name, int def)
+int ConfigMgr::GetIntDefault(std::string const& name, int def) const
 {
     return _config.get<int>(ptree::path_type(name, '/'), def);
 }
 
-float ConfigMgr::GetFloatDefault(std::string const& name, float def)
+float ConfigMgr::GetFloatDefault(std::string const& name, float def) const
 {
     return _config.get<float>(ptree::path_type(name, '/'), def);
 }
@@ -118,4 +118,32 @@ std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
             keys.push_back(child.first);
 
     return keys;
+}
+
+typedef char const* (*string_getter)();
+
+std::string GetStringWithDefaultValueFromFunction(std::string const& key, string_getter getter)
+{
+    std::string const value = sConfigMgr->GetStringDefault(key, "");
+    return value.empty() ? getter() : value;
+}
+
+std::string ConfigMgr::GetCMakeCommand() const
+{
+    return GetStringWithDefaultValueFromFunction("CMakeCommand", GitRevision::GetCMakeCommand);
+}
+
+std::string ConfigMgr::GetBuildDirectory() const
+{
+    return GetStringWithDefaultValueFromFunction("BuildDirectory", GitRevision::GetBuildDirectory);
+}
+
+std::string ConfigMgr::GetSourceDirectory() const
+{
+    return GetStringWithDefaultValueFromFunction("SourceDirectory", GitRevision::GetSourceDirectory);
+}
+
+std::string ConfigMgr::GetMySQLExecutable() const
+{
+    return GetStringWithDefaultValueFromFunction("MySQLExecutable", GitRevision::GetMySQLExecutable);
 }

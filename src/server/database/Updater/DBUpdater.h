@@ -57,7 +57,7 @@ struct TRINITY_DATABASE_API UpdateResult
 class DBUpdaterUtil
 {
 public:
-    static std::string GetMySqlCli();
+    static std::string GetCorrectedMySQLExecutable();
 
     static bool CheckExecutable();
 
@@ -70,8 +70,6 @@ class TRINITY_DATABASE_API DBUpdater
 {
 public:
     using Path = boost::filesystem::path;
-
-    static std::string GetSourceDirectory();
 
     static inline std::string GetConfigEntry();
 

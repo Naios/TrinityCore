@@ -25,6 +25,8 @@ namespace GitRevision
     TRINITY_COMMON_API char const* GetHash();
     TRINITY_COMMON_API char const* GetDate();
     TRINITY_COMMON_API char const* GetBranch();
+    TRINITY_COMMON_API char const* GetCMakeCommand();
+    TRINITY_COMMON_API char const* GetBuildDirectory();
     TRINITY_COMMON_API char const* GetSourceDirectory();
     TRINITY_COMMON_API char const* GetMySQLExecutable();
     TRINITY_COMMON_API char const* GetFullDatabase();
@@ -34,8 +36,6 @@ namespace GitRevision
     TRINITY_COMMON_API char const* GetLegalCopyrightStr();
     TRINITY_COMMON_API char const* GetFileVersionStr();
     TRINITY_COMMON_API char const* GetProductVersionStr();
-    TRINITY_COMMON_API char const* GetCompilerCFlags();
-    TRINITY_COMMON_API char const* GetCompilerCXXFlags();
 }
 
 #endif
