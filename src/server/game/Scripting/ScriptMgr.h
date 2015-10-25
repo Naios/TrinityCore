@@ -869,18 +869,6 @@ class TRINITY_GAME_API GroupScript : public ScriptObject
         virtual void OnDisband(Group* /*group*/) { }
 };
 
-// Placed here due to ScriptRegistry::AddScript dependency.
-#define sScriptMgr ScriptMgr::instance()
-
-// namespace
-// {
-    typedef std::vector<ScriptObject*> UnusedScriptContainer;
-    typedef std::list<std::string> UnusedScriptNamesContainer;
-
-    TRINITY_GAME_API extern UnusedScriptContainer UnusedScripts;
-    TRINITY_GAME_API extern UnusedScriptNamesContainer UnusedScriptNames;
-// }
-
 // Manages registration, loading, and execution of scripts.
 class TRINITY_GAME_API ScriptMgr
 {
@@ -890,22 +878,25 @@ class TRINITY_GAME_API ScriptMgr
         ScriptMgr();
         virtual ~ScriptMgr();
 
+        void FillSpellSummary();
+        void LoadDatabase();
+
     public: /* Initialization */
         static ScriptMgr* instance();
 
         void Initialize();
-        void LoadDatabase();
-        void FillSpellSummary();
 
-        const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
-
-        void IncrementScriptCount() { ++_scriptCount; }
         uint32 GetScriptCount() const { return _scriptCount; }
+
+    public: /* Script contexts */
+        void BeginScriptContext(std::string const& context);
+        void FinishScriptContext();
+
+        void ReleaseScriptContext(std::string const& context);
 
     public: /* Unloading */
 
         void Unload();
-        void UnloadUnusedScripts();
 
     public: /* SpellScriptLoader */
 
@@ -1133,11 +1124,14 @@ class TRINITY_GAME_API ScriptMgr
         bool IsScriptScheduled() const { return _scheduledScripts > 0; }
 
     private:
-
         uint32 _scriptCount;
 
         //atomic op counter for active scripts amount
         std::atomic<uint64> _scheduledScripts;
+
+        std::string _currentContext;
 };
+
+#define sScriptMgr ScriptMgr::instance()
 
 #endif

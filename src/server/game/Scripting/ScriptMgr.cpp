@@ -35,12 +35,6 @@
 #include "WorldSession.h"
 #include "Chat.h"
 
-// namespace
-// {
-    UnusedScriptContainer UnusedScripts;
-    UnusedScriptNamesContainer UnusedScriptNames;
-// }
-
 // This is the global static registry of scripts.
 template<class TScript>
 class ScriptRegistry
@@ -95,7 +89,7 @@ class ScriptRegistry
                     if (!existing)
                     {
                         ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
+                        // sScriptMgr->IncrementScriptCount();
 
                     /*
                     #ifdef SCRIPTS
@@ -121,7 +115,7 @@ class ScriptRegistry
 
                     // Avoid calling "delete script;" because we are currently in the script constructor
                     // In a valid scenario this will not happen because every script has a name assigned in the database
-                    UnusedScripts.push_back(script);
+                    // UnusedScripts.push_back(script);
                     return;
                 }
             }
@@ -129,7 +123,7 @@ class ScriptRegistry
             {
                 // We're dealing with a code-only script; just add it.
                 ScriptPointerList[_scriptIdCounter++] = script;
-                sScriptMgr->IncrementScriptCount();
+                // sScriptMgr->IncrementScriptCount();
             }
         }
 
@@ -207,11 +201,16 @@ void ScriptMgr::Initialize()
 
     FillSpellSummary();
 
-    // Load SmartAI
+    // Load core script systems
+    // SmartAI
+    BeginScriptContext("core scripts");
     AddSC_SmartScripts();
+    FinishScriptContext();
 
-    // Load all scripts through the script loader function.
+    // Load all static linked scripts through the script loader function.
+    BeginScriptContext("static scripts");
     sWorld->GetScriptLoader()();
+    FinishScriptContext();
 
     /*
 #ifdef SCRIPTS
@@ -222,9 +221,24 @@ void ScriptMgr::Initialize()
 #endif
     */
 
-    UnloadUnusedScripts();
+    // UnloadUnusedScripts();
 
     TC_LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ScriptMgr::BeginScriptContext(std::string const& context)
+{
+    _currentContext = context;
+}
+
+void ScriptMgr::FinishScriptContext()
+{
+    _currentContext.clear();
+}
+
+void ScriptMgr::ReleaseScriptContext(std::string const& /*context*/)
+{
+    // ToDo
 }
 
 void ScriptMgr::Unload()
@@ -264,17 +278,8 @@ void ScriptMgr::Unload()
 
     #undef SCR_CLEAR
 
-    UnloadUnusedScripts();
-
     delete[] SpellSummary;
     delete[] UnitAI::AISpellInfo;
-}
-
-void ScriptMgr::UnloadUnusedScripts()
-{
-    for (size_t i = 0; i < UnusedScripts.size(); ++i)
-        delete UnusedScripts[i];
-    UnusedScripts.clear();
 }
 
 void ScriptMgr::LoadDatabase()

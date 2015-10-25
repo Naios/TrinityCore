@@ -12,6 +12,7 @@
 #    SERVER LOGGING
 #    SERVER SETTINGS
 #    UPDATE SETTINGS
+#    HOTSWAP SETTINGS
 #    WARDEN SETTINGS
 #    PLAYER INTERACTION
 #    CREATURE SETTINGS
@@ -1233,6 +1234,55 @@ Updates.AllowRehash = 1
 #                    -1 - (Enabled - unlimited)
 
 Updates.CleanDeadRefMaxCount = 3
+
+#
+###################################################################################################
+
+###################################################################################################
+# HOTSWAP SETTINGS
+#
+#    HotSwap.Enabled (Requires compilation with DYNAMIC_LINKING=1)
+#        Description: Enables dynamic script hotswapping.
+#                     Reloads scripts on changes.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+HotSwap.Enabled = 1
+
+#
+#    HotSwap.ScriptDir
+#        Description: Directory containing the script shared libraries (.dll/.so).
+#        Example:     "/usr/local/scripts"
+#        Default:     "scripts"
+
+HotSwap.ScriptDir = "scripts"
+
+#    HotSwap.EnableReCompiler
+#        Description: Enables the dynamic script recompiler.
+#                     Watches your script source directories and recompiles the
+#                     script module on changes.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+HotSwap.EnableReCompiler = 0
+
+#    HotSwap.DeployMode
+#        Description: Sets the strategy how to deploy the shared libraries
+#                     after the build has finished.
+#
+#        Default:     1 - DEPLOY_MODE_INSTALL_MODULE
+#                     2 - DEPLOY_MODE_INSTALL_ALL
+#                     0 - DEPLOY_MODE_NONE
+
+HotSwap.DeployMode = 1
+
+#    HotSwap.RestartOnChanges
+#        Description: Terminates the build when a file was changed meanwhile
+#                     and restarts the build.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+HotSwap.RestartOnChanges = 0
 
 #
 ###################################################################################################
@@ -3389,6 +3439,7 @@ Logger.sql.updates=3,Console Server
 #Logger.scenes=3,Console Server
 #Logger.scripts=3,Console Server
 #Logger.scripts.ai=3,Console Server
+#Logger.scripts.hotswap=3,Console Server
 #Logger.server.bnetserver=3,Console Server
 #Logger.spells=3,Console Server
 #Logger.spells.periodic=3,Console Server

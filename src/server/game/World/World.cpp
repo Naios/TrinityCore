@@ -57,6 +57,7 @@
 #include "PoolMgr.h"
 #include "GitRevision.h"
 #include "ScriptMgr.h"
+#include "ScriptReloadMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
@@ -1399,6 +1400,10 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
 
+    // HotSwap
+    m_bool_configs[CONFIG_HOTSWAP_ENABLED] = sConfigMgr->GetBoolDefault("HotSwap.Enabled", true);
+    m_bool_configs[CONFIG_HOTSWAP_RECOMPILER_ENABLED] = sConfigMgr->GetBoolDefault("HotSwap.EnableReCompiler", false);
+
     // call ScriptMgr if we're reloading the configuration
     if (reload)
         sScriptMgr->OnConfigLoad(reload);
@@ -1911,6 +1916,7 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Initializing Scripts...");
     sScriptMgr->Initialize();
     sScriptMgr->OnConfigLoad(false);                                // must be done after the ScriptMgr has been properly initialized
+    sScriptReloadMgr->Initialize();
 
     TC_LOG_INFO("server.loading", "Validating spell scripts...");
     sObjectMgr->ValidateSpellScripts();
@@ -1946,6 +1952,9 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_PINGDB].SetInterval(getIntConfig(CONFIG_DB_PING_INTERVAL)*MINUTE*IN_MILLISECONDS);    // Mysql ping time in minutes
 
     m_timers[WUPDATE_GUILDSAVE].SetInterval(getIntConfig(CONFIG_GUILD_SAVE_INTERVAL) * MINUTE * IN_MILLISECONDS);
+
+    // for file changes checker
+    m_timers[WUPDATE_CHECK_FILECHANGES].SetInterval(1 * IN_MILLISECONDS);
 
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
@@ -2185,6 +2194,13 @@ void World::Update(uint32 diff)
     {
         sAuctionBot->Update();
         m_timers[WUPDATE_AHBOT].Reset();
+    }
+
+    /// <li> Handle file changes
+    if (m_timers[WUPDATE_CHECK_FILECHANGES].Passed())
+    {
+        sScriptReloadMgr->Update();
+        m_timers[WUPDATE_CHECK_FILECHANGES].Reset();
     }
 
     /// <li> Handle session updates when the timer has passed
