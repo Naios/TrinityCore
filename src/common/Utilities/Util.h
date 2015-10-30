@@ -21,9 +21,11 @@
 
 #include "Define.h"
 #include "Errors.h"
+#include "Common.h"
 
 #include <algorithm>
 #include <string>
+#include <memory>
 #include <vector>
 #include <list>
 #include <map>
@@ -541,5 +543,26 @@ bool CompareValues(ComparisionType type, T val1, T val2)
             return false;
     }
 }
+
+// Wrapper for lazy initialization
+template<typename T>
+class LazyWrapper
+{
+public:
+    LazyWrapper() { }
+    ~LazyWrapper() { }
+
+    // Associated storage is initialized on first use.
+    T* operator-> ()
+    {
+        if (!_impl)
+            _impl = Trinity::make_unique<T>();
+
+        return _impl.get();
+    }
+
+private:
+    std::unique_ptr<T> _impl;
+};
 
 #endif
