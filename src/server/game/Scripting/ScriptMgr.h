@@ -833,8 +833,6 @@ class TC_GAME_API GroupScript : public ScriptObject
         virtual void OnDisband(Group* /*group*/) { }
 };
 
-// Placed here due to ScriptRegistry::AddScript dependency.
-#define sScriptMgr ScriptMgr::instance()
 
 // namespace
 // {
@@ -851,12 +849,13 @@ class TC_GAME_API ScriptMgr
         ScriptMgr();
         virtual ~ScriptMgr();
 
+        void FillSpellSummary();
+        void LoadDatabase();
+
     public: /* Initialization */
         static ScriptMgr* instance();
 
         void Initialize();
-        void LoadDatabase();
-        void FillSpellSummary();
 
         const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
 
@@ -871,6 +870,12 @@ class TC_GAME_API ScriptMgr
         {
             _script_loader_callback = script_loader_callback;
         }
+
+    public: /* Script contexts */
+        void BeginScriptContext(std::string const& context);
+        void FinishScriptContext();
+
+        void ReleaseScriptContext(std::string const& context);
 
     public: /* Unloading */
 
@@ -1101,13 +1106,16 @@ class TC_GAME_API ScriptMgr
         bool IsScriptScheduled() const { return _scheduledScripts > 0; }
 
     private:
-
         uint32 _scriptCount;
 
         //atomic op counter for active scripts amount
         std::atomic<uint64> _scheduledScripts;
 
         ScriptLoaderCallbackType _script_loader_callback;
+
+        std::string _currentContext;
 };
+
+#define sScriptMgr ScriptMgr::instance()
 
 #endif
