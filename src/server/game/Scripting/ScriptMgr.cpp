@@ -34,6 +34,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Chat.h"
+#include "MapManager.h"
 
 // Trait which indicates whether this script type
 // must be assigned in the database.
@@ -98,25 +99,23 @@ struct is_script_database_bound<GroupScript>
     : std::true_type { };
 
 // This is the global static registry of scripts.
-template<class TScript>
+template<class Script>
 class ScriptRegistry
 {
     public:
+        using ScriptMapType = std::map<uint32, Script*>;
+        using ScriptMapIteratorType = typename ScriptMapType::iterator;
 
-        typedef std::map<uint32, TScript*> ScriptMap;
-        typedef typename ScriptMap::iterator ScriptMapIterator;
+        static ScriptMapType ScriptPointerList;
 
-        // The actual list of scripts. This will be accessed concurrently, so it must not be modified
-        // after server startup.
-        static ScriptMap ScriptPointerList;
+        static void AddScript(Script* const script)
 
-        static void AddScript(TScript* const script)
         {
             ASSERT(script);
 
             // See if the script is using the same memory as another script. If this happens, it means that
             // someone forgot to allocate new memory for a script.
-            for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+            for (ScriptMapIteratorType it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
             {
                 if (it->second == script)
                 {
@@ -136,7 +135,7 @@ class ScriptRegistry
                 {
                     // Try to find an existing script.
                     bool existing = false;
-                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                    for (ScriptMapIteratorType it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
                     {
                         // If the script names match...
                         if (it->second->GetName() == script->GetName())
@@ -184,52 +183,64 @@ class ScriptRegistry
             else
             {
                 // We're dealing with a code-only script; just add it.
-                ScriptPointerList[_scriptIdCounter++] = script;
+                // ScriptPointerList[_scriptIdCounter++] = script;
                 // sScriptMgr->IncrementScriptCount();
             }
         }
 
         // Gets a script by its ID (assigned by ObjectMgr).
-        static TScript* GetScriptById(uint32 id)
+        static Script* GetScriptById(uint32 id)
         {
-            ScriptMapIterator it = ScriptPointerList.find(id);
+            /*
+            ScriptMapIteratorType it = ScriptPointerList.find(id);
             if (it != ScriptPointerList.end())
                 return it->second;
+                */
 
             return NULL;
         }
 
     private:
-
         // Counter used for code-only scripts.
-        static uint32 _scriptIdCounter;
+        std::unordered_multimap<std::string /*context*/, uint32 /*id*/> ids_of_contexts;
 };
 
+template<typename Script>
+using ScriptMapType = typename ScriptRegistry<Script>::ScriptMapType;
+
+template<typename Script>
+using ScriptMapIteratorTypeType = typename ScriptRegistry<Script>::ScriptMapType::iterator;
+
 // Utility macros to refer to the script registry.
-#define SCR_REG_MAP(T) ScriptRegistry<T>::ScriptMap
-#define SCR_REG_ITR(T) ScriptRegistry<T>::ScriptMapIterator
+#define SCR_REG_MAP(T) ScriptMap<T>
+#define SCR_REG_ITR(T) ScriptMapIteratorTypeType<T>
 #define SCR_REG_LST(T) ScriptRegistry<T>::ScriptPointerList
 
 // Utility macros for looping over scripts.
 #define FOR_SCRIPTS(T, C, E) \
     if (SCR_REG_LST(T).empty()) \
         return; \
+    \
     for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
         C != SCR_REG_LST(T).end(); ++C)
+
 #define FOR_SCRIPTS_RET(T, C, E, R) \
     if (SCR_REG_LST(T).empty()) \
         return R; \
+    \
     for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
         C != SCR_REG_LST(T).end(); ++C)
+
 #define FOREACH_SCRIPT(T) \
     FOR_SCRIPTS(T, itr, end) \
-    itr->second
+        itr->second
 
 // Utility macros for finding specific scripts.
 #define GET_SCRIPT(T, I, V) \
     T* V = ScriptRegistry<T>::GetScriptById(I); \
     if (!V) \
         return;
+
 #define GET_SCRIPT_RET(T, I, V, R) \
     T* V = ScriptRegistry<T>::GetScriptById(I); \
     if (!V) \
@@ -300,7 +311,9 @@ void ScriptMgr::FinishScriptContext()
 
 void ScriptMgr::ReleaseScriptContext(std::string const& /*context*/)
 {
-    // ToDo
+    sMapMgr->DoForAllMaps([](Map* map)
+    {
+    });
 }
 
 void ScriptMgr::Unload()
@@ -1715,8 +1728,8 @@ GroupScript::GroupScript(const char* name)
 }
 
 // Instantiate static members of ScriptRegistry.
-template<class TScript> std::map<uint32, TScript*> ScriptRegistry<TScript>::ScriptPointerList;
-template<class TScript> uint32 ScriptRegistry<TScript>::_scriptIdCounter = 0;
+template<class Script>
+std::map<uint32, Script*> ScriptRegistry<Script>::ScriptPointerList;
 
 // Specialize for each script type class like so:
 template class TRINITY_GAME_API ScriptRegistry<SpellScriptLoader>;
