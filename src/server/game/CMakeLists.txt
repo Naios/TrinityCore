@@ -182,7 +182,9 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Weather
   ${CMAKE_CURRENT_SOURCE_DIR}/World
   ${CMAKE_SOURCE_DIR}/dep/cppformat
+  ${CMAKE_SOURCE_DIR}/dep/efsw/include/efsw
   ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/dep/process
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
   ${CMAKE_SOURCE_DIR}/dep/zlib
   ${CMAKE_SOURCE_DIR}/dep/zmqpp
@@ -233,6 +235,7 @@ if (WITH_DYNAMIC_LINKING)
     Detour
     zmqpp
     format
+    efsw
     ${JEMALLOC_LIBRARY}
     ${READLINE_LIBRARY}
     ${TERMCAP_LIBRARY}

@@ -266,11 +266,16 @@ void ScriptMgr::Initialize()
 
     FillSpellSummary();
 
-    // Load SmartAI
+    // Load core script systems
+    // SmartAI
+    BeginScriptContext("core scripts");
     AddSC_SmartScripts();
+    FinishScriptContext();
 
-    // Load all scripts through the script loader function.
+    // Load all static linked scripts through the script loader function.
+    BeginScriptContext("static scripts");
     sWorld->GetScriptLoader()();
+    FinishScriptContext();
 
     /*
 #ifdef SCRIPTS
@@ -284,6 +289,21 @@ void ScriptMgr::Initialize()
     UnloadUnusedScripts();
 
     TC_LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ScriptMgr::BeginScriptContext(std::string const& context)
+{
+    _currentContext = context;
+}
+
+void ScriptMgr::FinishScriptContext()
+{
+    _currentContext.clear();
+}
+
+void ScriptMgr::ReleaseScriptContext(std::string const& /*context*/)
+{
+    // ToDo
 }
 
 void ScriptMgr::Unload()

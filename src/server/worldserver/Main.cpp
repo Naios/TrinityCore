@@ -35,6 +35,7 @@
 #include "InstanceSaveMgr.h"
 #include "ObjectAccessor.h"
 #include "ScriptMgr.h"
+#include "ScriptReloadMgr.h"
 #include "OutdoorPvP/OutdoorPvPMgr.h"
 #include "BattlegroundMgr.h"
 #include "TCSoap.h"
@@ -275,6 +276,7 @@ extern int main(int argc, char** argv)
     sInstanceSaveMgr->Unload();
     sOutdoorPvPMgr->Die();                    // unload it before MapManager
     sMapMgr->UnloadAll();                     // unload all grids (including locked in memory)
+    sScriptReloadMgr->Unload();
     sScriptMgr->Unload();
 
     // set server offline
