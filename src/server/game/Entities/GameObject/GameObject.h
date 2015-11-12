@@ -1086,8 +1086,10 @@ class TRINITY_GAME_API GameObject : public WorldObject, public GridObject<GameOb
         uint16 GetAIAnimKitId() const override { return _animKitId; }
         void SetAnimKitId(uint16 animKitId, bool oneshot);
 
-    protected:
+        void AIM_Destroy();
         bool AIM_Initialize();
+
+    protected:
         GameObjectModel* CreateModel();
         void UpdateModel();                                 // updates model in case displayId were changed
         uint32      m_spellId;
