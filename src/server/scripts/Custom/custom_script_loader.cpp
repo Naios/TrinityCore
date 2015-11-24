@@ -15,11 +15,81 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This is where scripts' loading functions should be declared:
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
+struct hey
+{
+    hey()
+    {
+        TC_LOG_INFO("scripts.hotswap", "hey from my module blub!");
+
+        for (uint32 i = 0; i < 10; ++i)
+            if (auto const t = sObjectMgr->GetCreatureTemplate(i))
+                TC_LOG_INFO("scripts.hotswap", "the name is %s", t->Name.c_str());
+    }
+};
+
+static hey const h;
+
+
+class npc_test_script_1 : public CreatureScript
+{
+public:
+    npc_test_script_1() : CreatureScript("npc_test_script_1") { }
+
+    struct npc_test_script_1AI : public CreatureAI
+    {
+        npc_test_script_1AI(Creature* creature) : CreatureAI(creature)
+        {
+            TC_LOG_INFO("scripts.hotswap", "npc_test_script_1 instance created");
+        }
+
+        virtual ~npc_test_script_1AI()
+        {
+            TC_LOG_INFO("scripts.hotswap", "npc_test_script_1 instance destroyed");
+        }
+
+        TaskScheduler scheduler;
+
+        void Reset() override
+        {
+            me->Yell("Script reset!", LANG_UNIVERSAL);
+        }
+
+        void EnterCombat(Unit* /*victim*/) override
+        {
+            me->Yell("Entering combat now!", LANG_UNIVERSAL);
+
+            scheduler.Schedule(Seconds(2), [&](TaskContext context)
+            {
+                me->Yell("huhu and swapped!", LANG_UNIVERSAL);
+                context.Repeat();
+            });
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            scheduler.Update(diff);
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_test_script_1AI(creature);
+    }
+};
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
 void AddCustomScripts()
 {
+    new npc_test_script_1();
 }
