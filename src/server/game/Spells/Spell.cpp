@@ -1289,180 +1289,245 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
         case TARGET_DEST_CASTER_FRONT_LEAP:
         {
             float distance = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
-            Map* map = m_caster->GetMap();
-            uint32 mapid = m_caster->GetMapId();
-            uint32 phasemask = m_caster->GetPhaseMask();
-            float destx, desty, destz, ground;
 
-            Position pos;
+            Position pos = m_caster->GetPosition();
             Position lastpos;
-            pos = m_caster->GetPosition();
-            destx = pos.GetPositionX() + distance * cos(pos.GetOrientation());
-            desty = pos.GetPositionY() + distance * sin(pos.GetOrientation());
 
-            ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+            Position dest_pos = {
+                pos.GetPositionX() + distance * cos(pos.GetOrientation()),
+                pos.GetPositionY() + distance * sin(pos.GetOrientation()),
+                0.f
+            };
+
+            Map const* const map = m_caster->GetMap();
+            uint32 const mapid = m_caster->GetMapId();
+            uint32 const phasemask = m_caster->GetPhaseMask();
+
+            float ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
 
             if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < 25.0f))
             {
-                float tstX, tstY, tstZ, prevX, prevY, prevZ;
-                float tstZ1, tstZ2, tstZ3, destz1, destz2, destz3, srange, srange1, srange2, srange3;
+                float srange = 0.f;
                 float maxtravelDistZ = 2.65f;
                 float overdistance = 0.0f;
                 float totalpath = 0.0f;
                 float beforewaterz = 0.0f;
-                const float  step = 2.0f;
-                const uint8 numChecks = ceil(fabs(distance / step));
-                const float DELTA_X = (destx - pos.GetPositionX()) / numChecks;
-                const float DELTA_Y = (desty - pos.GetPositionY()) / numChecks;
-                int j = 1;
-                for (; j < (numChecks + 1); j++)
+                float const step = 2.0f;
+                uint8 const numChecks = ceil(fabs(distance / step));
+                float const DELTA_X = (dest_pos.GetPositionX() - pos.GetPositionX()) / numChecks;
+                float const DELTA_Y = (dest_pos.GetPositionY() - pos.GetPositionY()) / numChecks;
+
+                Position tst_pos;
+
+                for (int32 j = 1; j < (numChecks + 1); ++j)
                 {
-                    prevX = pos.GetPositionX() + (float(j - 1)*DELTA_X);
-                    prevY = pos.GetPositionY() + (float(j - 1)*DELTA_Y);
-                    tstX = pos.GetPositionX() + (float(j)*DELTA_X);
-                    tstY = pos.GetPositionY() + (float(j)*DELTA_Y);
+                    Position prev_pos = {
+                        pos.GetPositionX() + (float(j - 1) * DELTA_X),
+                        pos.GetPositionY() + (float(j - 1) * DELTA_Y),
+                        /**
+                         * FIXME:
+                         *
+                         * Old code heavily abused the branch j == 1
+                         * to evade accessing the uninitialized var tstZ...
+                         * very bad style...
+                         *
+                         * if (j < 2)
+                         *     prevZ = pos.GetPositionZ();
+                         * else
+                         *     prevZ = tstZ;
+                         *
+                         * TODO Check it for correctness
+                         */
+                        (j == 1) ? pos.GetPositionZ() : tst_pos.GetPositionZ()
+                    };
 
-                    if (j < 2)
-                    {
-                        prevZ = pos.GetPositionZ();
-                    }
-                    else
-                    {
-                        prevZ = tstZ;
-                    }
+                    tst_pos = {
+                        pos.GetPositionX() + (float(j) * DELTA_X),
+                        pos.GetPositionY() + (float(j) * DELTA_Y),
+                        map->GetHeight(phasemask,
+                            prev_pos.GetPositionX(),
+                            prev_pos.GetPositionY(),
+                            prev_pos.GetPositionZ() + maxtravelDistZ, true)
+                    };
 
-                    tstZ = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true);
-                    ground = tstZ;
+                    ground = tst_pos.GetPositionZ();
 
-                    if (!map->IsInWater(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()))
+                    if (map->IsInWater(tst_pos.GetPositionX(), tst_pos.GetPositionY(), tst_pos.GetPositionZ()))
                     {
-                        if (map->IsInWater(tstX, tstY, tstZ))
+                        if (map->IsInWater(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()))
                         {
-                            if (!(beforewaterz != 0.0f))
-                                beforewaterz = prevZ;
-                            tstZ = beforewaterz;
-                            srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));
-                            //TC_LOG_ERROR("server", "(start was from land) step in water , number of cycle = %i , distance of step = %f, total path = %f, Z = %f", j, srange, totalpath, tstZ);
+                            prev_pos.m_positionZ = pos.GetPositionZ();
+                            tst_pos.m_positionZ = pos.GetPositionZ();
+                            srange = tst_pos.GetExactDist(&prev_pos);
+                        }
+                        else
+                        {
+                            if (!beforewaterz)
+                                beforewaterz = tst_pos.GetPositionZ();
+
+                            tst_pos.m_positionZ = beforewaterz;
+                            srange = tst_pos.GetExactDist(&prev_pos);
                         }
                     }
-                    else if (map->IsInWater(tstX, tstY, tstZ))
+
+                    // second safety check z for blink way if on the ground
+                    if (!map->IsInWater(tst_pos.GetPositionX(), tst_pos.GetPositionY(), tst_pos.GetPositionZ()) &&
+                        (tst_pos.GetPositionZ() != beforewaterz))
                     {
-                        prevZ = pos.GetPositionZ();
-                        tstZ = pos.GetPositionZ();
-                        srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));
-                        //TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                        float tst_all_z[] = {
+                            // highest available point
+                            map->GetHeight(phasemask,
+                                tst_pos.GetPositionX(), tst_pos.GetPositionY(),
+                                prev_pos.GetPositionZ() + maxtravelDistZ, true, 25.0f),
+                            // upper or floor
+                            map->GetHeight(phasemask,
+                                tst_pos.GetPositionX(), tst_pos.GetPositionY(),
+                                prev_pos.GetPositionZ(), true, 25.0f),
+                            //lower than floor
+                            map->GetHeight(phasemask,
+                                tst_pos.GetPositionX(), tst_pos.GetPositionY(),
+                                prev_pos.GetPositionZ() - maxtravelDistZ / 2, true, 25.0f)
+                        };
+
+                        // transform the array to the distance to the target pos
+                        std::transform(std::begin(tst_all_z), std::end(tst_all_z),
+                                       std::begin(tst_all_z), [&](float tstZ)
+                        {
+                            Position const target = {
+                                tst_pos.GetPositionX(),
+                                tst_pos.GetPositionY(),
+                                tstZ
+                            };
+
+                            return target.GetExactDist(&prev_pos);
+                        });
+
+                        // distance of rays, will select the shortest in 3D
+                        tst_pos.m_positionZ = *std::min_element(std::begin(tst_all_z), std::end(tst_all_z));
+
+                        srange = tst_pos.GetExactDist(&prev_pos);
                     }
 
-                    if (!map->IsInWater(tstX, tstY, tstZ) && tstZ != beforewaterz)  // second safety check z for blink way if on the ground
-                    {
-                        // highest available point
-                        tstZ1 = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true, 25.0f);
-                        // upper or floor
-                        tstZ2 = map->GetHeight(phasemask, tstX, tstY, prevZ, true, 25.0f);
-                        //lower than floor
-                        tstZ3 = map->GetHeight(phasemask, tstX, tstY, prevZ - maxtravelDistZ / 2, true, 25.0f);
-
-                        //distance of rays, will select the shortest in 3D
-                        srange1 = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ1 - prevZ)*(tstZ1 - prevZ));
-                        //TC_LOG_ERROR("server", "step = %i, distance of ray1 = %f", j, srange1);
-                        srange2 = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ2 - prevZ)*(tstZ2 - prevZ));
-                        //TC_LOG_ERROR("server", "step = %i, distance of ray2 = %f", j, srange2);
-                        srange3 = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ3 - prevZ)*(tstZ3 - prevZ));
-                        //TC_LOG_ERROR("server", "step = %i, distance of ray3 = %f", j, srange3);
-
-                        if (srange1 < srange2)
-                            tstZ = tstZ1;
-                        else if (srange3 < srange2)
-                            tstZ = tstZ3;
-                        else
-                            tstZ = tstZ2;
-
-                        srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ - prevZ)*(tstZ - prevZ));
-                        //TC_LOG_ERROR("server", "step on ground, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
-                    }
-
-                    destx = tstX;
-                    desty = tstY;
-                    destz = tstZ;
+                    dest_pos = tst_pos;
 
                     totalpath += srange;
 
                     if (totalpath > distance)
                     {
                         overdistance = totalpath - distance;
-                        //TC_LOG_ERROR("server", "total path > than distance in 3D , need to move back a bit for save distance, total path = %f, overdistance = %f", totalpath, overdistance);
                     }
 
-                    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
-                    // check dynamic collision
-                    bool dcol = m_caster->GetMap()->getObjectHitPos(phasemask, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+                    bool const col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(
+                        mapid, prev_pos.GetPositionX(), prev_pos.GetPositionY(), prev_pos.GetPositionZ() + 0.5f,
+                        tst_pos.GetPositionX(), tst_pos.GetPositionY(), tst_pos.GetPositionZ() + 0.5f,
+                        tst_pos.m_positionX, tst_pos.m_positionY, tst_pos.m_positionZ, -0.5f);
+                    // ~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^~~~~~
+                    // See note below
 
-                    // collision occured
-                    if (col || dcol || (overdistance > 0.0f && !map->IsInWater(tstX, tstY, ground)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
+                    // check dynamic collision
+                    bool const dcol = m_caster->GetMap()->getObjectHitPos(
+                        phasemask,
+                        prev_pos.GetPositionX(), prev_pos.GetPositionY(), prev_pos.GetPositionZ() + 0.5f,
+                        tst_pos.GetPositionX(), tst_pos.GetPositionY(), tst_pos.GetPositionZ() + 0.5f,
+                        tst_pos.m_positionX, tst_pos.m_positionY, tst_pos.m_positionZ, -0.5f);
+                    // ~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^~~~~~
+                    // Overwrites result of:
+                    // VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos
+                    // since both times tst_pos.m_positionX, tst_pos.m_positionY, tst_pos.m_positionZ
+                    // are used as output variable... is this behavior wished?
+
+                    bool const distance_3d = overdistance > 0.0f &&
+                                                !map->IsInWater(tst_pos.GetPositionZ(), tst_pos.GetPositionY(), ground);
+                    bool const available_jump = fabs(prev_pos.GetPositionZ() - tst_pos.GetPositionZ()) >
+                                                    maxtravelDistZ && (tst_pos.GetPositionZ() > prev_pos.GetPositionZ());
+
+                    // collision occurred
+                    if (col || dcol || distance_3d || available_jump)
                     {
                         if ((overdistance > 0.0f) && (overdistance < step))
                         {
-                            destx = prevX + overdistance * cos(pos.GetOrientation());
-                            desty = prevY + overdistance * sin(pos.GetOrientation());
-                            //TC_LOG_ERROR("server", "(collision) collision occured 1");
+                            dest_pos = {
+                                prev_pos.GetPositionX() + overdistance * cos(pos.GetOrientation()),
+                                prev_pos.GetPositionY() + overdistance * sin(pos.GetOrientation()),
+                                dest_pos.GetPositionZ()
+                            };
                         }
                         else
                         {
                             // move back a bit
-                            destx = tstX - (0.6 * cos(pos.GetOrientation()));
-                            desty = tstY - (0.6 * sin(pos.GetOrientation()));
-                            //TC_LOG_ERROR("server", "(collision) collision occured 2");
+                            dest_pos = {
+                                tst_pos.GetPositionX() - (0.6f * cos(pos.GetOrientation())),
+                                tst_pos.GetPositionY() - (0.6f * sin(pos.GetOrientation())),
+                                dest_pos.GetPositionZ()
+                            };
                         }
 
-                        // highest available point
-                        destz1 = map->GetHeight(phasemask, destx, desty, prevZ + maxtravelDistZ, true, 25.0f);
-                        // upper or floor
-                        destz2 = map->GetHeight(phasemask, destx, desty, prevZ, true, 25.0f);
-                        //lower than floor
-                        destz3 = map->GetHeight(phasemask, destx, desty, prevZ - maxtravelDistZ / 2, true, 25.0f);
+                        float tst_all_z[] = {
+                            // highest available point
+                            map->GetHeight(phasemask, dest_pos.GetPositionX(), dest_pos.GetPositionY(),
+                                dest_pos.GetPositionZ() + maxtravelDistZ, true, 25.0f),
+                            // upper or floor
+                            map->GetHeight(phasemask, dest_pos.GetPositionX(), dest_pos.GetPositionY(),
+                                dest_pos.GetPositionZ(), true, 25.0f),
+                            // lower than floor
+                            map->GetHeight(phasemask, dest_pos.GetPositionX(), dest_pos.GetPositionY(),
+                                dest_pos.GetPositionZ() - maxtravelDistZ / 2, true, 25.0f)
+                        };
 
-                        //distance of rays, will select the shortest in 3D
-                        srange1 = sqrt((desty - prevY)*(desty - prevY) + (destx - prevX)*(destx - prevX) + (destz1 - prevZ)*(destz1 - prevZ));
-                        srange2 = sqrt((desty - prevY)*(desty - prevY) + (destx - prevX)*(destx - prevX) + (destz2 - prevZ)*(destz2 - prevZ));
-                        srange3 = sqrt((desty - prevY)*(desty - prevY) + (destx - prevX)*(destx - prevX) + (destz3 - prevZ)*(destz3 - prevZ));
+                        // transform the array to the distance to the target pos
+                        std::transform(std::begin(tst_all_z), std::end(tst_all_z),
+                                       std::begin(tst_all_z), [&](float tstZ)
+                        {
+                            Position const target = {
+                                dest_pos.GetPositionX(),
+                                dest_pos.GetPositionY(),
+                                tstZ
+                            };
 
-                        if (srange1 < srange2)
-                            destz = destz1;
-                        else if (srange3 < srange2)
-                            destz = destz3;
-                        else
-                            destz = destz2;
+                            return target.GetExactDist(&prev_pos);
+                        });
 
-                        //TC_LOG_ERROR("server", "(collision) destZ rewrited in prevZ");                         
-
+                        // distance of rays, will select the shortest in 3D
+                        dest_pos.m_positionZ = *std::min_element(std::begin(tst_all_z), std::end(tst_all_z));
                         break;
                     }
                     // we have correct destz now
                 }
-                //}
 
-                lastpos.Relocate(destx, desty, destz + 0.5f, pos.GetOrientation());
+                lastpos.Relocate(dest_pos.GetPositionX(), dest_pos.GetPositionY(),
+                                 dest_pos.GetPositionZ() + 0.5f, pos.GetOrientation());
                 dest = SpellDestination(lastpos);
             }
             else
             {
+                // FIXME: Result of z is unused
                 float z = pos.GetPositionZ();
-                bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
-                // check dynamic collision
-                bool dcol = m_caster->GetMap()->getObjectHitPos(phasemask, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
 
-                // collision occured
+                bool const col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(
+                    mapid, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f,
+                    dest_pos.GetPositionX(), dest_pos.GetPositionY(), z + 0.5f,
+                    dest_pos.m_positionX, dest_pos.m_positionY, z, -0.5f);
+                // ~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^~~~~~
+                // See note above (result overwritten)
+
+                // check dynamic collision
+                bool const dcol = m_caster->GetMap()->getObjectHitPos(
+                    phasemask, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f,
+                    dest_pos.GetPositionX(), dest_pos.GetPositionY(), z + 0.5f,
+                    dest_pos.m_positionX, dest_pos.m_positionY, z, -0.5f);
+                // ~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^~~~~~
+                // See note above (result overwritten)
+
+                // collision occurred
                 if (col || dcol)
                 {
                     // move back a bit
-                    destx = destx - (0.6 * cos(pos.GetOrientation()));
-                    desty = desty - (0.6 * sin(pos.GetOrientation()));
+                    dest_pos.m_positionX = dest_pos.GetPositionX() - (0.6f * cos(pos.GetOrientation()));
+                    dest_pos.m_positionY = dest_pos.GetPositionY() - (0.6f * sin(pos.GetOrientation()));
                 }
 
-                lastpos.Relocate(destx, desty, z, pos.GetOrientation());
+                lastpos.Relocate(dest_pos.GetPositionX(), dest_pos.GetPositionY(), z, pos.GetOrientation());
                 dest = SpellDestination(lastpos);
-                //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
-                //TC_LOG_ERROR("server", "Blink number 2, in falling but at a hight, distance of blink = %f", range);
             }
 
             break;
