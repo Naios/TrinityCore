@@ -51,6 +51,8 @@ int main(int, char**)
 {
   std::printf("");
 
+  ASSERT(crlf_str.find("\r\n") != std::string::npos);
+
   // Write the files
   {
     std::ofstream o("crlf_test.txt", std::fstream::binary);
@@ -67,6 +69,12 @@ int main(int, char**)
 
   auto crlf = ReadFile("crlf_test.txt");
   auto lf = ReadFile("lf_test.txt");
+
+  if (lf.find("\r\n") != std::string::npos)
+    printf("[NOTE] lf file has crlf line endings\n");
+
+  if (crlf.find("\r\n") != std::string::npos)
+    printf("[NOTE] crlf file has crlf line endings\n");
 
   if (lf == lf_str)
     printf("[OK] the lf file is ok\n(%s)\n",
