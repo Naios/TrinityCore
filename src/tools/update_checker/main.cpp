@@ -12,11 +12,14 @@
 #include <openssl/sha.h>
 
 
-static char const* crlf_str =
+static std::string const crlf_str =
   "blub\r\n1234567890\r\n1234567890\r\n";
 
-static char const* lf_str =
+static std::string const lf_str =
   "blub\n1234567890\n1234567890\n";
+
+static std::string const sha1 =
+  "F6A91C958ECC2C68F4484F44A5C267B061FACAE5";
 
 std::string ReadFile(std::string const& file)
 {
@@ -65,6 +68,14 @@ int main(int, char**)
   auto crlf = ReadFile("crlf_test.txt");
   auto lf = ReadFile("lf_test.txt");
 
+  if (lf == lf_str)
+    printf("[OK] the lf file is ok\n");
+  else
+  {
+    printf("[ERROR] lf file has the wrong content!\n");
+    lf = lf_str;
+  }
+
   if (lf == crlf)
     printf("[OK] textmode ok\n");
   else
@@ -84,10 +95,16 @@ int main(int, char**)
     crlf_hash = lf_hash;
   }
 
-  if (lf_hash == "F6A91C958ECC2C68F4484F44A5C267B061FACAE5")
-    printf("[OK] the hash is correct\n");
+  if (lf_hash == sha1)
+    printf("[OK] the file hash is correct\n");
   else
-    printf("[ERROR] The hash is wrong! (%s)\n", lf_hash.c_str());
+    printf("[ERROR] The file hash is wrong! (%s)\n", lf_hash.c_str());
+
+  auto const hash = CalculateHash(lf_str);
+  if (hash == sha1)
+    printf("[OK] OpenSSL SHA1 is ok\n");
+  else
+    printf("[ERROR] OpenSSL SHA1 is wrong (%s)\n", hash.c_str());
 
   return 0;
 }
