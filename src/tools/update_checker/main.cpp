@@ -69,10 +69,14 @@ int main(int, char**)
   auto lf = ReadFile("lf_test.txt");
 
   if (lf == lf_str)
-    printf("[OK] the lf file is ok\n");
+    printf("[OK] the lf file is ok\n(%s)\n",
+      ByteArrayToHexStr(reinterpret_cast<uint8 const*>(lf.c_str()), lf.length())
+        .c_str());
   else
   {
-    printf("[ERROR] lf file has the wrong content!\n");
+    printf("[ERROR] lf file has the wrong content!\n(%s)\n",
+      ByteArrayToHexStr(reinterpret_cast<uint8 const*>(lf.c_str()), lf.length())
+        .c_str());
     lf = lf_str;
   }
 
