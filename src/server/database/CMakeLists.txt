@@ -12,10 +12,6 @@ if (NOT MYSQL_FOUND)
   message(SEND_ERROR "MySQL wasn't found on your system but it's required to build the servers!")
 endif()
 
-if( USE_COREPCH )
-  include_directories(${CMAKE_CURRENT_BINARY_DIR})
-endif()
-
 file(GLOB_RECURSE sources_Database Database/*.cpp Database/*.h)
 file(GLOB_RECURSE sources_Logging Logging/*.cpp Logging/*.h)
 file(GLOB_RECURSE sources_Updater Updater/*.cpp Updater/*.h)
@@ -25,11 +21,6 @@ file(GLOB sources_localdir *.cpp *.h)
 #
 # Build shared sourcelist
 #
-
-if (USE_COREPCH)
-  set(database_STAT_PCH_HDR PrecompiledHeaders/databasePCH.h)
-  set(database_STAT_PCH_SRC PrecompiledHeaders/databasePCH.cpp)
-endif()
 
 set(database_STAT_SRCS
   ${database_STAT_SRCS}
@@ -71,7 +62,4 @@ add_library(database STATIC
   ${database_STAT_PCH_SRC}
 )
 
-# Generate precompiled header
-if (USE_COREPCH)
-  add_cxx_pch(database ${database_STAT_PCH_HDR} ${database_STAT_PCH_SRC})
-endif ()
+cotire(database)

@@ -13,11 +13,6 @@ file(GLOB_RECURSE sources_RemoteAccess RemoteAccess/*.cpp RemoteAccess/*.h)
 file(GLOB_RECURSE sources_TCSoap TCSoap/*.cpp TCSoap/*.h)
 file(GLOB sources_localdir *.cpp *.h)
 
-if (USE_COREPCH)
-  set(worldserver_PCH_HDR PrecompiledHeaders/worldPCH.h)
-  set(worldserver_PCH_SRC PrecompiledHeaders/worldPCH.cpp)
-endif()
-
 set(worldserver_SRCS
   ${worldserver_SRCS}
   ${sources_CommandLine}
@@ -171,7 +166,4 @@ elseif( WIN32 )
   install(FILES worldserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")
 endif()
 
-# Generate precompiled header
-if( USE_COREPCH )
-  add_cxx_pch(worldserver ${worldserver_PCH_HDR} ${worldserver_PCH_SRC})
-endif()
+cotire(worldserver)

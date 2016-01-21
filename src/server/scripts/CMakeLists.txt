@@ -10,11 +10,6 @@
 
 # Enable precompiled headers when using the GCC compiler.
 
-if (USE_SCRIPTPCH)
-  set(scripts_STAT_PCH_HDR PrecompiledHeaders/ScriptPCH.h)
-  set(scripts_STAT_PCH_SRC PrecompiledHeaders/ScriptPCH.cpp)
-endif ()
-
 message(STATUS "SCRIPT PREPARATIONS")
 include(Spells/CMakeLists.txt)
 
@@ -139,7 +134,4 @@ add_library(scripts STATIC
   ${scripts_STAT_PCH_SRC}
 )
 
-# Generate precompiled header
-if (USE_SCRIPTPCH)
-  add_cxx_pch(scripts ${scripts_STAT_PCH_HDR} ${scripts_STAT_PCH_SRC})
-endif()
+cotire(scripts)

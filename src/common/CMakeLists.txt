@@ -8,10 +8,6 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if( USE_COREPCH )
-  include_directories(${CMAKE_CURRENT_BINARY_DIR})
-endif()
-
 file(GLOB_RECURSE sources_Common Common.cpp Common.h)
 file(GLOB_RECURSE sources_Collision Collision/*.cpp Collision/*.h)
 file(GLOB_RECURSE sources_Threading Threading/*.cpp Threading/*.h)
@@ -27,11 +23,6 @@ endif (SERVERS)
 # and to handle crash logs on windows
 set(sources_Debugging Debugging/Errors.cpp Debugging/Errors.h)
 file(GLOB sources_localdir *.cpp *.h)
-
-if (USE_COREPCH)
-  set(common_STAT_PCH_HDR PrecompiledHeaders/commonPCH.h)
-  set(common_STAT_PCH_SRC PrecompiledHeaders/commonPCH.cpp)
-endif (USE_COREPCH)
 
 set(common_STAT_SRCS
   ${common_STAT_SRCS}
@@ -85,7 +76,4 @@ add_library(common STATIC
 
 add_dependencies(common revision_data.h)
 
-# Generate precompiled header
-if (USE_COREPCH)
-  add_cxx_pch(common ${common_STAT_PCH_HDR} ${common_STAT_PCH_SRC})
-endif ()
+cotire(common)

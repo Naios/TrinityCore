@@ -25,11 +25,6 @@ file(GLOB sources_localdir *.cpp *.h)
 # Build shared sourcelist
 #
 
-if (USE_COREPCH)
-  set(shared_STAT_PCH_HDR PrecompiledHeaders/sharedPCH.h)
-  set(shared_STAT_PCH_SRC PrecompiledHeaders/sharedPCH.cpp)
-endif()
-
 set(shared_STAT_SRCS
   ${shared_STAT_SRCS}
   ${sources_DataStores}
@@ -63,7 +58,4 @@ add_library(shared STATIC
 
 add_dependencies(shared revision_data.h)
 
-# Generate precompiled header
-if (USE_COREPCH)
-  add_cxx_pch(shared ${shared_STAT_PCH_HDR} ${shared_STAT_PCH_SRC})
-endif ()
+cotire(shared)
