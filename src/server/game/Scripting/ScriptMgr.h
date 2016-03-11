@@ -46,6 +46,7 @@ class InstanceMap;
 class InstanceScript;
 class Item;
 class Map;
+class ModuleReference;
 class OutdoorPvP;
 class Player;
 class Quest;
@@ -156,18 +157,30 @@ class TC_GAME_API ScriptObject
 
     protected:
 
-        ScriptObject(const char* name)
-            : _name(name)
-        {
-        }
-
-        virtual ~ScriptObject()
-        {
-        }
+        ScriptObject(const char* name);
+        virtual ~ScriptObject();
 
     private:
 
         const std::string _name;
+};
+
+/// LazyUnloadedScriptObject references the script module strong
+/// which provides the given scriptname to prevent unloading of used modules.
+class TC_GAME_API LazyUnloadedScriptObject
+    : public ScriptObject
+{
+protected:
+    LazyUnloadedScriptObject(const char* name) : ScriptObject(name) { }
+    virtual ~LazyUnloadedScriptObject() { }
+
+    void AcquireReference(const char* scriptname);
+
+private:
+#ifdef TRINITY_API_USE_DYNAMIC_LINKING
+    // Strong reference to the associated script module
+    std::shared_ptr<ModuleReference> m_moduleReference;
+#endif // #ifndef TRINITY_API_USE_DYNAMIC_LINKING
 };
 
 template<class TObject> class UpdatableScript
@@ -337,7 +350,8 @@ class TC_GAME_API WorldMapScript : public ScriptObject, public MapScript<Map>
         WorldMapScript(const char* name, uint32 mapId);
 };
 
-class TC_GAME_API InstanceMapScript : public ScriptObject, public MapScript<InstanceMap>
+class TC_GAME_API InstanceMapScript
+    : public LazyUnloadedScriptObject, public MapScript<InstanceMap>
 {
     protected:
 
@@ -833,13 +847,6 @@ class TC_GAME_API GroupScript : public ScriptObject
         virtual void OnDisband(Group* /*group*/) { }
 };
 
-
-// namespace
-// {
-    typedef std::list<std::string> UnusedScriptNamesContainer;
-    TC_GAME_API extern UnusedScriptNamesContainer UnusedScriptNames;
-// }
-
 // Manages registration, loading, and execution of scripts.
 class TC_GAME_API ScriptMgr
 {
@@ -852,14 +859,14 @@ class TC_GAME_API ScriptMgr
         void FillSpellSummary();
         void LoadDatabase();
 
+        void IncreaseScriptCount() { ++_scriptCount; }
+        void DecreaseScriptCount() { --_scriptCount; }
+
     public: /* Initialization */
         static ScriptMgr* instance();
 
         void Initialize();
 
-        const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
-
-        void IncrementScriptCount() { ++_scriptCount; }
         uint32 GetScriptCount() const { return _scriptCount; }
 
         typedef void(*ScriptLoaderCallbackType)();
@@ -872,10 +879,20 @@ class TC_GAME_API ScriptMgr
         }
 
     public: /* Script contexts */
-        void BeginScriptContext(std::string const& context);
-        void FinishScriptContext();
+        /// Set the current script context.
+        void SetScriptContext(std::string const& context);
+        /// Returns the current script context.
+        std::string const& GetCurrentScriptContext() { return _currentContext; }
+        /// Swaps all changes into the script entities.
+        void SwapScriptContext();
 
+        /// Releases all scripts associated with the given script context.
         void ReleaseScriptContext(std::string const& context);
+
+        /// Acquire a strong module reference to the module containing the
+        /// given script name.
+        std::shared_ptr<ModuleReference> AcquireModuleReferenceOfScriptName(
+            std::string const& scriptname) const;
 
     public: /* Unloading */
 
@@ -885,7 +902,7 @@ class TC_GAME_API ScriptMgr
 
         void CreateSpellScripts(uint32 spellId, std::list<SpellScript*>& scriptVector);
         void CreateAuraScripts(uint32 spellId, std::list<AuraScript*>& scriptVector);
-        void CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<SpellScriptLoader*, std::multimap<uint32, uint32>::iterator> >& scriptVector);
+        SpellScriptLoader* GetSpellScriptLoader(uint32 scriptId);
 
     public: /* ServerScript */
 

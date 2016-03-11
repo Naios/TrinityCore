@@ -33,18 +33,13 @@
 #include "ChatLink.h"
 #include "Group.h"
 
-bool ChatHandler::load_command_table = true;
+static std::unique_ptr<std::vector<ChatCommand>> commandTableCache;
 
 std::vector<ChatCommand> const& ChatHandler::getCommandTable()
 {
-    static std::vector<ChatCommand> commandTableCache;
-
-    if (LoadCommandTable())
+    if (!commandTableCache)
     {
-        SetLoadCommandTable(false);
-
-        std::vector<ChatCommand> cmds = sScriptMgr->GetChatCommands();
-        commandTableCache.swap(cmds);
+        commandTableCache = Trinity::make_unique<std::vector<ChatCommand>>(sScriptMgr->GetChatCommands());
 
         PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
@@ -55,13 +50,18 @@ std::vector<ChatCommand> const& ChatHandler::getCommandTable()
                 Field* fields = result->Fetch();
                 std::string name = fields[0].GetString();
 
-                SetDataForCommandInTable(commandTableCache, name.c_str(), fields[1].GetUInt16(), fields[2].GetString(), name);
+                SetDataForCommandInTable(*commandTableCache, name.c_str(), fields[1].GetUInt16(), fields[2].GetString(), name);
             }
             while (result->NextRow());
         }
     }
 
-    return commandTableCache;
+    return *commandTableCache;
+}
+
+void ChatHandler::invalidateCommandTable()
+{
+    commandTableCache.reset();
 }
 
 char const* ChatHandler::GetTrinityString(uint32 entry) const
