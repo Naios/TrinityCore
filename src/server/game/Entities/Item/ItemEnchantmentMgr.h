@@ -21,9 +21,9 @@
 
 #include "Common.h"
 
-void LoadRandomEnchantmentsTable();
-uint32 GetItemEnchantMod(int32 entry);
-uint32 GenerateEnchSuffixFactor(uint32 item_id);
-uint32 GetRandomPropertyPoints(uint32 itemLevel, uint32 quality, uint32 inventoryType, uint32 subclass);
+TRINITY_GAME_API void LoadRandomEnchantmentsTable();
+TRINITY_GAME_API uint32 GetItemEnchantMod(int32 entry);
+TRINITY_GAME_API uint32 GenerateEnchSuffixFactor(uint32 item_id);
+TRINITY_GAME_API uint32 GetRandomPropertyPoints(uint32 itemLevel, uint32 quality, uint32 inventoryType, uint32 subclass);
 #endif
 

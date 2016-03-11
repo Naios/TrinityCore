@@ -77,10 +77,10 @@ namespace Movement
 
     typedef counter<uint32, 0xFFFFFFFF> UInt32Counter;
 
-    extern float gravity;
-    extern UInt32Counter splineIdGen;
-    extern std::string MovementFlags_ToString(uint32 flags);
-    extern std::string MovementFlagsExtra_ToString(uint32 flags);
+    TRINITY_GAME_API extern float gravity;
+    TRINITY_GAME_API extern UInt32Counter splineIdGen;
+    TRINITY_GAME_API extern std::string MovementFlags_ToString(uint32 flags);
+    TRINITY_GAME_API extern std::string MovementFlagsExtra_ToString(uint32 flags);
 }
 
 #endif // TRINITYSERVER_TYPEDEFS_H

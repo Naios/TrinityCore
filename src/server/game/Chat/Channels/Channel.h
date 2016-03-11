@@ -123,7 +123,7 @@ enum ChannelMemberFlags
     // 0x80
 };
 
-class Channel
+class TRINITY_GAME_API Channel
 {
     struct PlayerInfo
     {

@@ -20,7 +20,7 @@
 
 #include "ArenaTeam.h"
 
-class ArenaTeamMgr
+class TRINITY_GAME_API ArenaTeamMgr
 {
 private:
     ArenaTeamMgr();

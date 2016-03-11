@@ -27,9 +27,9 @@ class GameObject;
 
 namespace FactorySelector
 {
-    CreatureAI* selectAI(Creature*);
-    MovementGenerator* selectMovementGenerator(Creature*);
-    GameObjectAI* SelectGameObjectAI(GameObject*);
+    TRINITY_GAME_API CreatureAI* selectAI(Creature*);
+    TRINITY_GAME_API MovementGenerator* selectMovementGenerator(Creature*);
+    TRINITY_GAME_API GameObjectAI* SelectGameObjectAI(GameObject*);
 }
 #endif
 

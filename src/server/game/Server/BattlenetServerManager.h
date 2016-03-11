@@ -31,7 +31,7 @@ namespace IPC
 {
     namespace BattlenetComm
     {
-        class ServerManager
+        class TRINITY_GAME_API ServerManager
         {
             ServerManager() : _socket(nullptr) { }
 

@@ -28,7 +28,7 @@
 class WorldSession;
 class Warden;
 
-class WardenMac : public Warden
+class TRINITY_GAME_API WardenMac : public Warden
 {
     public:
         WardenMac();

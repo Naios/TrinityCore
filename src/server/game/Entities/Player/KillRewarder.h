@@ -24,7 +24,7 @@ class Player;
 class Unit;
 class Group;
 
-class KillRewarder
+class TRINITY_GAME_API KillRewarder
 {
 public:
     KillRewarder(Player* killer, Unit* victim, bool isBattleGround);

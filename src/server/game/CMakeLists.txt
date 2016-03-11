@@ -215,10 +215,49 @@ include_directories(
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(game STATIC
-  ${game_STAT_PCH_SRC}
-  ${game_STAT_SRCS}
-)
+if (WITH_DYNAMIC_LINKING)
+  add_definitions(-DTRINITY_API_EXPORT_GAME)
+
+  add_library(game SHARED
+    ${game_STAT_PCH_SRC}
+    ${game_STAT_SRCS}
+  )
+
+  target_link_libraries(game
+    shared
+    database
+    ipc
+    common
+    g3dlib
+    gsoap
+    Detour
+    zmqpp
+    format
+    ${JEMALLOC_LIBRARY}
+    ${READLINE_LIBRARY}
+    ${TERMCAP_LIBRARY}
+    ${MYSQL_LIBRARY}
+    ${OPENSSL_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${ZMQ_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Boost_LIBRARIES}
+  )
+
+  if(UNIX)
+    install(TARGETS game DESTINATION lib)
+  elseif(WIN32)
+    install(TARGETS game
+      RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  endif()
+
+else()
+  add_library(game STATIC
+    ${game_STAT_PCH_SRC}
+    ${game_STAT_SRCS}
+  )
+endif()
 
 # Generate precompiled header
 if (USE_COREPCH)

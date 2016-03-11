@@ -20,7 +20,7 @@
 
 #include "Group.h"
 
-class GroupMgr
+class TRINITY_GAME_API GroupMgr
 {
 private:
     GroupMgr();

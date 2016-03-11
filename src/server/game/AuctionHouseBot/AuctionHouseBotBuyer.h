@@ -67,7 +67,7 @@ private:
 
 // This class handle all Buyer method
 // (holder of AuctionBotConfig for each auction house type)
-class AuctionBotBuyer : public AuctionBotAgent
+class TRINITY_GAME_API AuctionBotBuyer : public AuctionBotAgent
 {
 public:
     AuctionBotBuyer();

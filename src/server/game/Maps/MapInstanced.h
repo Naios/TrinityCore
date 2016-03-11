@@ -25,7 +25,7 @@
 
 class GarrisonMap;
 
-class MapInstanced : public Map
+class TRINITY_GAME_API MapInstanced : public Map
 {
     friend class MapManager;
     public:

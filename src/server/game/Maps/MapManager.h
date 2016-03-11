@@ -28,7 +28,7 @@
 class Transport;
 struct TransportCreatureProto;
 
-class MapManager
+class TRINITY_GAME_API MapManager
 {
     public:
         static MapManager* instance();

@@ -25,7 +25,7 @@
 class Player;
 struct TaxiNodesEntry;
 
-class TaxiPathGraph
+class TRINITY_GAME_API TaxiPathGraph
 {
 public:
     static TaxiPathGraph& Instance();

@@ -30,20 +30,20 @@ namespace CharacterDatabaseCleaner
         CLEANING_FLAG_QUESTSTATUS           = 0x10
     };
 
-    void CleanDatabase();
+    TRINITY_GAME_API void CleanDatabase();
 
-    void CheckUnique(const char* column, const char* table, bool (*check)(uint32));
+    TRINITY_GAME_API void CheckUnique(const char* column, const char* table, bool (*check)(uint32));
 
-    bool AchievementProgressCheck(uint32 criteria);
-    bool SkillCheck(uint32 skill);
-    bool SpellCheck(uint32 spell_id);
-    bool TalentCheck(uint32 talent_id);
+    TRINITY_GAME_API bool AchievementProgressCheck(uint32 criteria);
+    TRINITY_GAME_API bool SkillCheck(uint32 skill);
+    TRINITY_GAME_API bool SpellCheck(uint32 spell_id);
+    TRINITY_GAME_API bool TalentCheck(uint32 talent_id);
 
-    void CleanCharacterAchievementProgress();
-    void CleanCharacterSkills();
-    void CleanCharacterSpell();
-    void CleanCharacterTalent();
-    void CleanCharacterQuestStatus();
+    TRINITY_GAME_API void CleanCharacterAchievementProgress();
+    TRINITY_GAME_API void CleanCharacterSkills();
+    TRINITY_GAME_API void CleanCharacterSpell();
+    TRINITY_GAME_API void CleanCharacterTalent();
+    TRINITY_GAME_API void CleanCharacterQuestStatus();
 }
 
 #endif
