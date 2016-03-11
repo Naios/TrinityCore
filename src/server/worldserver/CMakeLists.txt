@@ -163,6 +163,12 @@ target_link_libraries(worldserver
   ${Boost_LIBRARIES}
 )
 
+# Register the dynamic script modules as dependency to the worldserver
+# to ensure that all scripts are always built when building the worldserver.
+if (REGISTERED_DYNAMIC_SCRIPT_MODULES)
+  add_dependencies(worldserver ${REGISTERED_DYNAMIC_SCRIPT_MODULES})
+endif()
+
 if( WIN32 )
   if ( MSVC )
     add_custom_command(TARGET worldserver

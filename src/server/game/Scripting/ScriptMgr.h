@@ -840,12 +840,6 @@ class TRINITY_GAME_API GroupScript : public ScriptObject
 // Placed here due to ScriptRegistry::AddScript dependency.
 #define sScriptMgr ScriptMgr::instance()
 
-// namespace
-// {
-    typedef std::list<std::string> UnusedScriptNamesContainer;
-    TRINITY_GAME_API extern UnusedScriptNamesContainer UnusedScriptNames;
-// }
-
 // Manages registration, loading, and execution of scripts.
 class TRINITY_GAME_API ScriptMgr
 {
@@ -870,6 +864,7 @@ class TRINITY_GAME_API ScriptMgr
     public: /* Unloading */
 
         void Unload();
+        void UnloadUnusedScripts();
 
     public: /* SpellScriptLoader */
 

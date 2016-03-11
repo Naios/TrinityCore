@@ -8610,10 +8610,11 @@ void ObjectMgr::LoadScriptNames()
 
     std::sort(_scriptNamesStore.begin(), _scriptNamesStore.end());
 
-#ifdef SCRIPTS
+/*#ifdef SCRIPTS
     for (size_t i = 1; i < _scriptNamesStore.size(); ++i)
         UnusedScriptNames.push_back(_scriptNamesStore[i]);
 #endif
+        */
 
     TC_LOG_INFO("server.loading", ">> Loaded " SZFMTD " ScriptNames in %u ms", _scriptNamesStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }

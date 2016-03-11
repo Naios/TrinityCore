@@ -92,6 +92,8 @@ void ShutdownThreadPool(std::vector<std::thread>& threadPool);
 bool LoadRealmInfo();
 variables_map GetConsoleArguments(int argc, char** argv, std::string& cfg_file, std::string& cfg_service);
 
+extern void AddScripts();
+
 /// Launch the Trinity server
 extern int main(int argc, char** argv)
 {
@@ -191,6 +193,9 @@ extern int main(int argc, char** argv)
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realm.Id.Realm);
 
     LoadRealmInfo();
+
+    // Pass the script loader to the world
+    sWorld->SetScriptLoader(AddScripts);
 
     // Initialize the World
     sWorld->SetInitialWorldSettings();
