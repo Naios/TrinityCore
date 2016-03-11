@@ -24,7 +24,7 @@
 class MySQLConnection;
 class SQLOperation;
 
-class DatabaseWorker
+class TRINITY_DATABASE_API DatabaseWorker
 {
     public:
         DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection);

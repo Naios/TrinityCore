@@ -25,7 +25,7 @@
 #include <memory>
 #include <vector>
 
-class UpdateFetcher
+class TRINITY_DATABASE_API UpdateFetcher
 {
     typedef boost::filesystem::path Path;
 

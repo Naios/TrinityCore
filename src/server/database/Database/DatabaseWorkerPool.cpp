@@ -317,7 +317,7 @@ T* DatabaseWorkerPool<T>::GetFreeConnection()
     return connection;
 }
 
-template class DatabaseWorkerPool<LoginDatabaseConnection>;
-template class DatabaseWorkerPool<WorldDatabaseConnection>;
-template class DatabaseWorkerPool<CharacterDatabaseConnection>;
-template class DatabaseWorkerPool<HotfixDatabaseConnection>;
+template class TRINITY_DATABASE_API DatabaseWorkerPool<LoginDatabaseConnection>;
+template class TRINITY_DATABASE_API DatabaseWorkerPool<WorldDatabaseConnection>;
+template class TRINITY_DATABASE_API DatabaseWorkerPool<CharacterDatabaseConnection>;
+template class TRINITY_DATABASE_API DatabaseWorkerPool<HotfixDatabaseConnection>;

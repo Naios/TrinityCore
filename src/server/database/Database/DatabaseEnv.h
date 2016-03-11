@@ -40,12 +40,12 @@
 #include "Implementation/HotfixDatabase.h"
 
 /// Accessor to the world database
-extern WorldDatabaseWorkerPool WorldDatabase;
+TRINITY_DATABASE_API extern WorldDatabaseWorkerPool WorldDatabase;
 /// Accessor to the character database
-extern CharacterDatabaseWorkerPool CharacterDatabase;
+TRINITY_DATABASE_API extern CharacterDatabaseWorkerPool CharacterDatabase;
 /// Accessor to the realm/login database
-extern LoginDatabaseWorkerPool LoginDatabase;
+TRINITY_DATABASE_API extern LoginDatabaseWorkerPool LoginDatabase;
 /// Accessor to the hotfix database
-extern HotfixDatabaseWorkerPool HotfixDatabase;
+TRINITY_DATABASE_API extern HotfixDatabaseWorkerPool HotfixDatabase;
 
 #endif
