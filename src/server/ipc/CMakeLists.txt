@@ -24,4 +24,31 @@ include_directories(
   ${ZMQ_INCLUDE_DIR}
 )
 
-add_library(ipc STATIC ${ipc_SRCS})
+if (WITH_DYNAMIC_LINKING)
+  add_definitions(-DTRINITY_API_EXPORT_IPC)
+
+  add_library(ipc SHARED ${ipc_SRCS})
+
+  if( WIN32 AND MSVC)
+    set(ADDITIONAL_WINDOWS_LIBRARIES ws2_32)
+  endif()
+
+  target_link_libraries(ipc
+    zmqpp
+    ${ADDITIONAL_WINDOWS_LIBRARIES}
+    ${ZMQ_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Boost_LIBRARIES}
+  )
+
+  if( UNIX )
+    install(TARGETS ipc DESTINATION lib)
+  elseif( WIN32 )
+    install(TARGETS ipc
+      RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  endif()
+
+else()
+  add_library(ipc STATIC ${ipc_SRCS})
+endif()
