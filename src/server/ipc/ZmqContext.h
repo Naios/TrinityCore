@@ -29,11 +29,7 @@ class ZmqContext
 public:
     ~ZmqContext();
 
-    static ZmqContext* Instance()
-    {
-        static ZmqContext instance;
-        return &instance;
-    }
+    static ZmqContext* Instance();
 
     zmqpp::socket* CreateNewSocket(zmqpp::socket_type);
     void Initialize();
