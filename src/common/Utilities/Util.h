@@ -41,7 +41,7 @@ template<typename T, class S> struct Finder
     bool operator()(const std::pair<int, S> &obj) { return obj.second.*idMember_ == val_; }
 };
 
-class Tokenizer
+class TRINITY_COMMON_API Tokenizer
 {
 public:
     typedef std::vector<char const*> StorageType;
@@ -69,15 +69,15 @@ private:
     StorageType m_storage;
 };
 
-void stripLineInvisibleChars(std::string &src);
+TRINITY_COMMON_API void stripLineInvisibleChars(std::string &src);
 
-int64 MoneyStringToMoney(const std::string& moneyString);
+TRINITY_COMMON_API int64 MoneyStringToMoney(const std::string& moneyString);
 
-struct tm* localtime_r(const time_t* time, struct tm *result);
+TRINITY_COMMON_API struct tm* localtime_r(const time_t* time, struct tm *result);
 
-std::string secsToTimeString(uint64 timeInSecs, bool shortText = false, bool hoursOnly = false);
-uint32 TimeStringToSecs(const std::string& timestring);
-std::string TimeToTimestampStr(time_t t);
+TRINITY_COMMON_API std::string secsToTimeString(uint64 timeInSecs, bool shortText = false, bool hoursOnly = false);
+TRINITY_COMMON_API uint32 TimeStringToSecs(const std::string& timestring);
+TRINITY_COMMON_API std::string TimeToTimestampStr(time_t t);
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
@@ -112,20 +112,23 @@ inline T RoundToInterval(T& num, T floor, T ceil)
 }
 
 // UTF8 handling
-bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr);
+TRINITY_COMMON_API bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr);
+
 // in wsize==max size of buffer, out wsize==real string size
-bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+TRINITY_COMMON_API bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+
 inline bool Utf8toWStr(const std::string& utf8str, wchar_t* wstr, size_t& wsize)
 {
     return Utf8toWStr(utf8str.c_str(), utf8str.size(), wstr, wsize);
 }
 
-bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str);
+TRINITY_COMMON_API bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str);
 // size==real string size
-bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str);
+TRINITY_COMMON_API bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str);
 
-size_t utf8length(std::string& utf8str);                    // set string to "" if invalid utf8 sequence
-void utf8truncate(std::string& utf8str, size_t len);
+// set string to "" if invalid utf8 sequence
+TRINITY_COMMON_API size_t utf8length(std::string& utf8str);
+TRINITY_COMMON_API void utf8truncate(std::string& utf8str, size_t len);
 
 inline bool isBasicLatinCharacter(wchar_t wchar)
 {
@@ -304,23 +307,23 @@ inline void wstrToLower(std::wstring& str)
     std::transform( str.begin(), str.end(), str.begin(), wcharToLower );
 }
 
-std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
+TRINITY_COMMON_API std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
 
-bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
-bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
-bool Utf8FitTo(const std::string& str, std::wstring const& search);
-void utf8printf(FILE* out, const char *str, ...);
-void vutf8printf(FILE* out, const char *str, va_list* ap);
-bool Utf8ToUpperOnlyLatin(std::string& utf8String);
+TRINITY_COMMON_API bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
+TRINITY_COMMON_API bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
+TRINITY_COMMON_API bool Utf8FitTo(const std::string& str, std::wstring const& search);
+TRINITY_COMMON_API void utf8printf(FILE* out, const char *str, ...);
+TRINITY_COMMON_API void vutf8printf(FILE* out, const char *str, va_list* ap);
+TRINITY_COMMON_API bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
-bool IsIPAddress(char const* ipaddress);
+TRINITY_COMMON_API bool IsIPAddress(char const* ipaddress);
 
-uint32 CreatePIDFile(const std::string& filename);
+TRINITY_COMMON_API uint32 CreatePIDFile(const std::string& filename);
 
-std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
-void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
+TRINITY_COMMON_API std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
+TRINITY_COMMON_API void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
 
-bool StringToBool(std::string const& str);
+TRINITY_COMMON_API bool StringToBool(std::string const& str);
 
 // simple class for not-modifyable list
 template <typename T>
@@ -354,7 +357,7 @@ class HookList
         }
 };
 
-class flag128
+class TRINITY_COMMON_API flag128
 {
 private:
     uint32 part[4];

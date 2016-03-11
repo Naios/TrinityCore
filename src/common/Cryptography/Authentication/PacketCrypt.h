@@ -22,7 +22,7 @@
 
 class BigNumber;
 
-class PacketCrypt
+class TRINITY_COMMON_API PacketCrypt
 {
     public:
         PacketCrypt(uint32 rc4InitSize);

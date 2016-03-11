@@ -76,10 +76,41 @@ include_directories(
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(common STATIC
-  ${common_STAT_SRCS}
-  ${common_STAT_PCH_SRC}
-)
+if (WITH_DYNAMIC_LINKING)
+  add_definitions(-DTRINITY_API_EXPORT_COMMON)
+
+  add_library(common SHARED
+    ${common_STAT_SRCS}
+    ${common_STAT_PCH_SRC}
+  )
+
+  target_link_libraries(common
+    ipc
+    g3dlib
+    Detour
+    format
+    ${JEMALLOC_LIBRARY}
+    ${READLINE_LIBRARY}
+    ${TERMCAP_LIBRARY}
+    ${OPENSSL_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Boost_LIBRARIES}
+  )
+
+  if( UNIX )
+    install(TARGETS common DESTINATION lib)
+  elseif( WIN32 )
+    install(TARGETS common
+      RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  endif()
+
+else()
+  add_library(common STATIC
+    ${common_STAT_SRCS}
+    ${common_STAT_PCH_SRC}
+  )
+endif()
 
 add_dependencies(common revision_data.h)
 
