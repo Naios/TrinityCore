@@ -73,11 +73,15 @@ FUNCTION(GENERATE_CXX_PCH_COMMAND TARGET_NAME_LIST INCLUDE_FLAGS IN PCH_SRC OUT)
   SEPARATE_ARGUMENTS(DEFINITION_FLAGS)
 
   message("pch ${PCH_SRC_N}_dephelp PCH_INCLUDES: ${PCH_INCLUDES}")
+  message("")
   message("pch ${PCH_SRC_N}_dephelp PCH_DEFINITIONS: ${PCH_DEFINITIONS}")
-  
+  message("******")
   message("pch ${PCH_SRC_N}_dephelp CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
+  message("")
   message("pch ${PCH_SRC_N}_dephelp DEFINITION_FLAGS: ${DEFINITION_FLAGS}")
+  message("")
   message("pch ${PCH_SRC_N}_dephelp COMPILE_FLAGS: ${COMPILE_FLAGS}")
+  message("")
   message("pch ${PCH_SRC_N}_dephelp INCLUDE_FLAGS: ${INCLUDE_FLAGS}")
 
   GET_FILENAME_COMPONENT(PCH_SRC_N ${PCH_SRC} NAME)
