@@ -1,4 +1,4 @@
-if (WITH_DYNAMIC_LINKING)
+if (BUILD_SHARED_LIBS)
   set(SRCS
     src/efsw/DirectorySnapshot.cpp
     src/efsw/DirectorySnapshotDiff.cpp
