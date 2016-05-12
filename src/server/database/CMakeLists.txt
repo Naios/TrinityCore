@@ -21,6 +21,10 @@ endif()
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
+if (BUILD_SHARED_LIBS AND WIN32 AND MSVC)
+  list(APPEND PRIVATE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Database.rc)
+endif()
+
 add_library(database
   ${PRIVATE_PCH_SOURCE}
   ${PRIVATE_SOURCES}

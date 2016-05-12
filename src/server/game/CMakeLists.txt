@@ -42,6 +42,10 @@ target_link_libraries(game-interface
     shared
     Detour)
 
+if (BUILD_SHARED_LIBS AND WIN32 AND MSVC)
+  list(APPEND PRIVATE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Game.rc)
+endif()
+
 add_library(game
   ${PRIVATE_PCH_SOURCE}
   ${PRIVATE_SOURCES})

@@ -17,7 +17,7 @@ CollectSourceFiles(
 if( WIN32 )
   list(APPEND PRIVATE_SOURCES ${sources_windows})
   if ( MSVC )
-    list(APPEND PRIVATE_SOURCES worldserver.rc)
+    list(APPEND PRIVATE_SOURCES Worldserver.rc)
   endif()
 endif()
 

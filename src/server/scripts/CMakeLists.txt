@@ -100,7 +100,7 @@ GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 # It is possible to expose multiple subdirectories from the same scriptloader through passing
 # it to the variable arguments
 function(ConfigureScriptLoader SCRIPTLOADER_NAME LOADER_OUT IS_DYNAMIC_SCRIPTLOADER)
-  # Deduces following variables which are referenced by thge template:
+  # Deduces following variables which are referenced by the template:
   # TRINITY_IS_DYNAMIC_SCRIPTLOADER
   # TRINITY_SCRIPTS_FORWARD_DECL
   # TRINITY_SCRIPTS_INVOKE
@@ -158,11 +158,17 @@ foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
     GetProjectNameOfScriptModule(${SCRIPT_MODULE} SCRIPT_MODULE_PROJECT_NAME)
     # Add the module name to DYNAMIC_SCRIPT_MODULES
     list(APPEND DYNAMIC_SCRIPT_MODULE_PROJECTS ${SCRIPT_MODULE_PROJECT_NAME})
+
+    if (BUILD_SHARED_LIBS AND WIN32 AND MSVC)
+      list(APPEND PRIVATE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Scripts.rc)
+    endif()
+
     # Create the script module project
     add_library(${SCRIPT_MODULE_PROJECT_NAME} SHARED
       ${PRIVATE_PCH_SOURCE}
       ${SCRIPT_MODULE_PRIVATE_SOURCES}
       ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER})
+
     target_link_libraries(${SCRIPT_MODULE_PROJECT_NAME}
       PUBLIC
         game)
@@ -170,6 +176,11 @@ foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
       PROPERTIES
         FOLDER
           "scripts")
+
+    target_compile_definitions(${SCRIPT_MODULE_PROJECT_NAME}
+      PRIVATE
+        -DTRINITY_SCRIPT_PROJECT_NAME="${SCRIPT_MODULE_PROJECT_NAME}"
+        -DTRINITY_SCRIPT_MODULE_NAME="${SCRIPT_MODULE}")
 
     if(UNIX)
       install(TARGETS ${SCRIPT_MODULE_PROJECT_NAME}

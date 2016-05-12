@@ -19,7 +19,7 @@ CollectSourceFiles(
 if( WIN32 )
   list(APPEND PRIVATE_SOURCES ${sources_windows})
   if ( MSVC )
-    list(APPEND PRIVATE_SOURCES authserver.rc)
+    list(APPEND PRIVATE_SOURCES Authserver.rc)
   endif()
 endif()
 
