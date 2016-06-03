@@ -18,5 +18,4 @@
 // This file was created automatically from your script configuration!
 // Use CMake to reconfigure this file, never change it on your own!
 
-@TRINITY_SCRIPTS_FORWARD_DECL@
-
+#define TRINITY_SCRIPT_MODULES @TRINITY_SCRIPT_MODULES@
