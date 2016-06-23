@@ -92,40 +92,52 @@ endforeach()
 if (USE_SCRIPTPCH)
   set(PRIVATE_PCH_HEADER ScriptPCH.h)
   set(PRIVATE_PCH_SOURCE ScriptPCH.cpp)
-endif ()
+endif()
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Configures the scriptloader with the given name and stores the output in the LOADER_OUT variable.
 # It is possible to expose multiple subdirectories from the same scriptloader through passing
 # it to the variable arguments
-function(ConfigureScriptLoader SCRIPTLOADER_NAME LOADER_OUT IS_DYNAMIC_SCRIPTLOADER)
-  # Deduces following variables which are referenced by the template:
-  # TRINITY_IS_DYNAMIC_SCRIPTLOADER
-  # TRINITY_SCRIPTS_FORWARD_DECL
-  # TRINITY_SCRIPTS_INVOKE
-  # TRINITY_CURRENT_SCRIPT_PROJECT
+function(ConfigureScriptLoaderForTarget SCRIPT_LOADER_TARGET SCRIPT_MODULE_NAME IS_DYNAMIC_SCRIPTLOADER)
+  # TRINITY_IS_DYNAMIC_SCRIPTLOADER To define whether the module is linked dynamically.
+  if (IS_DYNAMIC_SCRIPTLOADER)
+    set(TRINITY_IS_DYNAMIC_SCRIPTLOADER)
+  else()
+    unset(TRINITY_IS_DYNAMIC_SCRIPTLOADER)
+  endif()
 
-  # To generate export macros
-  set(TRINITY_IS_DYNAMIC_SCRIPTLOADER ${IS_DYNAMIC_SCRIPTLOADER})
-  # To generate forward declarations of the loading functions
-  unset(TRINITY_SCRIPTS_FORWARD_DECL)
-  unset(TRINITY_SCRIPTS_INVOKE)
-  # The current script project which is built in
-  set(TRINITY_CURRENT_SCRIPT_PROJECT ${SCRIPTLOADER_NAME})
+  # Deduces following variables which are referenced
+  # by the "ScriptLoaderDefine.h.in.cmake" template:
+  #
+  # TRINITY_DYNAMIC_SCRIPT_MODULE_NAME is defined when the
+  # module is linked dynamically.
+  if (IS_DYNAMIC_SCRIPTLOADER)
+    set(TRINITY_DYNAMIC_SCRIPT_MODULE_NAME ${SCRIPT_MODULE_NAME})
+  else()
+    unset(TRINITY_DYNAMIC_SCRIPT_MODULE_NAME)
+  endif()
+
+  # TRINITY_SCRIPT_LOADER_DECL is used to generate the
+  # forward declarations of the scriptloader functions.
+  # TRINITY_SCRIPT_LOADER_INVOKE is used
+  # to call the scriptloader functions.
+  unset(TRINITY_SCRIPT_LOADER_DECL)
+  unset(TRINITY_SCRIPT_LOADER_INVOKE)
   foreach(LOCALE_SCRIPT_MODULE ${ARGN})
     # Determine the loader function ("Add##${NameOfDirectory}##Scripts()")
-    set(LOADER_FUNCTION
-      "Add${LOCALE_SCRIPT_MODULE}Scripts()")
+    set(LOADER_FUNCTION "Add${LOCALE_SCRIPT_MODULE}Scripts()")
     # Generate the funciton call and the forward declarations
-    set(TRINITY_SCRIPTS_FORWARD_DECL
-      "${TRINITY_SCRIPTS_FORWARD_DECL}void ${LOADER_FUNCTION};\n")
-    set(TRINITY_SCRIPTS_INVOKE
-      "${TRINITY_SCRIPTS_INVOKE}    ${LOADER_FUNCTION};\n")
+    list(APPEND TRINITY_SCRIPT_LOADER_DECL " void ${LOADER_FUNCTION}")
+    list(APPEND TRINITY_SCRIPT_LOADER_INVOKE " ${LOADER_FUNCTION}")
   endforeach()
+
+  list(APPEND TRINITY_SCRIPT_LOADER_DECL "")
+  list(APPEND TRINITY_SCRIPT_LOADER_INVOKE "")
+
   set(GENERATED_LOADER ${CMAKE_CURRENT_BINARY_DIR}/gen_scriptloader/${SCRIPTLOADER_NAME}/ScriptLoader.cpp)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in.cmake ${GENERATED_LOADER})
-  set(${LOADER_OUT} ${GENERATED_LOADER} PARENT_SCOPE)
+
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoaderDefine.h.in.cmake ${GENERATED_LOADER})
 endfunction()
 
 # Generates the actual script projects
@@ -153,8 +165,7 @@ foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
     # Add the module content to the whole static module
     unset(SCRIPT_MODULE_PRIVATE_SOURCES)
     CollectSourceFiles(${SCRIPT_MODULE_PATH} SCRIPT_MODULE_PRIVATE_SOURCES)
-    # Configure the scriptloader
-    ConfigureScriptLoader(${SCRIPT_MODULE} SCRIPT_MODULE_PRIVATE_SCRIPTLOADER ON ${SCRIPT_MODULE})
+
     GetProjectNameOfScriptModule(${SCRIPT_MODULE} SCRIPT_MODULE_PROJECT_NAME)
     # Add the module name to DYNAMIC_SCRIPT_MODULES
     list(APPEND DYNAMIC_SCRIPT_MODULE_PROJECTS ${SCRIPT_MODULE_PROJECT_NAME})
@@ -166,8 +177,11 @@ foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
     # Create the script module project
     add_library(${SCRIPT_MODULE_PROJECT_NAME} SHARED
       ${PRIVATE_PCH_SOURCE}
-      ${SCRIPT_MODULE_PRIVATE_SOURCES}
-      ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER})
+      ${SCRIPT_MODULE_PRIVATE_SOURCES})
+
+    # Configure the scriptloader
+    ConfigureScriptLoaderForTarget(${SCRIPT_MODULE_PROJECT_NAME}
+      ${SCRIPT_MODULE} ON ${SCRIPT_MODULE})
 
     target_link_libraries(${SCRIPT_MODULE_PROJECT_NAME}
       PUBLIC
@@ -207,13 +221,13 @@ endforeach()
 # Add the dynamic script modules to the worldserver as dependency
 set(WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES ${DYNAMIC_SCRIPT_MODULE_PROJECTS} PARENT_SCOPE)
 
-ConfigureScriptLoader("static" SCRIPT_MODULE_PRIVATE_SCRIPTLOADER OFF ${STATIC_SCRIPT_MODULES})
-
 add_library(scripts STATIC
   ScriptLoader.h
   ${PRIVATE_PCH_SOURCE}
-  ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER}
   ${PRIVATE_SOURCES})
+
+ConfigureScriptLoaderForTarget(scripts
+  "Static" OFF ${STATIC_SCRIPT_MODULES})
 
 target_link_libraries(scripts
   PUBLIC
