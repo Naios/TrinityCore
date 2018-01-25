@@ -9,3 +9,11 @@ max_line_length = 80
 
 [*.{c,h,cpp,hpp,inl}]
 charset = latin1
+
+[CMakeLists.txt]
+indent_size = 2
+tab_width = 2
+
+[*.cmake]
+indent_size = 2
+tab_width = 2
