@@ -417,6 +417,38 @@ function (cotire_is_target_supported _target _isSupportedVar)
 	set (${_isSupportedVar} TRUE PARENT_SCOPE)
 endfunction()
 
+macro(cotire_handle_language_standard_properties _target _language _compileFlags)
+	if (_target)
+		# to get the required language standard due to INTERFACE_COMPILE_FEATURES required by
+		# linked targets, we need to add them to our target explicitly, because cmake itself
+		# only appends them when building apparently.
+		set (_linkedTargets "")
+		cotire_get_target_usage_requirements(${_target} ${_config} _linkedTargets)
+		foreach(_linkedTarget ${_linkedTargets})
+			get_target_property(_compileFeatures ${_linkedTarget} INTERFACE_COMPILE_FEATURES)
+			get_target_property(_tmpTest ${_linkedTarget} CXX_STANDARD)
+			if(_compileFeatures)
+				# PRIVATE to be safe, cmake will add them later on as INTERFACE if required (I think?)
+				target_compile_features(${_target} PRIVATE ${_compileFeatures})
+			endif()
+		endforeach()
+		get_target_property(_targetLanguageStandard ${_target} CXX_STANDARD)
+		if (_targetLanguageStandard)
+			set (_type "EXTENSION")
+			get_property(_isSet TARGET ${_target} PROPERTY ${_language}_EXTENSIONS SET)
+			if (_isSet)
+				get_target_property(_targetUseLanguageExtensions ${_target} ${_language}_EXTENSIONS)
+				if (NOT _targetUseLanguageExtensions)
+					set (_type "STANDARD")
+				endif()
+			endif()
+			if (CMAKE_${_language}${_targetLanguageStandard}_${_type}_COMPILE_OPTION)
+				list (APPEND ${_compileFlags} "${CMAKE_${_language}${_targetLanguageStandard}_${_type}_COMPILE_OPTION}")
+			endif()
+		endif()
+	endif()
+endmacro()
+
 function (cotire_get_target_compile_flags _config _language _target _flagsVar)
 	string (TOUPPER "${_config}" _upperConfig)
 	# collect options from CMake language variables
@@ -459,25 +491,9 @@ function (cotire_get_target_compile_flags _config _language _target _flagsVar)
 			endif()
 		endforeach()
 	endif()
-	# handle language standard properties
+	# handle language standard properties (also from linked libraries)
 	if (CMAKE_${_language}_STANDARD_DEFAULT)
-		# used compiler supports language standard levels
-		if (_target)
-			get_target_property(_targetLanguageStandard ${_target} ${_language}_STANDARD)
-			if (_targetLanguageStandard)
-				set (_type "EXTENSION")
-				get_property(_isSet TARGET ${_target} PROPERTY ${_language}_EXTENSIONS SET)
-				if (_isSet)
-					get_target_property(_targetUseLanguageExtensions ${_target} ${_language}_EXTENSIONS)
-					if (NOT _targetUseLanguageExtensions)
-						set (_type "STANDARD")
-					endif()
-				endif()
-				if (CMAKE_${_language}${_targetLanguageStandard}_${_type}_COMPILE_OPTION)
-					list (APPEND _compileFlags "${CMAKE_${_language}${_targetLanguageStandard}_${_type}_COMPILE_OPTION}")
-				endif()
-			endif()
-		endif()
+		cotire_handle_language_standard_properties(${_target} ${_language} _compileFlags)
 	endif()
 	# handle the POSITION_INDEPENDENT_CODE target property
 	if (_target)
@@ -922,7 +938,9 @@ function (cotire_add_includes_to_cmd _cmdVar _language _includesVar _systemInclu
 					list (FIND ${_systemIncludesVar} "${_include}" _index)
 				endif()
 				if (_index GREATER -1)
-					list (APPEND ${_cmdVar} "${CMAKE_INCLUDE_SYSTEM_FLAG_${_language}}${CMAKE_INCLUDE_FLAG_SEP_${_language}}${_include}")
+					# Pass -isystem as a separated flag, not as "-isystem <include_dir>".
+					string(STRIP "${CMAKE_INCLUDE_SYSTEM_FLAG_${_language}}" _include_system_flag)
+					list (APPEND ${_cmdVar} "${_include_system_flag}" "${_include}")
 				else()
 					list (APPEND ${_cmdVar} "${CMAKE_INCLUDE_FLAG_${_language}}${CMAKE_INCLUDE_FLAG_SEP_${_language}}${_include}")
 				endif()
@@ -1589,20 +1607,23 @@ function (cotire_add_pch_compilation_flags _language _compilerID _compilerVersio
 		file (TO_NATIVE_PATH "${_prefixFile}" _prefixFileNative)
 		file (TO_NATIVE_PATH "${_pchFile}" _pchFileNative)
 		file (TO_NATIVE_PATH "${_hostFile}" _hostFileNative)
+		string (REGEX REPLACE "\\.[^.]*$" ".obj" _objFileNative "${_hostFileNative}")
 		# cl.exe options used
 		# /Yc creates a precompiled header file
 		# /Fp specifies precompiled header binary file name
 		# /FI forces inclusion of file
 		# /TC treat all files named on the command line as C source files
 		# /TP treat all files named on the command line as C++ source files
-		# /Zs syntax check only
+		# /c stop compilation after creating an object file
+		# /Fo specifies object file name
 		# /Zm precompiled header memory allocation scaling factor
 		set (_sourceFileTypeC "/TC")
 		set (_sourceFileTypeCXX "/TP")
 		if (_flags)
 			# append to list
 			list (APPEND _flags /nologo "${_sourceFileType${_language}}"
-				"/Yc${_prefixFileNative}" "/Fp${_pchFileNative}" "/FI${_prefixFileNative}" /Zs "${_hostFileNative}")
+				"/Yc${_prefixFileNative}" "/Fp${_pchFileNative}" "/FI${_prefixFileNative}" /c "/Fo${_objFileNative}"
+				"${_hostFileNative}")
 			if (COTIRE_PCH_MEMORY_SCALING_FACTOR)
 				list (APPEND _flags "/Zm${COTIRE_PCH_MEMORY_SCALING_FACTOR}")
 			endif()
@@ -2261,7 +2282,7 @@ endfunction()
 
 function (cotire_setup_pch_file_compilation _language _target _targetScript _prefixFile _pchFile _hostFile)
 	set (_sourceFiles ${ARGN})
-	if (CMAKE_${_language}_COMPILER_ID MATCHES "MSVC|Intel")
+	if (CMAKE_${_language}_COMPILER_ID MATCHES "MSVC|Intel" AND NOT "${CMAKE_GENERATOR}" MATCHES "Make|Ninja")
 		# for Visual Studio and Intel, we attach the precompiled header compilation to the host file
 		# the remaining files include the precompiled header, see cotire_setup_pch_file_inclusion
 		if (_sourceFiles)
@@ -2293,9 +2314,16 @@ function (cotire_setup_pch_file_compilation _language _target _targetScript _pre
 			if (COTIRE_DEBUG)
 				message (STATUS "add_custom_command: OUTPUT ${_pchFile} ${_cmds} DEPENDS ${_prefixFile} ${_realCompilerExe} IMPLICIT_DEPENDS ${_language} ${_prefixFile}")
 			endif()
+			set (_outputFiles "")
+			list (APPEND _outputFiles "${_pchFile}")
 			set_property (SOURCE "${_pchFile}" PROPERTY GENERATED TRUE)
+			if (CMAKE_${_language}_COMPILER_ID MATCHES "MSVC")
+				string (REGEX REPLACE "\\.[^.]*$" ".obj" _hostObjFile "${_hostFile}")
+				list (APPEND _outputFiles "${_hostObjFile}")
+				set_property (SOURCE "${_hostObjFile}" PROPERTY GENERATED TRUE)
+			endif()
 			add_custom_command(
-				OUTPUT "${_pchFile}"
+				OUTPUT ${_outputFiles}
 				COMMAND ${_cmds}
 				DEPENDS "${_prefixFile}" "${_realCompilerExe}"
 				IMPLICIT_DEPENDS ${_language} "${_prefixFile}"
@@ -2307,7 +2335,7 @@ function (cotire_setup_pch_file_compilation _language _target _targetScript _pre
 endfunction()
 
 function (cotire_setup_pch_file_inclusion _language _target _wholeTarget _prefixFile _pchFile _hostFile)
-	if (CMAKE_${_language}_COMPILER_ID MATCHES "MSVC|Intel")
+	if (CMAKE_${_language}_COMPILER_ID MATCHES "MSVC|Intel" AND NOT "${CMAKE_GENERATOR}" MATCHES "Make|Ninja")
 		# for Visual Studio and Intel, we include the precompiled header in all but the host file
 		# the host file does the precompiled header compilation, see cotire_setup_pch_file_compilation
 		set (_sourceFiles ${ARGN})
@@ -2454,9 +2482,9 @@ function (cotire_setup_target_pch_usage _languages _target _wholeTarget)
 		# if this is a single-language target without any excluded files
 		if (_wholeTarget)
 			set (_language "${_languages}")
-			# for Visual Studio and Intel, precompiled header inclusion is always done on the source file level
+			# for Intel, precompiled header inclusion is always done on the source file level
 			# see cotire_setup_pch_file_inclusion
-			if (NOT CMAKE_${_language}_COMPILER_ID MATCHES "MSVC|Intel")
+			if (NOT CMAKE_${_language}_COMPILER_ID MATCHES "Intel")
 				get_property(_prefixFile TARGET ${_target} PROPERTY COTIRE_${_language}_PREFIX_HEADER)
 				if (_prefixFile)
 					get_property(_pchFile TARGET ${_target} PROPERTY COTIRE_${_language}_PRECOMPILED_HEADER)
@@ -2883,6 +2911,16 @@ function (cotire_process_target_language _language _configurations _target _whol
 		if (_targetUsePCH)
 			cotire_make_pch_file_path(${_language} ${_target} _pchFile)
 			if (_pchFile)
+				if (CMAKE_${_language}_COMPILER_ID MATCHES "MSVC" AND "${CMAKE_GENERATOR}" MATCHES "Make|Ninja")
+					# use stub file to link in precompiled header
+					string (REGEX REPLACE "\\.[^.]*$" "_stub.cxx" _stubFile "${_prefixFile}")
+					file (WRITE "${_stubFile}" "#include \"${_prefixFile}\"")
+					list (INSERT _sourceFiles 0 "${_stubFile}")
+					string (REGEX REPLACE "\\.[^.]*$" ".obj" _stubObjFile "${_stubFile}")
+					set_property (SOURCE "${_stubObjFile}" PROPERTY GENERATED TRUE)
+					target_sources (${_target} PRIVATE "${_stubObjFile}")
+					set_property(TARGET ${_target} PROPERTY COTIRE_${_language}_STUB_OBJECT "${_stubObjFile}")
+				endif()
 				# first file in _sourceFiles is passed as the host file
 				cotire_setup_pch_file_compilation(
 					${_language} ${_target} "${_targetConfigScript}" "${_prefixFile}" "${_pchFile}" ${_sourceFiles})
@@ -2970,6 +3008,11 @@ function (cotire_collect_unity_target_sources _target _languages _unityTargetSou
 			cotire_filter_language_source_files(${_language} ${_target} _sourceFiles _excludedSources _cotiredSources ${_targetSourceFiles})
 			if (_sourceFiles OR _cotiredSources)
 				list (REMOVE_ITEM _unityTargetSources ${_sourceFiles} ${_cotiredSources})
+			endif()
+			if (CMAKE_${_language}_COMPILER_ID MATCHES "MSVC" AND "${CMAKE_GENERATOR}" MATCHES "Make|Ninja")
+				# remove pch stub object file
+				get_property(_stubObjFile TARGET ${_target} PROPERTY COTIRE_${_language}_STUB_OBJECT)
+				list (REMOVE_ITEM _unityTargetSources "${_stubObjFile}")
 			endif()
 			# add unity source files instead
 			list (APPEND _unityTargetSources ${_unityFiles})
